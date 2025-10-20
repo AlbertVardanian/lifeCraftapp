@@ -311,6 +311,62 @@
             border-radius: 8px;
             z-index: 1000;
         }
+
+        .mode-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--tg-theme-secondary-bg-color);
+            padding-bottom: 8px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .mode-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .learned-words-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .learned-word-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .learned-word-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-results {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .test-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+
+        .test-accuracy {
+            font-size: 18px;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -363,16 +419,18 @@
             <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
-            <div class="card">
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <button class="btn btn-primary" onclick="setWordMode('cards')" id="cards-btn">Карточки</button>
-                    <button class="btn" onclick="setWordMode('test')" id="test-btn">Тест</button>
-                </div>
-                <div>Прогресс: <span id="words-progress">0%</span></div>
+            <div class="mode-tabs">
+                <div class="mode-tab active" onclick="setWordMode('cards')">Карточки</div>
+                <div class="mode-tab" onclick="setWordMode('test')">Тест</div>
+                <div class="mode-tab" onclick="setWordMode('learned')">Изученные слова</div>
             </div>
 
             <!-- Режим карточек -->
             <div id="cards-mode">
+                <div class="card">
+                    <div>Прогресс: <span id="words-progress">0%</span></div>
+                </div>
+
                 <div class="card word-card">
                     <div class="word-original" id="current-word">Загрузка...</div>
                     <div class="word-translation" id="current-translation" style="display: none;"></div>
@@ -387,10 +445,35 @@
 
             <!-- Режим теста -->
             <div id="test-mode" style="display: none;">
+                <div class="card">
+                    <div>Тест на знание изученных слов</div>
+                    <div>Вопрос: <span id="test-progress">1/10</span></div>
+                </div>
+
                 <div class="card word-card">
                     <div class="word-original" id="test-word">Слово</div>
                     <div class="test-options" id="test-options">
                         <!-- Варианты появятся здесь -->
+                    </div>
+                </div>
+
+                <div id="test-results" style="display: none;">
+                    <div class="card test-results">
+                        <div class="test-score" id="test-score">0%</div>
+                        <div class="test-accuracy" id="test-accuracy">Правильно: 0/10</div>
+                        <button class="btn btn-primary" onclick="startNewTest()" style="width: 100%;">
+                            Пройти тест еще раз
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Режим изученных слов -->
+            <div id="learned-mode" style="display: none;">
+                <div class="card">
+                    <div class="section-title">Изученные слова</div>
+                    <div class="learned-words-list" id="learned-words-list">
+                        <!-- Слова появятся здесь -->
                     </div>
                 </div>
             </div>
@@ -500,7 +583,6 @@
             });
             document.getElementById(screenId).classList.add('active');
             
-            // Скрываем игру мемори при переходе на другой экран
             if (screenId !== 'games-screen') {
                 document.getElementById('memory-game').style.display = 'none';
                 document.getElementById('games-screen').querySelector('.card').style.display = 'block';
@@ -538,6 +620,10 @@
         let wordsData = [];
         let currentWordIndex = 0;
         let wordMode = 'cards';
+        let testWords = [];
+        let currentTestQuestion = 0;
+        let testScore = 0;
+        let totalTestQuestions = 10;
 
         function initWordMaster() {
             if (!localStorage.getItem('lifecraft_words')) {
@@ -548,7 +634,9 @@
                     ["car", "машина"], ["bus", "автобус"], ["train", "поезд"], ["plane", "самолет"],
                     ["school", "школа"], ["work", "работа"], ["friend", "друг"], ["family", "семья"],
                     ["time", "время"], ["day", "день"], ["night", "ночь"], ["week", "неделя"],
-                    ["month", "месяц"], ["year", "год"], ["city", "город"], ["country", "страна"]
+                    ["month", "месяц"], ["year", "год"], ["city", "город"], ["country", "страна"],
+                    ["hello", "привет"], ["goodbye", "до свидания"], ["please", "пожалуйста"], ["thank you", "спасибо"],
+                    ["yes", "да"], ["no", "нет"], ["sorry", "извините"], ["help", "помощь"]
                 ].map(([en, ru], index) => ({
                     id: index + 1,
                     original: en,
@@ -567,16 +655,26 @@
         function setWordMode(mode) {
             wordMode = mode;
             
-            document.getElementById('cards-mode').style.display = mode === 'cards' ? 'block' : 'none';
-            document.getElementById('test-mode').style.display = mode === 'test' ? 'block' : 'none';
+            // Скрываем все режимы
+            document.getElementById('cards-mode').style.display = 'none';
+            document.getElementById('test-mode').style.display = 'none';
+            document.getElementById('learned-mode').style.display = 'none';
             
-            document.getElementById('cards-btn').className = mode === 'cards' ? 'btn btn-primary' : 'btn';
-            document.getElementById('test-btn').className = mode === 'test' ? 'btn btn-primary' : 'btn';
+            // Показываем выбранный режим
+            document.getElementById(mode + '-mode').style.display = 'block';
+            
+            // Обновляем активные табы
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
             
             if (mode === 'cards') {
                 showNextWord();
-            } else {
-                generateTest();
+            } else if (mode === 'test') {
+                startNewTest();
+            } else if (mode === 'learned') {
+                showLearnedWords();
             }
         }
 
@@ -612,22 +710,41 @@
             showNextWord();
         }
 
-        function generateTest() {
-            if (wordsData.length < 4) return;
+        function startNewTest() {
+            const learnedWords = wordsData.filter(word => word.learned);
             
-            // Находим невыученное слово
-            let questionWord;
-            const unlearnedWords = wordsData.filter(word => !word.learned);
-            if (unlearnedWords.length === 0) {
-                showNotification('Все слова изучены!');
+            if (learnedWords.length < 4) {
+                showNotification('Изучите хотя бы 4 слова для прохождения теста!');
+                setWordMode('cards');
                 return;
             }
             
-            questionWord = unlearnedWords[Math.floor(Math.random() * unlearnedWords.length)];
-            currentWordIndex = wordsData.findIndex(word => word.id === questionWord.id);
+            // Выбираем слова для теста
+            testWords = learnedWords
+                .sort(() => Math.random() - 0.5)
+                .slice(0, totalTestQuestions);
+            
+            currentTestQuestion = 0;
+            testScore = 0;
+            
+            document.getElementById('test-results').style.display = 'none';
+            document.getElementById('test-word').style.display = 'block';
+            document.getElementById('test-options').style.display = 'block';
+            
+            showTestQuestion();
+        }
+
+        function showTestQuestion() {
+            if (currentTestQuestion >= testWords.length) {
+                showTestResults();
+                return;
+            }
+            
+            const questionWord = testWords[currentTestQuestion];
+            const learnedWords = wordsData.filter(word => word.learned);
             
             // Создаем варианты ответов
-            const otherWords = wordsData
+            const otherWords = learnedWords
                 .filter(word => word.id !== questionWord.id)
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 3);
@@ -635,6 +752,7 @@
             const options = [questionWord, ...otherWords].sort(() => Math.random() - 0.5);
             
             document.getElementById('test-word').textContent = questionWord.original;
+            document.getElementById('test-progress').textContent = `${currentTestQuestion + 1}/${totalTestQuestions}`;
             
             const optionsContainer = document.getElementById('test-options');
             optionsContainer.innerHTML = '';
@@ -649,18 +767,72 @@
         }
 
         function checkTestAnswer(isCorrect, element) {
+            // Блокируем все варианты
+            document.querySelectorAll('.test-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
             if (isCorrect) {
                 element.classList.add('correct');
+                testScore++;
                 showNotification('✅ Правильно!');
-                markWordAsKnown();
             } else {
                 element.classList.add('incorrect');
                 showNotification('❌ Неправильно!');
+                
+                // Показываем правильный ответ
+                document.querySelectorAll('.test-option').forEach(opt => {
+                    if (opt.textContent === testWords[currentTestQuestion].translation) {
+                        opt.classList.add('correct');
+                    }
+                });
             }
             
             setTimeout(() => {
-                generateTest();
-            }, 1000);
+                currentTestQuestion++;
+                showTestQuestion();
+            }, 1500);
+        }
+
+        function showTestResults() {
+            document.getElementById('test-word').style.display = 'none';
+            document.getElementById('test-options').style.display = 'none';
+            document.getElementById('test-results').style.display = 'block';
+            
+            const accuracy = Math.round((testScore / totalTestQuestions) * 100);
+            document.getElementById('test-score').textContent = accuracy + '%';
+            document.getElementById('test-accuracy').textContent = `Правильно: ${testScore}/${totalTestQuestions}`;
+            
+            // Награда за тест
+            if (testScore >= 8) {
+                addExperience(25);
+                showNotification('🎉 Отличный результат! +25 XP');
+            } else if (testScore >= 5) {
+                addExperience(15);
+                showNotification('👍 Хороший результат! +15 XP');
+            } else {
+                addExperience(5);
+                showNotification('💪 Продолжайте учиться! +5 XP');
+            }
+        }
+
+        function showLearnedWords() {
+            const learnedWords = wordsData.filter(word => word.learned);
+            const learnedList = document.getElementById('learned-words-list');
+            
+            if (learnedWords.length === 0) {
+                learnedList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--tg-theme-hint-color);">Вы еще не изучили ни одного слова</div>';
+                return;
+            }
+            
+            learnedList.innerHTML = learnedWords.map(word => `
+                <div class="learned-word-item">
+                    <div>
+                        <div style="font-weight: bold;">${word.original}</div>
+                        <div style="font-size: 14px; color: var(--tg-theme-hint-color);">${word.translation}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function updateWordStats() {
@@ -682,7 +854,6 @@
             let habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
             const today = new Date().toDateString();
             
-            // Если нет привычек, создаем демо
             if (habits.length === 0) {
                 habits = [
                     {
@@ -721,17 +892,12 @@
             
             if (habit) {
                 if (habit.history[today]) {
-                    // Отмечаем как невыполненное
                     delete habit.history[today];
                     showNotification('Привычка отменена');
                 } else {
-                    // Отмечаем как выполненное
                     habit.history[today] = true;
                     addExperience(10);
                     showNotification('Привычка выполнена! +10 XP');
-                    
-                    // Отправляем уведомление в Telegram
-                    sendTelegramNotification(`✅ Выполнена привычка: ${habit.name}`);
                 }
                 
                 localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
@@ -768,11 +934,6 @@
             }
         }
 
-        function sendTelegramNotification(message) {
-            // В реальном приложении здесь будет отправка через Bot API
-            console.log('Telegram notification:', message);
-        }
-
         // ===== BRAINGAMES =====
         let memoryCards = [];
         let flippedCards = [];
@@ -782,7 +943,6 @@
             document.getElementById('games-screen').querySelector('.card').style.display = 'none';
             document.getElementById('memory-game').style.display = 'block';
             
-            // Создаем карточки
             const symbols = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
             memoryCards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
             flippedCards = [];
@@ -903,7 +1063,6 @@
                 
                 const user = tg.initDataUnsafe?.user;
                 if (user) {
-                    // ИСПРАВЛЕНО: правильное отображение имени
                     const displayName = user.first_name || user.username || 'Пользователь';
                     document.getElementById('user-name').textContent = displayName;
                     document.getElementById('user-avatar').textContent = displayName.charAt(0).toUpperCase();
@@ -925,7 +1084,6 @@
             initRegistration();
         });
 
-        // Эмуляция Telegram WebApp
         if (!window.Telegram) {
             window.Telegram = {
                 WebApp: {
