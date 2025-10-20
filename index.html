@@ -708,7 +708,7 @@
         <div class="nav-header">
             <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
             <div class="section-title">HabitTracker</div>
-                    <div style="width: 40px;"></div>
+            <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
             <div class="card">
@@ -893,7 +893,7 @@
                         <div class="test-accuracy" id="math-test-accuracy">Правильно: 0/10</div>
                         <button class="btn btn-primary" id="restart-math-test-btn">Пройти тест еще раз</button>
                     </div>
-                </div>
+            </div>
             </div>
 
             <!-- Режим теории -->
@@ -1766,8 +1766,9 @@
                 
                 const user = tg.initDataUnsafe?.user;
                 if (user) {
-                    const displayName = user.first_name || user.username || 'Пользователь';
-                    document.getElementById('user-name').textContent = displayName;
+                    // Используем username вместо first_name
+                    const displayName = user.username || user.first_name || 'Пользователь';
+                    document.getElementById('user-name').textContent = '@' + displayName;
                     document.getElementById('user-avatar').textContent = displayName.charAt(0).toUpperCase();
                     
                     const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
@@ -1838,7 +1839,7 @@
                         user: {
                             id: 123456,
                             first_name: "Иван",
-                            username: "ivan_user"
+                            username: "super_user"  // Теперь покажет @super_user
                         }
                     },
                     expand: function() {},
