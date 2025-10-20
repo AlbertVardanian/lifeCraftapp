@@ -111,6 +111,11 @@
             padding: 20px;
             text-align: center;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .module-card:active {
+            transform: scale(0.95);
         }
 
         .module-icon {
@@ -189,6 +194,11 @@
             font-size: 16px;
             cursor: pointer;
             text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .btn-primary {
@@ -225,6 +235,11 @@
             background: var(--tg-theme-bg-color);
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s;
+        }
+
+        .test-option:active {
+            transform: scale(0.98);
         }
 
         .test-option.correct {
@@ -286,14 +301,18 @@
             padding: 12px 20px;
             border-radius: 8px;
             z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
         }
 
         .mode-tabs {
             display: flex;
             gap: 8px;
             margin-bottom: 16px;
-            border-bottom: 2px solid var(--tg-theme-secondary-bg-color);
-            padding-bottom: 8px;
         }
 
         .mode-tab {
@@ -302,6 +321,12 @@
             text-align: center;
             cursor: pointer;
             border-radius: 8px;
+            background: var(--tg-theme-secondary-bg-color);
+            transition: background-color 0.2s;
+        }
+
+        .mode-tab:active {
+            transform: scale(0.95);
         }
 
         .mode-tab.active {
@@ -357,6 +382,11 @@
             cursor: pointer;
             border-radius: 8px;
             background: var(--tg-theme-secondary-bg-color);
+            transition: background-color 0.2s;
+        }
+
+        .math-tab:active {
+            transform: scale(0.95);
         }
 
         .math-tab.active {
@@ -407,6 +437,19 @@
             gap: 8px;
         }
 
+        .habit-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .habit-btn:active {
+            transform: scale(0.95);
+        }
+
         /* Змейка */
         #snake-game {
             text-align: center;
@@ -439,6 +482,11 @@
             border-radius: 8px;
             font-size: 18px;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .snake-btn:active {
+            transform: scale(0.95);
         }
 
         .snake-btn:disabled {
@@ -450,6 +498,12 @@
             display: flex;
             justify-content: space-around;
             margin: 16px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--tg-theme-hint-color);
         }
     </style>
 </head>
@@ -481,7 +535,7 @@
                     <div class="module-title">HabitTracker</div>
                     <div class="module-desc">Отслеживание привычек</div>
                 </div>
-                <div class="module-card" onclick="showScreen('games-screen'); initGames();">
+                <div class="module-card" onclick="showScreen('games-screen');">
                     <div class="module-icon">🎮</div>
                     <div class="module-title">BrainGames</div>
                     <div class="module-desc">Тренировка мозга</div>
@@ -504,9 +558,9 @@
         </div>
         <div class="module-content">
             <div class="mode-tabs">
-                <div class="mode-tab active" onclick="setWordMode('cards')">Карточки</div>
-                <div class="mode-tab" onclick="setWordMode('test')">Тест</div>
-                <div class="mode-tab" onclick="setWordMode('learned')">Изученные</div>
+                <div class="mode-tab active" data-mode="cards">Карточки</div>
+                <div class="mode-tab" data-mode="test">Тест</div>
+                <div class="mode-tab" data-mode="learned">Изученные</div>
             </div>
 
             <!-- Режим карточек -->
@@ -521,9 +575,9 @@
                 </div>
 
                 <div class="buttons-row">
-                    <button class="btn btn-danger" onclick="markWordAsHard()">Сложно</button>
-                    <button class="btn btn-primary" onclick="showTranslation()">Показать</button>
-                    <button class="btn btn-success" onclick="markWordAsKnown()">Знаю</button>
+                    <button class="btn btn-danger" id="hard-btn">Сложно</button>
+                    <button class="btn btn-primary" id="show-btn">Показать</button>
+                    <button class="btn btn-success" id="know-btn">Знаю</button>
                 </div>
             </div>
 
@@ -536,18 +590,14 @@
 
                 <div class="card word-card">
                     <div class="word-original" id="test-word">Слово</div>
-                    <div class="test-options" id="test-options">
-                        <!-- Варианты появятся здесь -->
-                    </div>
+                    <div class="test-options" id="test-options"></div>
                 </div>
 
                 <div id="test-results" style="display: none;">
                     <div class="card test-results">
                         <div class="test-score" id="test-score">0%</div>
                         <div class="test-accuracy" id="test-accuracy">Правильно: 0/10</div>
-                        <button class="btn btn-primary" onclick="startNewTest()" style="width: 100%;">
-                            Пройти тест еще раз
-                        </button>
+                        <button class="btn btn-primary" id="restart-test-btn">Пройти тест еще раз</button>
                     </div>
                 </div>
             </div>
@@ -556,9 +606,7 @@
             <div id="learned-mode" style="display: none;">
                 <div class="card">
                     <div class="section-title">Изученные слова</div>
-                    <div class="learned-words-list" id="learned-words-list">
-                        <!-- Слова появятся здесь -->
-                    </div>
+                    <div class="learned-words-list" id="learned-words-list"></div>
                 </div>
             </div>
 
@@ -587,10 +635,8 @@
         <div class="module-content">
             <div class="card">
                 <div class="section-title">Мои привычки</div>
-                <div id="habits-list">
-                    <!-- Привычки появятся здесь -->
-                </div>
-                <button class="btn btn-primary" onclick="addNewHabit()" style="margin-top: 16px; width: 100%;">
+                <div id="habits-list"></div>
+                <button class="btn btn-primary" id="add-habit-btn" style="margin-top: 16px; width: 100%;">
                     + Добавить привычку
                 </button>
             </div>
@@ -619,7 +665,7 @@
             <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
-            <div class="game-card card" onclick="startSnakeGame()">
+            <div class="card game-card" onclick="startSnakeGame()">
                 <div style="text-align: center;">
                     <div style="font-size: 24px; margin-bottom: 8px;">🐍</div>
                     <div style="font-weight: bold;">Змейка</div>
@@ -627,7 +673,7 @@
                 </div>
             </div>
 
-            <div class="game-card card" onclick="startReactionGame()">
+            <div class="card game-card" onclick="startReactionGame()">
                 <div style="text-align: center;">
                     <div style="font-size: 24px; margin-bottom: 8px;">🎯</div>
                     <div style="font-weight: bold;">Реакция</div>
@@ -696,9 +742,9 @@
         </div>
         <div class="module-content">
             <div class="math-tabs">
-                <div class="math-tab active" onclick="setMathMode('practice')">Практика</div>
-                <div class="math-tab" onclick="setMathMode('test')">Тест</div>
-                <div class="math-tab" onclick="setMathMode('theory')">Теория</div>
+                <div class="math-tab active" data-mode="practice">Практика</div>
+                <div class="math-tab" data-mode="test">Тест</div>
+                <div class="math-tab" data-mode="theory">Теория</div>
             </div>
 
             <!-- Режим практики -->
@@ -706,9 +752,7 @@
                 <div class="card">
                     <div class="math-problem" id="math-problem">5 + 3 = ?</div>
                     <input type="number" class="answer-input" id="math-answer" placeholder="Введите ответ">
-                    <button class="btn btn-primary" onclick="checkMathAnswer()" style="width: 100%;">
-                        Проверить
-                    </button>
+                    <button class="btn btn-primary" id="check-math-btn">Проверить</button>
                 </div>
 
                 <div class="card">
@@ -735,18 +779,14 @@
                 <div class="card">
                     <div class="math-problem" id="math-test-problem">5 + 3 = ?</div>
                     <input type="number" class="answer-input" id="math-test-answer" placeholder="Введите ответ">
-                    <button class="btn btn-primary" onclick="checkMathTestAnswer()" style="width: 100%;">
-                        Ответить
-                    </button>
+                    <button class="btn btn-primary" id="check-math-test-btn">Ответить</button>
                 </div>
 
                 <div id="math-test-results" style="display: none;">
                     <div class="card test-results">
                         <div class="test-score" id="math-test-score">0%</div>
                         <div class="test-accuracy" id="math-test-accuracy">Правильно: 0/10</div>
-                        <button class="btn btn-primary" onclick="startNewMathTest()" style="width: 100%;">
-                            Пройти тест еще раз
-                        </button>
+                        <button class="btn btn-primary" id="restart-math-test-btn">Пройти тест еще раз</button>
                     </div>
                 </div>
             </div>
@@ -780,22 +820,6 @@
                             <em>Пример:</em> 12 ÷ 3 = 4<br>
                             <small>Деление - это обратная операция к умножению.</small>
                         </div>
-
-                        <h3>📐 Порядок операций</h3>
-                        <p>1. Скобки () - сначала выполняем операции в скобках</p>
-                        <p>2. Умножение и деление - слева направо</p>
-                        <p>3. Сложение и вычитание - слева направо</p>
-
-                        <div class="example">
-                            <strong>Пример:</strong> 2 + 3 × 4 = ?<br>
-                            <em>Решение:</em> Сначала умножение: 3 × 4 = 12, затем сложение: 2 + 12 = 14
-                        </div>
-
-                        <h3>🎯 Советы для решения</h3>
-                        <p>• Внимательно читайте условие</p>
-                        <p>• Проверяйте вычисления</p>
-                        <p>• Тренируйтесь регулярно</p>
-                        <p>• Используйте черновик для сложных примеров</p>
                     </div>
                 </div>
             </div>
@@ -818,7 +842,6 @@
         function hideAllGames() {
             document.getElementById('snake-game').style.display = 'none';
             document.getElementById('reaction-game').style.display = 'none';
-            // Останавливаем змейку при скрытии
             if (window.snakeGameInterval) {
                 clearInterval(window.snakeGameInterval);
                 window.snakeGameInterval = null;
@@ -866,7 +889,15 @@
                 wordsData = [
                     ["apple", "яблоко"], ["book", "книга"], ["cat", "кот"], ["dog", "собака"],
                     ["house", "дом"], ["water", "вода"], ["food", "еда"], ["sun", "солнце"],
-                    // ... (остальные 150+ слов из предыдущего кода)
+                    ["moon", "луна"], ["star", "звезда"], ["tree", "дерево"], ["flower", "цветок"],
+                    ["car", "машина"], ["bus", "автобус"], ["train", "поезд"], ["plane", "самолет"],
+                    ["school", "школа"], ["work", "работа"], ["friend", "друг"], ["family", "семья"],
+                    ["time", "время"], ["day", "день"], ["night", "ночь"], ["week", "неделя"],
+                    ["month", "месяц"], ["year", "год"], ["city", "город"], ["country", "страна"],
+                    ["hello", "привет"], ["goodbye", "до свидания"], ["please", "пожалуйста"], ["thank you", "спасибо"],
+                    ["yes", "да"], ["no", "нет"], ["sorry", "извините"], ["help", "помощь"],
+                    ["computer", "компьютер"], ["phone", "телефон"], ["internet", "интернет"],
+                    ["music", "музыка"], ["movie", "фильм"], ["game", "игра"], ["sport", "спорт"]
                 ].map(([en, ru], index) => ({
                     id: index + 1,
                     original: en,
@@ -882,7 +913,175 @@
             updateWordStats();
         }
 
-        // ... (функции WordMaster остаются такими же)
+        function setWordMode(mode) {
+            wordMode = mode;
+            
+            document.getElementById('cards-mode').style.display = 'none';
+            document.getElementById('test-mode').style.display = 'none';
+            document.getElementById('learned-mode').style.display = 'none';
+            
+            document.getElementById(mode + '-mode').style.display = 'block';
+            
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (mode === 'cards') {
+                showNextWord();
+            } else if (mode === 'test') {
+                startNewTest();
+            } else if (mode === 'learned') {
+                showLearnedWords();
+            }
+        }
+
+        function showNextWord() {
+            if (wordsData.length === 0) return;
+            
+            for (let i = 0; i < wordsData.length; i++) {
+                currentWordIndex = (currentWordIndex + 1) % wordsData.length;
+                if (!wordsData[currentWordIndex].learned) break;
+            }
+            
+            const word = wordsData[currentWordIndex];
+            document.getElementById('current-word').textContent = word.original;
+            document.getElementById('current-translation').textContent = word.translation;
+            document.getElementById('current-translation').style.display = 'none';
+        }
+
+        function showTranslation() {
+            document.getElementById('current-translation').style.display = 'block';
+        }
+
+        function markWordAsKnown() {
+            wordsData[currentWordIndex].learned = true;
+            localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+            addExperience(5);
+            showNextWord();
+            updateWordStats();
+        }
+
+        function markWordAsHard() {
+            addExperience(1);
+            showNextWord();
+        }
+
+        function startNewTest() {
+            const learnedWords = wordsData.filter(word => word.learned);
+            
+            if (learnedWords.length < 10) {
+                showNotification('Изучите хотя бы 10 слов для прохождения теста!');
+                setWordMode('cards');
+                return;
+            }
+            
+            testWords = learnedWords.sort(() => Math.random() - 0.5).slice(0, totalTestQuestions);
+            currentTestQuestion = 0;
+            testScore = 0;
+            
+            document.getElementById('test-results').style.display = 'none';
+            showTestQuestion();
+        }
+
+        function showTestQuestion() {
+            if (currentTestQuestion >= testWords.length) {
+                showTestResults();
+                return;
+            }
+            
+            const questionWord = testWords[currentTestQuestion];
+            const learnedWords = wordsData.filter(word => word.learned);
+            const otherWords = learnedWords
+                .filter(word => word.id !== questionWord.id)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const options = [questionWord, ...otherWords].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('test-word').textContent = questionWord.original;
+            document.getElementById('test-progress').textContent = `${currentTestQuestion + 1}/${totalTestQuestions}`;
+            
+            const optionsContainer = document.getElementById('test-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach((word) => {
+                const option = document.createElement('div');
+                option.className = 'test-option';
+                option.textContent = word.translation;
+                option.onclick = () => checkTestAnswer(word.id === questionWord.id, option);
+                optionsContainer.appendChild(option);
+            });
+        }
+
+        function checkTestAnswer(isCorrect, element) {
+            document.querySelectorAll('.test-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                testScore++;
+                showNotification('✅ Правильно!');
+            } else {
+                element.classList.add('incorrect');
+                showNotification('❌ Неправильно!');
+                
+                document.querySelectorAll('.test-option').forEach(opt => {
+                    if (opt.textContent === testWords[currentTestQuestion].translation) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            setTimeout(() => {
+                currentTestQuestion++;
+                showTestQuestion();
+            }, 1500);
+        }
+
+        function showTestResults() {
+            document.getElementById('test-results').style.display = 'block';
+            const accuracy = Math.round((testScore / totalTestQuestions) * 100);
+            document.getElementById('test-score').textContent = accuracy + '%';
+            document.getElementById('test-accuracy').textContent = `Правильно: ${testScore}/${totalTestQuestions}`;
+            
+            if (testScore >= 8) {
+                addExperience(25);
+            } else if (testScore >= 5) {
+                addExperience(15);
+            } else {
+                addExperience(5);
+            }
+        }
+
+        function showLearnedWords() {
+            const learnedWords = wordsData.filter(word => word.learned);
+            const learnedList = document.getElementById('learned-words-list');
+            
+            if (learnedWords.length === 0) {
+                learnedList.innerHTML = '<div class="empty-state">Вы еще не изучили ни одного слова</div>';
+                return;
+            }
+            
+            learnedList.innerHTML = learnedWords.map(word => `
+                <div class="learned-word-item">
+                    <div>
+                        <div style="font-weight: bold;">${word.original}</div>
+                        <div style="font-size: 14px; color: var(--tg-theme-hint-color);">${word.translation}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateWordStats() {
+            const learnedWords = wordsData.filter(word => word.learned).length;
+            const totalWords = wordsData.length;
+            const progress = Math.round((learnedWords / totalWords) * 100);
+            
+            document.getElementById('words-learned').textContent = learnedWords;
+            document.getElementById('words-progress').textContent = progress + '%';
+        }
 
         // ===== HABITTRACKER =====
         function initHabitTracker() {
@@ -897,7 +1096,7 @@
             habitsList.innerHTML = '';
 
             if (habits.length === 0) {
-                habitsList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--tg-theme-hint-color);">Добавьте свою первую привычку</div>';
+                habitsList.innerHTML = '<div class="empty-state">Добавьте свою первую привычку</div>';
             } else {
                 habits.forEach(habit => {
                     const completed = habit.history && habit.history[today];
@@ -911,11 +1110,11 @@
                             </div>
                         </div>
                         <div class="habit-actions">
-                            <button class="btn ${completed ? 'btn-success' : 'btn-primary'}" 
+                            <button class="habit-btn ${completed ? 'btn-success' : 'btn-primary'}" 
                                     onclick="toggleHabit('${habit.id}')">
                                 ${completed ? '✅' : '⏳'}
                             </button>
-                            <button class="btn btn-danger" onclick="deleteHabit('${habit.id}')">
+                            <button class="habit-btn btn-danger" onclick="deleteHabit('${habit.id}')">
                                 🗑️
                             </button>
                         </div>
@@ -992,11 +1191,6 @@
         }
 
         // ===== BRAINGAMES =====
-        function initGames() {
-            // Инициализация игр
-        }
-
-        // Змейка
         let snake = [];
         let food = {};
         let direction = 'right';
@@ -1011,7 +1205,6 @@
             const canvas = document.getElementById('snake-canvas');
             const ctx = canvas.getContext('2d');
             
-            // Инициализация змейки
             snake = [
                 {x: 10, y: 10},
                 {x: 9, y: 10},
@@ -1038,7 +1231,6 @@
         }
 
         function gameUpdate(ctx, canvas) {
-            // Двигаем змейку
             const head = {x: snake[0].x, y: snake[0].y};
             
             switch(direction) {
@@ -1048,13 +1240,11 @@
                 case 'right': head.x++; break;
             }
             
-            // Проверка столкновения со стеной
             if (head.x < 0 || head.x >= canvas.width/10 || head.y < 0 || head.y >= canvas.height/10) {
                 gameOver();
                 return;
             }
             
-            // Проверка столкновения с собой
             for (let segment of snake) {
                 if (head.x === segment.x && head.y === segment.y) {
                     gameOver();
@@ -1064,7 +1254,6 @@
             
             snake.unshift(head);
             
-            // Проверка поедания еды
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 document.getElementById('snake-score').textContent = score;
@@ -1074,29 +1263,20 @@
                 snake.pop();
             }
             
-            // Отрисовка
             ctx.fillStyle = 'var(--tg-theme-bg-color)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Отрисовка змейки
             ctx.fillStyle = 'var(--primary-color)';
             for (let segment of snake) {
                 ctx.fillRect(segment.x * 10, segment.y * 10, 9, 9);
             }
             
-            // Отрисовка еды
             ctx.fillStyle = 'var(--success-color)';
             ctx.fillRect(food.x * 10, food.y * 10, 9, 9);
         }
 
         function changeSnakeDirection(newDirection) {
-            const opposites = {
-                'up': 'down',
-                'down': 'up', 
-                'left': 'right',
-                'right': 'left'
-            };
-            
+            const opposites = {'up': 'down', 'down': 'up', 'left': 'right', 'right': 'left'};
             if (opposites[newDirection] !== direction) {
                 direction = newDirection;
             }
@@ -1130,7 +1310,6 @@
             }
         }
 
-        // Реакция (остается без изменений)
         let reactionStartTime;
         let bestReactionTime = localStorage.getItem('best_reaction_time') || 9999;
 
@@ -1151,9 +1330,154 @@
         }
 
         // ===== MATHGYM =====
-        // ... (функции MathGym остаются без изменений)
+        let mathScore = 0;
+        let mathTotal = 0;
+        let mathMode = 'practice';
+        let mathTestScore = 0;
+        let currentMathTestQuestion = 0;
+        let mathTestQuestions = [];
 
-        // ===== РЕГИСТРАЦИЯ =====
+        function initMathGym() {
+            setMathMode('practice');
+        }
+
+        function setMathMode(mode) {
+            mathMode = mode;
+            
+            document.getElementById('math-practice').style.display = 'none';
+            document.getElementById('math-test').style.display = 'none';
+            document.getElementById('math-theory').style.display = 'none';
+            
+            document.getElementById('math-' + mode).style.display = 'block';
+            
+            document.querySelectorAll('.math-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (mode === 'practice') {
+                generateMathProblem();
+            } else if (mode === 'test') {
+                startNewMathTest();
+            }
+        }
+
+        function generateMathProblem() {
+            const a = Math.floor(Math.random() * 20) + 1;
+            const b = Math.floor(Math.random() * 20) + 1;
+            const operators = ['+', '-', '×'];
+            const operator = operators[Math.floor(Math.random() * operators.length)];
+            
+            let answer;
+            switch (operator) {
+                case '+': answer = a + b; break;
+                case '-': answer = a - b; break;
+                case '×': answer = a * b; break;
+            }
+            
+            document.getElementById('math-problem').textContent = `${a} ${operator} ${b} = ?`;
+            document.getElementById('math-problem').dataset.answer = answer;
+            document.getElementById('math-answer').value = '';
+        }
+
+        function checkMathAnswer() {
+            const userAnswer = parseInt(document.getElementById('math-answer').value);
+            const correctAnswer = parseInt(document.getElementById('math-problem').dataset.answer);
+            
+            if (userAnswer === correctAnswer) {
+                mathScore++;
+                addExperience(3);
+                showNotification('✅ Правильно! +3 XP');
+            } else {
+                showNotification(`❌ Неправильно! Правильный ответ: ${correctAnswer}`);
+            }
+            
+            mathTotal++;
+            
+            if (mathTotal >= 10) {
+                const accuracy = Math.round((mathScore / 10) * 100);
+                showNotification(`🎯 Результат: ${mathScore}/10 (${accuracy}%)`);
+                if (mathScore >= 8) addExperience(20);
+                mathScore = 0;
+                mathTotal = 0;
+            }
+            
+            updateMathStats();
+            generateMathProblem();
+        }
+
+        function updateMathStats() {
+            document.getElementById('math-correct').textContent = mathScore;
+            document.getElementById('math-total').textContent = mathTotal;
+        }
+
+        function startNewMathTest() {
+            mathTestQuestions = [];
+            for (let i = 0; i < 10; i++) {
+                const a = Math.floor(Math.random() * 20) + 1;
+                const b = Math.floor(Math.random() * 20) + 1;
+                const operators = ['+', '-', '×'];
+                const operator = operators[Math.floor(Math.random() * operators.length)];
+                
+                let answer;
+                switch (operator) {
+                    case '+': answer = a + b; break;
+                    case '-': answer = a - b; break;
+                    case '×': answer = a * b; break;
+                }
+                
+                mathTestQuestions.push({problem: `${a} ${operator} ${b} = ?`, answer: answer});
+            }
+            
+            currentMathTestQuestion = 0;
+            mathTestScore = 0;
+            document.getElementById('math-test-results').style.display = 'none';
+            showMathTestQuestion();
+        }
+
+        function showMathTestQuestion() {
+            if (currentMathTestQuestion >= mathTestQuestions.length) {
+                showMathTestResults();
+                return;
+            }
+            
+            const question = mathTestQuestions[currentMathTestQuestion];
+            document.getElementById('math-test-problem').textContent = question.problem;
+            document.getElementById('math-test-answer').value = '';
+            document.getElementById('math-test-progress').textContent = `${currentMathTestQuestion + 1}/10`;
+        }
+
+        function checkMathTestAnswer() {
+            const userAnswer = parseInt(document.getElementById('math-test-answer').value);
+            const correctAnswer = mathTestQuestions[currentMathTestQuestion].answer;
+            
+            if (userAnswer === correctAnswer) {
+                mathTestScore++;
+                showNotification('✅ Правильно!');
+            } else {
+                showNotification(`❌ Неправильно! Правильный ответ: ${correctAnswer}`);
+            }
+            
+            currentMathTestQuestion++;
+            showMathTestQuestion();
+        }
+
+        function showMathTestResults() {
+            document.getElementById('math-test-results').style.display = 'block';
+            const accuracy = Math.round((mathTestScore / 10) * 100);
+            document.getElementById('math-test-score').textContent = accuracy + '%';
+            document.getElementById('math-test-accuracy').textContent = `Правильно: ${mathTestScore}/10`;
+            
+            if (mathTestScore >= 8) {
+                addExperience(30);
+            } else if (mathTestScore >= 5) {
+                addExperience(20);
+            } else {
+                addExperience(10);
+            }
+        }
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
         function initRegistration() {
             const tg = window.Telegram?.WebApp;
             if (tg) {
@@ -1178,11 +1502,34 @@
             updateUserInfo();
         }
 
-        // ИНИЦИАЛИЗАЦИЯ
+        // ОБРАБОТЧИКИ СОБЫТИЙ
         document.addEventListener('DOMContentLoaded', function() {
             initRegistration();
             
-            // Обработчик для игры в реакцию
+            // WordMaster
+            document.getElementById('hard-btn').onclick = markWordAsHard;
+            document.getElementById('show-btn').onclick = showTranslation;
+            document.getElementById('know-btn').onclick = markWordAsKnown;
+            document.getElementById('restart-test-btn').onclick = startNewTest;
+            
+            // Habits
+            document.getElementById('add-habit-btn').onclick = addNewHabit;
+            
+            // Math
+            document.getElementById('check-math-btn').onclick = checkMathAnswer;
+            document.getElementById('check-math-test-btn').onclick = checkMathTestAnswer;
+            document.getElementById('restart-math-test-btn').onclick = startNewMathTest;
+            
+            // Tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.onclick = (e) => setWordMode(e.target.dataset.mode);
+            });
+            
+            document.querySelectorAll('.math-tab').forEach(tab => {
+                tab.onclick = (e) => setMathMode(e.target.dataset.mode);
+            });
+            
+            // Reaction game
             document.getElementById('reaction-area').onclick = function() {
                 if (!reactionStartTime) return;
                 
@@ -1203,6 +1550,7 @@
             };
         });
 
+        // Telegram WebApp для тестирования
         if (!window.Telegram) {
             window.Telegram = {
                 WebApp: {
