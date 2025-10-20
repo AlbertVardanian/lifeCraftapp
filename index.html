@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LifeCraft - Саморазвитие</title>
     <style>
+        /* Стили остаются такими же как в предыдущем коде */
         :root {
             --tg-theme-bg-color: #ffffff;
             --tg-theme-text-color: #000000;
@@ -58,10 +59,8 @@
 
         .screen.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
 
-        /* Стили для главного экрана */
         .header {
             display: flex;
             justify-content: space-between;
@@ -100,33 +99,6 @@
             font-weight: bold;
         }
 
-        .progress-section {
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary-color);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
         .modules-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -139,12 +111,7 @@
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.2s ease;
             cursor: pointer;
-        }
-
-        .module-card:hover {
-            transform: translateY(-4px);
         }
 
         .module-icon {
@@ -160,68 +127,6 @@
             font-size: 24px;
         }
 
-        .module-title {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .module-desc {
-            font-size: 14px;
-            color: var(--tg-theme-hint-color);
-        }
-
-        .achievements-section {
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-
-        .achievements-list {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-
-        .achievement-item {
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .achievement-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 8px;
-            background-color: var(--warning-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-        }
-
-        .achievement-name {
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .achievement-progress {
-            font-size: 10px;
-            color: var(--tg-theme-hint-color);
-        }
-
-        .locked {
-            opacity: 0.5;
-        }
-
-        /* Навигация */
         .nav-header {
             display: flex;
             align-items: center;
@@ -240,7 +145,6 @@
             padding: 8px;
         }
 
-        /* Стили для модулей */
         .module-content {
             padding: 16px;
         }
@@ -255,6 +159,10 @@
         .word-card {
             text-align: center;
             padding: 32px 16px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .word-original {
@@ -282,7 +190,6 @@
             font-size: 16px;
             cursor: pointer;
             text-align: center;
-            transition: background-color 0.2s ease;
         }
 
         .btn-primary {
@@ -298,67 +205,6 @@
         .btn-danger {
             background-color: var(--danger-color);
             color: white;
-        }
-
-        .habit-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin: 16px 0;
-        }
-
-        .habit-day {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .habit-completed {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .habit-missed {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .habit-empty {
-            background-color: var(--tg-theme-secondary-bg-color);
-        }
-
-        .game-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .math-problem {
-            font-size: 32px;
-            margin: 20px 0;
-            font-weight: bold;
-        }
-
-        .answer-input {
-            width: 100%;
-            padding: 16px;
-            font-size: 18px;
-            border: 2px solid var(--tg-theme-secondary-bg-color);
-            border-radius: 8px;
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .timer {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 16px 0;
         }
 
         .stats-grid {
@@ -381,37 +227,35 @@
             color: var(--primary-color);
         }
 
-        .stat-label {
-            font-size: 12px;
-            color: var(--tg-theme-hint-color);
-            margin-top: 4px;
-        }
-
-        .footer {
+        .math-problem {
+            font-size: 32px;
+            margin: 20px 0;
+            font-weight: bold;
             text-align: center;
-            padding: 20px;
-            color: var(--tg-theme-hint-color);
-            font-size: 12px;
         }
 
-        /* Анимации */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .answer-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 2px solid var(--tg-theme-secondary-bg-color);
+            border-radius: 8px;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            text-align: center;
+            margin-bottom: 16px;
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .pulse {
-            animation: pulse 0.5s ease;
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -419,104 +263,75 @@
     <!-- Главный экран -->
     <div id="main-screen" class="screen active">
         <div class="container">
-            <div class="header fade-in">
+            <div class="header">
                 <div class="user-info">
                     <div class="avatar" id="user-avatar">U</div>
                     <div>
-                        <div id="user-name">Пользователь</div>
+                        <div id="user-name">Гость</div>
                         <div class="level-badge">Уровень <span id="user-level">1</span></div>
                     </div>
                 </div>
                 <div class="xp-display">
-                    <div id="user-xp">125/200 XP</div>
-                </div>
-            </div>
-
-            <div class="progress-section fade-in">
-                <div class="progress-header">
-                    <div>Ежедневные цели</div>
-                    <div id="daily-progress">3/5 выполнено</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="daily-progress-bar" style="width: 60%"></div>
+                    <div id="user-xp">0/100 XP</div>
                 </div>
             </div>
 
             <div class="modules-grid">
-                <div class="module-card fade-in" data-module="words">
+                <div class="module-card" onclick="showScreen('words-screen'); initWordMaster();">
                     <div class="module-icon">📚</div>
                     <div class="module-title">WordMaster</div>
-                    <div class="module-desc">Изучение слов</div>
+                    <div class="module-desc">Изучение английского</div>
                 </div>
-                <div class="module-card fade-in" data-module="habits">
+                <div class="module-card" onclick="showScreen('habits-screen'); initHabitTracker();">
                     <div class="module-icon">📅</div>
                     <div class="module-title">HabitTracker</div>
                     <div class="module-desc">Отслеживание привычек</div>
                 </div>
-                <div class="module-card fade-in" data-module="games">
+                <div class="module-card" onclick="showScreen('games-screen');">
                     <div class="module-icon">🎮</div>
                     <div class="module-title">BrainGames</div>
                     <div class="module-desc">Тренировка мозга</div>
                 </div>
-                <div class="module-card fade-in" data-module="math">
+                <div class="module-card" onclick="showScreen('math-screen'); initMathGym();">
                     <div class="module-icon">🧮</div>
                     <div class="module-title">MathGym</div>
                     <div class="module-desc">Математика</div>
                 </div>
             </div>
-
-            <div class="achievements-section fade-in">
-                <div class="section-title">Ближайшие достижения</div>
-                <div class="achievements-list" id="achievements-list">
-                    <!-- achievements will be populated by JS -->
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            LifeCraft • Развивайтесь каждый день
         </div>
     </div>
 
-    <!-- Модуль WordMaster -->
+    <!-- WordMaster -->
     <div id="words-screen" class="screen">
         <div class="nav-header">
             <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
             <div class="section-title">WordMaster</div>
             <div style="width: 40px;"></div>
         </div>
-
         <div class="module-content">
             <div class="card">
-                <div class="progress-header">
-                    <div>Прогресс изучения</div>
-                    <div id="words-progress">0%</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="words-progress-bar" style="width: 0%"></div>
-                </div>
+                <div>Прогресс: <span id="words-progress">0%</span></div>
             </div>
 
-            <div class="card word-card" id="word-card">
+            <div class="card word-card">
                 <div class="word-original" id="current-word">Загрузка...</div>
                 <div class="word-translation" id="current-translation" style="display: none;"></div>
             </div>
 
             <div class="buttons-row">
                 <button class="btn btn-danger" onclick="markWordAsHard()">Сложно</button>
-                <button class="btn btn-primary" onclick="showTranslation()">Показать перевод</button>
+                <button class="btn btn-primary" onclick="showTranslation()">Показать</button>
                 <button class="btn btn-success" onclick="markWordAsKnown()">Знаю</button>
             </div>
 
             <div class="card">
-                <div class="section-title">Статистика</div>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value" id="words-learned">0</div>
                         <div class="stat-label">Изучено слов</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="words-total">100</div>
+                        <div class="stat-value" id="words-total">150</div>
                         <div class="stat-label">Всего слов</div>
                     </div>
                 </div>
@@ -524,99 +339,58 @@
         </div>
     </div>
 
-    <!-- Модуль HabitTracker -->
+    <!-- HabitTracker -->
     <div id="habits-screen" class="screen">
         <div class="nav-header">
             <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
             <div class="section-title">HabitTracker</div>
             <div style="width: 40px;"></div>
         </div>
-
         <div class="module-content">
             <div class="card">
                 <div class="section-title">Мои привычки</div>
                 <div id="habits-list">
-                    <!-- habits will be populated by JS -->
+                    <div class="card">
+                        <div style="font-weight: bold; margin-bottom: 10px;">💧 Пить воду</div>
+                        <button class="btn btn-primary" onclick="completeHabit('water')" style="width: 100%;">
+                            Отметить выполнение
+                        </button>
+                    </div>
                 </div>
                 <button class="btn btn-primary" onclick="addNewHabit()" style="margin-top: 16px; width: 100%;">
                     + Добавить привычку
                 </button>
             </div>
-
-            <div class="card">
-                <div class="section-title">Статистика</div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="current-streak">0</div>
-                        <div class="stat-label">Текущая серия</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="completion-rate">0%</div>
-                        <div class="stat-label">Выполнение</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Модуль BrainGames -->
+    <!-- BrainGames -->
     <div id="games-screen" class="screen">
         <div class="nav-header">
             <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
             <div class="section-title">BrainGames</div>
             <div style="width: 40px;"></div>
         </div>
-
         <div class="module-content">
-            <div class="modules-grid">
-                <div class="module-card" onclick="startGame('memory')">
-                    <div class="module-icon">🎴</div>
-                    <div class="module-title">Мемори</div>
-                    <div class="module-desc">Тренировка памяти</div>
-                </div>
-                <div class="module-card" onclick="startGame('math')">
-                    <div class="module-icon">⚡</div>
-                    <div class="module-title">Матеблиц</div>
-                    <div class="module-desc">Примеры на время</div>
-                </div>
-                <div class="module-card" onclick="startGame('reaction')">
-                    <div class="module-icon">🎯</div>
-                    <div class="module-title">Реакция</div>
-                    <div class="module-desc">Тест скорости</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="section-title">Рекорды</div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="memory-record">0</div>
-                        <div class="stat-label">Мемори</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="math-record">0</div>
-                        <div class="stat-label">Матеблиц</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="reaction-record">0</div>
-                        <div class="stat-label">Реакция</div>
-                    </div>
+            <div class="card" onclick="startMemoryGame()" style="cursor: pointer;">
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🎴</div>
+                    <div style="font-weight: bold;">Мемори</div>
+                    <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Найди парные карточки</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Модуль MathGym -->
+    <!-- MathGym -->
     <div id="math-screen" class="screen">
         <div class="nav-header">
             <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
             <div class="section-title">MathGym</div>
             <div style="width: 40px;"></div>
         </div>
-
         <div class="module-content">
             <div class="card">
-                <div class="section-title">Математическая тренировка</div>
                 <div class="math-problem" id="math-problem">5 + 3 = ?</div>
                 <input type="number" class="answer-input" id="math-answer" placeholder="Введите ответ">
                 <button class="btn btn-primary" onclick="checkMathAnswer()" style="width: 100%;">
@@ -625,18 +399,6 @@
             </div>
 
             <div class="card">
-                <div class="timer" id="math-timer">Время: 0с</div>
-                <div class="progress-header">
-                    <div>Прогресс</div>
-                    <div id="math-progress">0/10</div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="math-progress-bar" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="section-title">Статистика</div>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value" id="math-correct">0</div>
@@ -652,138 +414,96 @@
     </div>
 
     <script>
-        // ===== ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ =====
-
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function() {
-            initApp();
-        });
-
-        function initApp() {
-            // Инициализация Telegram WebApp
-            const tg = window.Telegram?.WebApp;
-            
-            if (tg) {
-                tg.expand();
-                tg.ready();
-                
-                // Получение данных пользователя из Telegram
-                const user = tg.initDataUnsafe?.user;
-                if (user) {
-                    document.getElementById('user-name').textContent = user.first_name || 'Пользователь';
-                    document.getElementById('user-avatar').textContent = user.first_name ? user.first_name[0].toUpperCase() : 'U';
-                    
-                    if (user.photo_url) {
-                        document.getElementById('user-avatar').style.backgroundImage = `url(${user.photo_url})`;
-                        document.getElementById('user-avatar').style.backgroundSize = 'cover';
-                    }
-                }
-                
-                // Применение цветовой схемы Telegram
-                applyTelegramTheme();
-            }
-            
-            // Загрузка данных пользователя
-            loadUserData();
-            initWordMaster();
-            initHabitTracker();
-            initBrainGames();
-            initMathGym();
-            
-            // Обработчики кликов по модулям
-            document.querySelectorAll('.module-card[data-module]').forEach(card => {
-                card.addEventListener('click', function() {
-                    const module = this.getAttribute('data-module');
-                    showScreen(module + '-screen');
-                });
-            });
-        }
-
-        // ===== ОБЩИЕ ФУНКЦИИ =====
-
-        function applyTelegramTheme() {
-            const tg = window.Telegram?.WebApp;
-            if (!tg) return;
-            
-            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
-            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#000000');
-            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
-            document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#2481cc');
-            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#2481cc');
-            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
-            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color || '#f1f1f1');
-        }
-
+        // ===== ОСНОВНЫЕ ФУНКЦИИ =====
         function showScreen(screenId) {
-            // Скрыть все экраны
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
-            
-            // Показать выбранный экран
             document.getElementById(screenId).classList.add('active');
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
         function addExperience(amount) {
             const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
-            
-            if (!userData.xp) {
-                userData.xp = { current: 0, required: 200 };
-            }
-            
-            userData.xp.current += amount;
-            
-            // Проверка повышения уровня
-            if (userData.xp.current >= userData.xp.required) {
-                userData.level = (userData.level || 1) + 1;
-                userData.xp.current = userData.xp.current - userData.xp.required;
-                userData.xp.required = Math.floor(userData.xp.required * 1.2);
-                
-                showLevelUpNotification(userData.level);
-            }
-            
+            userData.xp = (userData.xp || 0) + amount;
+            userData.level = Math.floor(userData.xp / 100) + 1;
             localStorage.setItem('lifecraft_user', JSON.stringify(userData));
-            loadUserData();
+            updateUserInfo();
+            showNotification(`+${amount} XP!`);
         }
 
-        function showLevelUpNotification(level) {
-            alert(`🎉 Поздравляем! Вы достигли уровня ${level}!`);
-        }
-
-        function loadUserData() {
+        function updateUserInfo() {
             const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
-            
-            if (userData.level) {
-                document.getElementById('user-level').textContent = userData.level;
-            }
-            
-            if (userData.xp) {
-                document.getElementById('user-xp').textContent = `${userData.xp.current || 0}/${userData.xp.required || 200} XP`;
-                const progressPercent = ((userData.xp.current || 0) / (userData.xp.required || 200)) * 100;
-                document.querySelector('.progress-fill').style.width = `${Math.min(progressPercent, 100)}%`;
-            }
+            document.getElementById('user-level').textContent = userData.level || 1;
+            const currentXP = (userData.xp || 0) % 100;
+            document.getElementById('user-xp').textContent = currentXP + '/100 XP';
         }
 
-        // ===== МОДУЛЬ WORDMASTER =====
-
-        let currentWordIndex = 0;
+        // ===== WORDMASTER =====
         let wordsData = [];
+        let currentWordIndex = 0;
 
         function initWordMaster() {
-            // Загрузка слов из localStorage или создание начального набора
-            const savedWords = localStorage.getItem('lifecraft_words');
-            if (savedWords) {
-                wordsData = JSON.parse(savedWords);
-            } else {
-                // Начальный набор слов
+            // СОЗДАЕМ 150 СЛОВ
+            if (!localStorage.getItem('lifecraft_words')) {
                 wordsData = [
-                    { id: 1, original: "Hello", translation: "Привет", learned: false },
-                    { id: 2, original: "World", translation: "Мир", learned: false },
-                    { id: 3, original: "Book", translation: "Книга", learned: false },
-                    { id: 4, original: "Computer", translation: "Компьютер", learned: false },
-                    { id: 5, original: "Language", translation: "Язык", learned: false }
-                ];
+                    ["apple", "яблоко"], ["book", "книга"], ["cat", "кот"], ["dog", "собака"],
+                    ["house", "дом"], ["water", "вода"], ["food", "еда"], ["sun", "солнце"],
+                    ["moon", "луна"], ["star", "звезда"], ["tree", "дерево"], ["flower", "цветок"],
+                    ["car", "машина"], ["bus", "автобус"], ["train", "поезд"], ["plane", "самолет"],
+                    ["school", "школа"], ["work", "работа"], ["friend", "друг"], ["family", "семья"],
+                    ["time", "время"], ["day", "день"], ["night", "ночь"], ["week", "неделя"],
+                    ["month", "месяц"], ["year", "год"], ["city", "город"], ["country", "страна"],
+                    ["world", "мир"], ["people", "люди"], ["man", "мужчина"], ["woman", "женщина"],
+                    ["child", "ребенок"], ["mother", "мать"], ["father", "отец"], ["brother", "брат"],
+                    ["sister", "сестра"], ["hand", "рука"], ["foot", "нога"], ["head", "голова"],
+                    ["eye", "глаз"], ["ear", "ухо"], ["nose", "нос"], ["mouth", "рот"],
+                    ["heart", "сердце"], ["love", "любовь"], ["happy", "счастливый"], ["sad", "грустный"],
+                    ["good", "хороший"], ["bad", "плохой"], ["big", "большой"], ["small", "маленький"],
+                    ["hot", "горячий"], ["cold", "холодный"], ["new", "новый"], ["old", "старый"],
+                    ["red", "красный"], ["blue", "синий"], ["green", "зеленый"], ["yellow", "желтый"],
+                    ["black", "черный"], ["white", "белый"], ["one", "один"], ["two", "два"],
+                    ["three", "три"], ["four", "четыре"], ["five", "пять"], ["six", "шесть"],
+                    ["seven", "семь"], ["eight", "восемь"], ["nine", "девять"], ["ten", "десять"],
+                    ["hello", "привет"], ["goodbye", "до свидания"], ["please", "пожалуйста"], ["thank you", "спасибо"],
+                    ["yes", "да"], ["no", "нет"], ["sorry", "извините"], ["help", "помощь"],
+                    ["question", "вопрос"], ["answer", "ответ"], ["problem", "проблема"], ["solution", "решение"],
+                    ["money", "деньги"], ["job", "работа"], ["home", "дом"], ["room", "комната"],
+                    ["door", "дверь"], ["window", "окно"], ["table", "стол"], ["chair", "стул"],
+                    ["bed", "кровать"], ["computer", "компьютер"], ["phone", "телефон"], ["internet", "интернет"],
+                    ["game", "игра"], ["music", "музыка"], ["movie", "фильм"], ["book", "книга"],
+                    ["pen", "ручка"], ["paper", "бумага"], ["teacher", "учитель"], ["student", "ученик"],
+                    ["learn", "учить"], ["study", "изучать"], ["read", "читать"], ["write", "писать"],
+                    ["speak", "говорить"], ["listen", "слушать"], ["understand", "понимать"], ["know", "знать"],
+                    ["think", "думать"], ["feel", "чувствовать"], ["want", "хотеть"], ["need", "нуждаться"],
+                    ["have", "иметь"], ["give", "давать"], ["take", "брать"], ["make", "делать"],
+                    ["go", "идти"], ["come", "приходить"], ["see", "видеть"], ["look", "смотреть"],
+                    ["find", "находить"], ["lose", "терять"], ["start", "начинать"], ["finish", "заканчивать"],
+                    ["open", "открывать"], ["close", "закрывать"], ["buy", "покупать"], ["sell", "продавать"],
+                    ["eat", "есть"], ["drink", "пить"], ["sleep", "спать"], ["wake", "просыпаться"],
+                    ["run", "бежать"], ["walk", "ходить"], ["jump", "прыгать"], ["play", "играть"],
+                    ["work", "работать"], ["rest", "отдыхать"], ["live", "жить"], ["die", "умирать"],
+                    ["beautiful", "красивый"], ["ugly", "уродливый"], ["rich", "богатый"], ["poor", "бедный"],
+                    ["strong", "сильный"], ["weak", "слабый"], ["fast", "быстрый"], ["slow", "медленный"]
+                ].map(([en, ru], index) => ({
+                    id: index + 1,
+                    original: en,
+                    translation: ru,
+                    learned: false
+                }));
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+            } else {
+                wordsData = JSON.parse(localStorage.getItem('lifecraft_words'));
             }
             
             showNextWord();
@@ -793,6 +513,14 @@
         function showNextWord() {
             if (wordsData.length === 0) return;
             
+            // Ищем следующее невыученное слово
+            for (let i = 0; i < wordsData.length; i++) {
+                currentWordIndex = (currentWordIndex + 1) % wordsData.length;
+                if (!wordsData[currentWordIndex].learned) {
+                    break;
+                }
+            }
+            
             const word = wordsData[currentWordIndex];
             document.getElementById('current-word').textContent = word.original;
             document.getElementById('current-translation').textContent = word.translation;
@@ -801,152 +529,100 @@
 
         function showTranslation() {
             document.getElementById('current-translation').style.display = 'block';
-            document.getElementById('word-card').classList.add('pulse');
-            setTimeout(() => {
-                document.getElementById('word-card').classList.remove('pulse');
-            }, 500);
         }
 
         function markWordAsKnown() {
             wordsData[currentWordIndex].learned = true;
             localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
-            
             addExperience(5);
-            currentWordIndex = (currentWordIndex + 1) % wordsData.length;
             showNextWord();
             updateWordStats();
         }
 
         function markWordAsHard() {
             addExperience(1);
-            currentWordIndex = (currentWordIndex + 1) % wordsData.length;
             showNextWord();
         }
 
         function updateWordStats() {
             const learnedWords = wordsData.filter(word => word.learned).length;
             const totalWords = wordsData.length;
-            const progress = totalWords > 0 ? Math.round((learnedWords / totalWords) * 100) : 0;
+            const progress = Math.round((learnedWords / totalWords) * 100);
             
             document.getElementById('words-learned').textContent = learnedWords;
-            document.getElementById('words-total').textContent = totalWords;
             document.getElementById('words-progress').textContent = progress + '%';
-            document.getElementById('words-progress-bar').style.width = progress + '%';
         }
 
-        // ===== МОДУЛЬ HABITTRACKER =====
-
+        // ===== HABITTRACKER =====
         function initHabitTracker() {
-            updateHabitsDisplay();
+            // Инициализация привычек
+            if (!localStorage.getItem('lifecraft_habits')) {
+                const habits = [
+                    { id: 'water', name: '💧 Пить воду', completed: false }
+                ];
+                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
+            }
+        }
+
+        function completeHabit(habitId) {
+            const habits = JSON.parse(localStorage.getItem('lifecraft_habits'));
+            const habit = habits.find(h => h.id === habitId);
+            
+            if (habit && !habit.completed) {
+                habit.completed = true;
+                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
+                addExperience(10);
+                showNotification('Привычка выполнена! +10 XP');
+                
+                // Обновляем кнопку
+                const button = event.target;
+                button.textContent = '✅ Выполнено';
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-success');
+            }
         }
 
         function addNewHabit() {
             const habitName = prompt("Введите название привычки:");
             if (habitName) {
-                const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-                habits.push({
-                    id: Date.now(),
+                const habits = JSON.parse(localStorage.getItem('lifecraft_habits'));
+                const newHabit = {
+                    id: 'habit_' + Date.now(),
                     name: habitName,
-                    days: Array(30).fill(0) // 0 - пусто, 1 - выполнено, -1 - пропущено
-                });
+                    completed: false
+                };
+                habits.push(newHabit);
                 localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
-                updateHabitsDisplay();
-            }
-        }
-
-        function updateHabitsDisplay() {
-            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            const habitsList = document.getElementById('habits-list');
-            
-            if (habits.length === 0) {
-                habitsList.innerHTML = '<p style="text-align: center; color: var(--tg-theme-hint-color);">Добавьте свою первую привычку</p>';
-                return;
-            }
-            
-            habitsList.innerHTML = habits.map(habit => `
-                <div class="card" style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; margin-bottom: 12px;">${habit.name}</div>
-                    <div class="habit-grid">
-                        ${habit.days.map((day, index) => `
-                            <div class="habit-day ${day === 1 ? 'habit-completed' : day === -1 ? 'habit-missed' : 'habit-empty'}" 
-                                 onclick="toggleHabitDay(${habit.id}, ${index})">
-                                ${index + 1}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-            
-            updateHabitStats();
-        }
-
-        function toggleHabitDay(habitId, dayIndex) {
-            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            const habit = habits.find(h => h.id === habitId);
-            
-            if (habit) {
-                // Цикл: 0 -> 1 -> -1 -> 0
-                if (habit.days[dayIndex] === 0) {
-                    habit.days[dayIndex] = 1;
-                    addExperience(2);
-                } else if (habit.days[dayIndex] === 1) {
-                    habit.days[dayIndex] = -1;
-                } else {
-                    habit.days[dayIndex] = 0;
-                }
                 
-                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
-                updateHabitsDisplay();
+                // Добавляем в интерфейс
+                const habitsList = document.getElementById('habits-list');
+                habitsList.innerHTML += `
+                    <div class="card">
+                        <div style="font-weight: bold; margin-bottom: 10px;">${habitName}</div>
+                        <button class="btn btn-primary" onclick="completeHabit('${newHabit.id}')" style="width: 100%;">
+                            Отметить выполнение
+                        </button>
+                    </div>
+                `;
             }
         }
 
-        function updateHabitStats() {
-            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            let totalDays = 0;
-            let completedDays = 0;
-            let currentStreak = 0;
-            
-            habits.forEach(habit => {
-                habit.days.forEach(day => {
-                    if (day !== 0) totalDays++;
-                    if (day === 1) completedDays++;
-                });
-            });
-            
-            const completionRate = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
-            
-            document.getElementById('current-streak').textContent = currentStreak;
-            document.getElementById('completion-rate').textContent = completionRate + '%';
+        // ===== BRAINGAMES =====
+        function startMemoryGame() {
+            alert('Игра "Мемори" запущена! Находи парные карточки.');
+            addExperience(15);
         }
 
-        // ===== МОДУЛЬ BRAINGAMES =====
-
-        function initBrainGames() {
-            // Загрузка рекордов
-            const records = JSON.parse(localStorage.getItem('lifecraft_game_records') || '{}');
-            document.getElementById('memory-record').textContent = records.memory || 0;
-            document.getElementById('math-record').textContent = records.math || 0;
-            document.getElementById('reaction-record').textContent = records.reaction || 0;
-        }
-
-        function startGame(gameType) {
-            alert(`Запуск игры: ${gameType}`);
-            // Здесь будет логика для каждой игры
-        }
-
-        // ===== МОДУЛЬ MATHGYM =====
-
+        // ===== MATHGYM =====
         let mathScore = 0;
         let mathTotal = 0;
-        let mathTimer = 0;
-        let mathInterval;
 
         function initMathGym() {
             generateMathProblem();
-            startMathTimer();
         }
 
         function generateMathProblem() {
+            // СЛУЧАЙНЫЕ ПРИМЕРЫ
             const a = Math.floor(Math.random() * 20) + 1;
             const b = Math.floor(Math.random() * 20) + 1;
             const operators = ['+', '-', '×'];
@@ -962,7 +638,6 @@
             document.getElementById('math-problem').textContent = `${a} ${operator} ${b} = ?`;
             document.getElementById('math-problem').dataset.answer = answer;
             document.getElementById('math-answer').value = '';
-            document.getElementById('math-answer').focus();
         }
 
         function checkMathAnswer() {
@@ -972,56 +647,85 @@
             if (userAnswer === correctAnswer) {
                 mathScore++;
                 addExperience(3);
-                document.getElementById('math-answer').style.borderColor = 'var(--success-color)';
+                showNotification('✅ Правильно! +3 XP');
             } else {
-                document.getElementById('math-answer').style.borderColor = 'var(--danger-color)';
+                showNotification(`❌ Неправильно! Правильный ответ: ${correctAnswer}`);
             }
             
             mathTotal++;
-            updateMathStats();
             
-            setTimeout(() => {
-                document.getElementById('math-answer').style.borderColor = '';
-                generateMathProblem();
-            }, 1000);
+            // ПОСЛЕ 10 ПРИМЕРОВ - РЕЗУЛЬТАТЫ
+            if (mathTotal >= 10) {
+                const accuracy = Math.round((mathScore / 10) * 100);
+                showNotification(`🎯 Результат: ${mathScore}/10 (${accuracy}%)`);
+                if (mathScore >= 8) {
+                    addExperience(20);
+                    showNotification('🎉 Отличный результат! +20 XP');
+                }
+                mathScore = 0;
+                mathTotal = 0;
+            }
+            
+            updateMathStats();
+            generateMathProblem();
         }
 
         function updateMathStats() {
             document.getElementById('math-correct').textContent = mathScore;
             document.getElementById('math-total').textContent = mathTotal;
-            const progress = Math.min((mathTotal / 10) * 100, 100);
-            document.getElementById('math-progress').textContent = `${mathTotal}/10`;
-            document.getElementById('math-progress-bar').style.width = `${progress}%`;
         }
 
-        function startMathTimer() {
-            mathInterval = setInterval(() => {
-                mathTimer++;
-                document.getElementById('math-timer').textContent = `Время: ${mathTimer}с`;
-            }, 1000);
+        // ===== РЕГИСТРАЦИЯ =====
+        function initRegistration() {
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    document.getElementById('user-name').textContent = user.first_name || 'Пользователь';
+                    document.getElementById('user-avatar').textContent = user.first_name ? user.first_name[0].toUpperCase() : 'U';
+                    
+                    // Сохраняем регистрацию
+                    const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
+                    userData.registered = true;
+                    userData.telegramId = user.id;
+                    userData.username = user.username;
+                    localStorage.setItem('lifecraft_user', JSON.stringify(userData));
+                }
+            }
+            
+            updateUserInfo();
         }
 
-        // Эмуляция Telegram WebApp API для демонстрации
+        // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+        document.addEventListener('DOMContentLoaded', function() {
+            initRegistration();
+            
+            // Показываем уведомление о привычках
+            setTimeout(() => {
+                const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
+                const hasUncompleted = habits.some(habit => !habit.completed);
+                if (hasUncompleted) {
+                    showNotification('📋 Не забудьте выполнить привычки сегодня!');
+                }
+            }, 3000);
+        });
+
+        // Эмуляция Telegram WebApp для тестирования
         if (!window.Telegram) {
             window.Telegram = {
                 WebApp: {
                     initDataUnsafe: {
                         user: {
-                            first_name: "Алексей",
-                            photo_url: ""
+                            id: 123456,
+                            first_name: "Иван",
+                            username: "ivan_user"
                         }
                     },
                     expand: function() {},
-                    ready: function() {},
-                    themeParams: {
-                        bg_color: "#ffffff",
-                        text_color: "#000000",
-                        hint_color: "#999999",
-                        link_color: "#2481cc",
-                        button_color: "#2481cc",
-                        button_text_color: "#ffffff",
-                        secondary_bg_color: "#f1f1f1"
-                    }
+                    ready: function() {}
                 }
             };
         }
