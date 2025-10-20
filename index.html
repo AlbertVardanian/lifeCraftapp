@@ -288,6 +288,7 @@
             color: white;
             font-size: 24px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .memory-card.hidden {
@@ -298,6 +299,28 @@
         .memory-card.matched {
             background: var(--success-color);
             cursor: default;
+        }
+
+        .reaction-area {
+            width: 100%;
+            height: 200px;
+            background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .target {
+            width: 60px;
+            height: 60px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            position: absolute;
+            display: none;
         }
 
         .notification {
@@ -367,6 +390,49 @@
             color: var(--tg-theme-hint-color);
             margin-bottom: 20px;
         }
+
+        .math-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .math-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            background: var(--tg-theme-secondary-bg-color);
+        }
+
+        .math-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .theory-content {
+            line-height: 1.6;
+        }
+
+        .theory-content h3 {
+            margin: 15px 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .theory-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .theory-content li {
+            margin: 5px 0;
+        }
+
+        .game-card {
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -397,7 +463,7 @@
                     <div class="module-title">HabitTracker</div>
                     <div class="module-desc">Отслеживание привычек</div>
                 </div>
-                <div class="module-card" onclick="showScreen('games-screen');">
+                <div class="module-card" onclick="showScreen('games-screen'); initGames();">
                     <div class="module-icon">🎮</div>
                     <div class="module-title">BrainGames</div>
                     <div class="module-desc">Тренировка мозга</div>
@@ -422,7 +488,7 @@
             <div class="mode-tabs">
                 <div class="mode-tab active" onclick="setWordMode('cards')">Карточки</div>
                 <div class="mode-tab" onclick="setWordMode('test')">Тест</div>
-                <div class="mode-tab" onclick="setWordMode('learned')">Изученные слова</div>
+                <div class="mode-tab" onclick="setWordMode('learned')">Изученные</div>
             </div>
 
             <!-- Режим карточек -->
@@ -521,11 +587,19 @@
             <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
-            <div class="card" onclick="startMemoryGame()" style="cursor: pointer;">
+            <div class="game-card card" onclick="startMemoryGame()">
                 <div style="text-align: center;">
                     <div style="font-size: 24px; margin-bottom: 8px;">🎴</div>
                     <div style="font-weight: bold;">Мемори</div>
                     <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Найди парные карточки</div>
+                </div>
+            </div>
+
+            <div class="game-card card" onclick="startReactionGame()">
+                <div style="text-align: center;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🎯</div>
+                    <div style="font-weight: bold;">Реакция</div>
+                    <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Проверь скорость реакции</div>
                 </div>
             </div>
 
@@ -541,6 +615,30 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Игра Реакция -->
+            <div id="reaction-game" style="display: none;">
+                <div class="card">
+                    <div class="section-title">Тест на реакцию</div>
+                    <div class="reaction-area" id="reaction-area">
+                        <div class="target" id="reaction-target"></div>
+                        <div id="reaction-message">Нажми когда появится цель</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="reaction-time">0</div>
+                            <div class="stat-label">Время (мс)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="best-time">0</div>
+                            <div class="stat-label">Лучший</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startReactionGame()" style="width: 100%;">
+                        Начать заново
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -552,23 +650,81 @@
             <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
-            <div class="card">
-                <div class="math-problem" id="math-problem">5 + 3 = ?</div>
-                <input type="number" class="answer-input" id="math-answer" placeholder="Введите ответ">
-                <button class="btn btn-primary" onclick="checkMathAnswer()" style="width: 100%;">
-                    Проверить
-                </button>
+            <div class="math-tabs">
+                <div class="math-tab active" onclick="setMathMode('practice')">Практика</div>
+                <div class="math-tab" onclick="setMathMode('test')">Тест</div>
+                <div class="math-tab" onclick="setMathMode('theory')">Теория</div>
             </div>
 
-            <div class="card">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="math-correct">0</div>
-                        <div class="stat-label">Правильно</div>
+            <!-- Режим практики -->
+            <div id="math-practice">
+                <div class="card">
+                    <div class="math-problem" id="math-problem">5 + 3 = ?</div>
+                    <input type="number" class="answer-input" id="math-answer" placeholder="Введите ответ">
+                    <button class="btn btn-primary" onclick="checkMathAnswer()" style="width: 100%;">
+                        Проверить
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="math-correct">0</div>
+                            <div class="stat-label">Правильно</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="math-total">0</div>
+                            <div class="stat-label">Всего решено</div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="math-total">0</div>
-                        <div class="stat-label">Всего решено</div>
+                </div>
+            </div>
+
+            <!-- Режим теста -->
+            <div id="math-test" style="display: none;">
+                <div class="card">
+                    <div>Математический тест</div>
+                    <div>Вопрос: <span id="math-test-progress">1/10</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="math-problem" id="math-test-problem">5 + 3 = ?</div>
+                    <input type="number" class="answer-input" id="math-test-answer" placeholder="Введите ответ">
+                    <button class="btn btn-primary" onclick="checkMathTestAnswer()" style="width: 100%;">
+                        Ответить
+                    </button>
+                </div>
+
+                <div id="math-test-results" style="display: none;">
+                    <div class="card test-results">
+                        <div class="test-score" id="math-test-score">0%</div>
+                        <div class="test-accuracy" id="math-test-accuracy">Правильно: 0/10</div>
+                        <button class="btn btn-primary" onclick="startNewMathTest()" style="width: 100%;">
+                            Пройти тест еще раз
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Режим теории -->
+            <div id="math-theory" style="display: none;">
+                <div class="card">
+                    <div class="theory-content">
+                        <h3>🔢 Основы арифметики</h3>
+                        <p><strong>Сложение:</strong> a + b = c</p>
+                        <p><strong>Вычитание:</strong> a - b = c</p>
+                        <p><strong>Умножение:</strong> a × b = c</p>
+                        <p><strong>Деление:</strong> a ÷ b = c</p>
+                        
+                        <h3>📐 Порядок операций</h3>
+                        <p>1. Скобки ()</p>
+                        <p>2. Умножение и деление</p>
+                        <p>3. Сложение и вычитание</p>
+                        
+                        <h3>🎯 Советы для решения</h3>
+                        <p>• Внимательно читайте условие</p>
+                        <p>• Проверяйте вычисления</p>
+                        <p>• Тренируйтесь регулярно</p>
                     </div>
                 </div>
             </div>
@@ -583,10 +739,15 @@
             });
             document.getElementById(screenId).classList.add('active');
             
+            // Скрываем игры при переходе
             if (screenId !== 'games-screen') {
-                document.getElementById('memory-game').style.display = 'none';
-                document.getElementById('games-screen').querySelector('.card').style.display = 'block';
+                hideAllGames();
             }
+        }
+
+        function hideAllGames() {
+            document.getElementById('memory-game').style.display = 'none';
+            document.getElementById('reaction-game').style.display = 'none';
         }
 
         function showNotification(message) {
@@ -627,7 +788,9 @@
 
         function initWordMaster() {
             if (!localStorage.getItem('lifecraft_words')) {
+                // 150+ СЛОВ ДЛЯ ИЗУЧЕНИЯ
                 wordsData = [
+                    // Основные слова
                     ["apple", "яблоко"], ["book", "книга"], ["cat", "кот"], ["dog", "собака"],
                     ["house", "дом"], ["water", "вода"], ["food", "еда"], ["sun", "солнце"],
                     ["moon", "луна"], ["star", "звезда"], ["tree", "дерево"], ["flower", "цветок"],
@@ -636,7 +799,37 @@
                     ["time", "время"], ["day", "день"], ["night", "ночь"], ["week", "неделя"],
                     ["month", "месяц"], ["year", "год"], ["city", "город"], ["country", "страна"],
                     ["hello", "привет"], ["goodbye", "до свидания"], ["please", "пожалуйста"], ["thank you", "спасибо"],
-                    ["yes", "да"], ["no", "нет"], ["sorry", "извините"], ["help", "помощь"]
+                    ["yes", "да"], ["no", "нет"], ["sorry", "извините"], ["help", "помощь"],
+                    
+                    // Дополнительные слова
+                    ["computer", "компьютер"], ["phone", "телефон"], ["internet", "интернет"],
+                    ["music", "музыка"], ["movie", "фильм"], ["game", "игра"], ["sport", "спорт"],
+                    ["money", "деньги"], ["job", "работа"], ["home", "дом"], ["room", "комната"],
+                    ["bed", "кровать"], ["table", "стол"], ["chair", "стул"], ["door", "дверь"],
+                    ["window", "окно"], ["pen", "ручка"], ["paper", "бумага"], ["teacher", "учитель"],
+                    ["student", "ученик"], ["learn", "учить"], ["study", "изучать"], ["read", "читать"],
+                    ["write", "писать"], ["speak", "говорить"], ["listen", "слушать"], ["understand", "понимать"],
+                    ["know", "знать"], ["think", "думать"], ["feel", "чувствовать"], ["want", "хотеть"],
+                    ["need", "нуждаться"], ["have", "иметь"], ["give", "давать"], ["take", "брать"],
+                    ["make", "делать"], ["go", "идти"], ["come", "приходить"], ["see", "видеть"],
+                    ["look", "смотреть"], ["find", "находить"], ["lose", "терять"], ["start", "начинать"],
+                    ["finish", "заканчивать"], ["open", "открывать"], ["close", "закрывать"], ["buy", "покупать"],
+                    ["sell", "продавать"], ["eat", "есть"], ["drink", "пить"], ["sleep", "спать"],
+                    ["wake", "просыпаться"], ["run", "бежать"], ["walk", "ходить"], ["jump", "прыгать"],
+                    ["play", "играть"], ["work", "работать"], ["rest", "отдыхать"], ["live", "жить"],
+                    
+                    // Прилагательные
+                    ["good", "хороший"], ["bad", "плохой"], ["big", "большой"], ["small", "маленький"],
+                    ["hot", "горячий"], ["cold", "холодный"], ["new", "новый"], ["old", "старый"],
+                    ["young", "молодой"], ["beautiful", "красивый"], ["ugly", "уродливый"], ["rich", "богатый"],
+                    ["poor", "бедный"], ["strong", "сильный"], ["weak", "слабый"], ["fast", "быстрый"],
+                    ["slow", "медленный"], ["easy", "легкий"], ["difficult", "сложный"], ["happy", "счастливый"],
+                    ["sad", "грустный"], ["angry", "злой"], ["tired", "уставший"], ["hungry", "голодный"],
+                    ["thirsty", "жаждущий"], ["clean", "чистый"], ["dirty", "грязный"], ["dark", "темный"],
+                    ["light", "светлый"], ["high", "высокий"], ["low", "низкий"], ["long", "длинный"],
+                    ["short", "короткий"], ["wide", "широкий"], ["narrow", "узкий"], ["heavy", "тяжелый"],
+                    ["light", "легкий"], ["soft", "мягкий"], ["hard", "твердый"], ["sweet", "сладкий"],
+                    ["sour", "кислый"], ["salty", "соленый"], ["bitter", "горький"]
                 ].map(([en, ru], index) => ({
                     id: index + 1,
                     original: en,
@@ -655,15 +848,12 @@
         function setWordMode(mode) {
             wordMode = mode;
             
-            // Скрываем все режимы
             document.getElementById('cards-mode').style.display = 'none';
             document.getElementById('test-mode').style.display = 'none';
             document.getElementById('learned-mode').style.display = 'none';
             
-            // Показываем выбранный режим
             document.getElementById(mode + '-mode').style.display = 'block';
             
-            // Обновляем активные табы
             document.querySelectorAll('.mode-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -681,7 +871,6 @@
         function showNextWord() {
             if (wordsData.length === 0) return;
             
-            // Ищем невыученное слово
             for (let i = 0; i < wordsData.length; i++) {
                 currentWordIndex = (currentWordIndex + 1) % wordsData.length;
                 if (!wordsData[currentWordIndex].learned) break;
@@ -713,13 +902,13 @@
         function startNewTest() {
             const learnedWords = wordsData.filter(word => word.learned);
             
-            if (learnedWords.length < 4) {
-                showNotification('Изучите хотя бы 4 слова для прохождения теста!');
+            // МИНИМУМ 10 СЛОВ ДЛЯ ТЕСТА
+            if (learnedWords.length < 10) {
+                showNotification('Изучите хотя бы 10 слов для прохождения теста!');
                 setWordMode('cards');
                 return;
             }
             
-            // Выбираем слова для теста
             testWords = learnedWords
                 .sort(() => Math.random() - 0.5)
                 .slice(0, totalTestQuestions);
@@ -743,7 +932,6 @@
             const questionWord = testWords[currentTestQuestion];
             const learnedWords = wordsData.filter(word => word.learned);
             
-            // Создаем варианты ответов
             const otherWords = learnedWords
                 .filter(word => word.id !== questionWord.id)
                 .sort(() => Math.random() - 0.5)
@@ -767,7 +955,6 @@
         }
 
         function checkTestAnswer(isCorrect, element) {
-            // Блокируем все варианты
             document.querySelectorAll('.test-option').forEach(opt => {
                 opt.style.pointerEvents = 'none';
             });
@@ -780,7 +967,6 @@
                 element.classList.add('incorrect');
                 showNotification('❌ Неправильно!');
                 
-                // Показываем правильный ответ
                 document.querySelectorAll('.test-option').forEach(opt => {
                     if (opt.textContent === testWords[currentTestQuestion].translation) {
                         opt.classList.add('correct');
@@ -803,7 +989,6 @@
             document.getElementById('test-score').textContent = accuracy + '%';
             document.getElementById('test-accuracy').textContent = `Правильно: ${testScore}/${totalTestQuestions}`;
             
-            // Награда за тест
             if (testScore >= 8) {
                 addExperience(25);
                 showNotification('🎉 Отличный результат! +25 XP');
@@ -847,7 +1032,6 @@
         // ===== HABITTRACKER =====
         function initHabitTracker() {
             updateHabitsDisplay();
-            sendHabitReminder();
         }
 
         function updateHabitsDisplay() {
@@ -922,25 +1106,17 @@
             }
         }
 
-        function sendHabitReminder() {
-            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            const today = new Date().toDateString();
-            const uncompletedHabits = habits.filter(habit => !habit.history[today]);
-            
-            if (uncompletedHabits.length > 0) {
-                setTimeout(() => {
-                    showNotification(`📋 Не забудьте выполнить ${uncompletedHabits.length} привычку(и)`);
-                }, 2000);
-            }
+        // ===== BRAINGAMES =====
+        function initGames() {
+            // Инициализация игр
         }
 
-        // ===== BRAINGAMES =====
         let memoryCards = [];
         let flippedCards = [];
         let matchedPairs = 0;
 
         function startMemoryGame() {
-            document.getElementById('games-screen').querySelector('.card').style.display = 'none';
+            hideAllGames();
             document.getElementById('memory-game').style.display = 'block';
             
             const symbols = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
@@ -988,19 +1164,90 @@
                     addExperience(50);
                 }
             } else {
-                card1.classList.add('hidden');
-                card2.classList.add('hidden');
+                setTimeout(() => {
+                    card1.classList.add('hidden');
+                    card2.classList.add('hidden');
+                }, 1000);
             }
             
             flippedCards = [];
         }
 
+        let reactionStartTime;
+        let bestReactionTime = localStorage.getItem('best_reaction_time') || 9999;
+
+        function startReactionGame() {
+            hideAllGames();
+            document.getElementById('reaction-game').style.display = 'block';
+            
+            document.getElementById('reaction-time').textContent = '0';
+            document.getElementById('best-time').textContent = bestReactionTime;
+            document.getElementById('reaction-message').textContent = 'Жди появления цели...';
+            document.getElementById('reaction-target').style.display = 'none';
+            
+            setTimeout(() => {
+                reactionStartTime = Date.now();
+                document.getElementById('reaction-target').style.display = 'block';
+                document.getElementById('reaction-message').textContent = 'Нажимай сейчас!';
+            }, Math.random() * 3000 + 1000);
+        }
+
+        function checkReaction() {
+            if (!reactionStartTime) return;
+            
+            const reactionTime = Date.now() - reactionStartTime;
+            document.getElementById('reaction-time').textContent = reactionTime;
+            
+            if (reactionTime < bestReactionTime) {
+                bestReactionTime = reactionTime;
+                localStorage.setItem('best_reaction_time', bestReactionTime);
+                document.getElementById('best-time').textContent = bestReactionTime;
+                showNotification('🎉 Новый рекорд!');
+                addExperience(20);
+            }
+            
+            reactionStartTime = null;
+            document.getElementById('reaction-target').style.display = 'none';
+            document.getElementById('reaction-message').textContent = 'Нажми "Начать заново"';
+        }
+
+        // Назначаем обработчик для области реакции
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('reaction-area').onclick = checkReaction;
+        });
+
         // ===== MATHGYM =====
         let mathScore = 0;
         let mathTotal = 0;
+        let mathMode = 'practice';
+        let mathTestScore = 0;
+        let mathTestTotal = 0;
+        let currentMathTestQuestion = 0;
+        let mathTestQuestions = [];
 
         function initMathGym() {
-            generateMathProblem();
+            setMathMode('practice');
+        }
+
+        function setMathMode(mode) {
+            mathMode = mode;
+            
+            document.getElementById('math-practice').style.display = 'none';
+            document.getElementById('math-test').style.display = 'none';
+            document.getElementById('math-theory').style.display = 'none';
+            
+            document.getElementById('math-' + mode).style.display = 'block';
+            
+            document.querySelectorAll('.math-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (mode === 'practice') {
+                generateMathProblem();
+            } else if (mode === 'test') {
+                startNewMathTest();
+            }
         }
 
         function generateMathProblem() {
@@ -1052,6 +1299,89 @@
         function updateMathStats() {
             document.getElementById('math-correct').textContent = mathScore;
             document.getElementById('math-total').textContent = mathTotal;
+        }
+
+        function startNewMathTest() {
+            mathTestQuestions = generateMathTestQuestions();
+            currentMathTestQuestion = 0;
+            mathTestScore = 0;
+            
+            document.getElementById('math-test-results').style.display = 'none';
+            document.getElementById('math-test-problem').style.display = 'block';
+            document.getElementById('math-test-answer').style.display = 'block';
+            
+            showMathTestQuestion();
+        }
+
+        function generateMathTestQuestions() {
+            const questions = [];
+            for (let i = 0; i < 10; i++) {
+                const a = Math.floor(Math.random() * 20) + 1;
+                const b = Math.floor(Math.random() * 20) + 1;
+                const operators = ['+', '-', '×'];
+                const operator = operators[Math.floor(Math.random() * operators.length)];
+                
+                let answer;
+                switch (operator) {
+                    case '+': answer = a + b; break;
+                    case '-': answer = a - b; break;
+                    case '×': answer = a * b; break;
+                }
+                
+                questions.push({
+                    problem: `${a} ${operator} ${b} = ?`,
+                    answer: answer
+                });
+            }
+            return questions;
+        }
+
+        function showMathTestQuestion() {
+            if (currentMathTestQuestion >= mathTestQuestions.length) {
+                showMathTestResults();
+                return;
+            }
+            
+            const question = mathTestQuestions[currentMathTestQuestion];
+            document.getElementById('math-test-problem').textContent = question.problem;
+            document.getElementById('math-test-answer').value = '';
+            document.getElementById('math-test-progress').textContent = `${currentMathTestQuestion + 1}/10`;
+        }
+
+        function checkMathTestAnswer() {
+            const userAnswer = parseInt(document.getElementById('math-test-answer').value);
+            const correctAnswer = mathTestQuestions[currentMathTestQuestion].answer;
+            
+            if (userAnswer === correctAnswer) {
+                mathTestScore++;
+                showNotification('✅ Правильно!');
+            } else {
+                showNotification(`❌ Неправильно! Правильный ответ: ${correctAnswer}`);
+            }
+            
+            currentMathTestQuestion++;
+            showMathTestQuestion();
+        }
+
+        function showMathTestResults() {
+            document.getElementById('math-test-problem').style.display = 'none';
+            document.getElementById('math-test-answer').style.display = 'none';
+            document.getElementById('math-test-results').style.display = 'block';
+            
+            const accuracy = Math.round((mathTestScore / 10) * 100);
+            document.getElementById('math-test-score').textContent = accuracy + '%';
+            document.getElementById('math-test-accuracy').textContent = `Правильно: ${mathTestScore}/10`;
+            
+            if (mathTestScore >= 8) {
+                addExperience(30);
+                showNotification('🎉 Отличный результат! +30 XP');
+            } else if (mathTestScore >= 5) {
+                addExperience(20);
+                showNotification('👍 Хороший результат! +20 XP');
+            } else {
+                addExperience(10);
+                showNotification('💪 Продолжайте тренироваться! +10 XP');
+            }
         }
 
         // ===== РЕГИСТРАЦИЯ =====
