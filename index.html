@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeCraft - Саморазвитие</title>
+    <style>
+        :root {
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-link-color: #2481cc;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #f1f1f1;
+            --primary-color: #3390ec;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --tg-theme-bg-color: #1c1c1d;
+                --tg-theme-text-color: #ffffff;
+                --tg-theme-hint-color: #8e8e93;
+                --tg-theme-link-color: #5ac8fa;
+                --tg-theme-button-color: #5ac8fa;
+                --tg-theme-button-text-color: #ffffff;
+                --tg-theme-secondary-bg-color: #2c2c2e;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 16px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Стили для главного экрана */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .level-badge {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .progress-section {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .module-card {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .module-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            background-color: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .module-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .module-desc {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .achievements-section {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .achievements-list {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .achievement-item {
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .achievement-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 8px;
+            background-color: var(--warning-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .achievement-name {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .achievement-progress {
+            font-size: 10px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .locked {
+            opacity: 0.5;
+        }
+
+        /* Навигация */
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: var(--tg-theme-secondary-bg-color);
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Стили для модулей */
+        .module-content {
+            padding: 16px;
+        }
+
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .word-card {
+            text-align: center;
+            padding: 32px 16px;
+        }
+
+        .word-original {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .word-translation {
+            font-size: 18px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .habit-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .habit-day {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .habit-completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .habit-missed {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .habit-empty {
+            background-color: var(--tg-theme-secondary-bg-color);
+        }
+
+        .game-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .math-problem {
+            font-size: 32px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 2px solid var(--tg-theme-secondary-bg-color);
+            border-radius: 8px;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .timer {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 16px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-card {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color);
+            margin-top: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color);
+            font-size: 12px;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Главный экран -->
+    <div id="main-screen" class="screen active">
+        <div class="container">
+            <div class="header fade-in">
+                <div class="user-info">
+                    <div class="avatar" id="user-avatar">U</div>
+                    <div>
+                        <div id="user-name">Пользователь</div>
+                        <div class="level-badge">Уровень <span id="user-level">1</span></div>
+                    </div>
+                </div>
+                <div class="xp-display">
+                    <div id="user-xp">125/200 XP</div>
+                </div>
+            </div>
+
+            <div class="progress-section fade-in">
+                <div class="progress-header">
+                    <div>Ежедневные цели</div>
+                    <div id="daily-progress">3/5 выполнено</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="daily-progress-bar" style="width: 60%"></div>
+                </div>
+            </div>
+
+            <div class="modules-grid">
+                <div class="module-card fade-in" data-module="words">
+                    <div class="module-icon">📚</div>
+                    <div class="module-title">WordMaster</div>
+                    <div class="module-desc">Изучение слов</div>
+                </div>
+                <div class="module-card fade-in" data-module="habits">
+                    <div class="module-icon">📅</div>
+                    <div class="module-title">HabitTracker</div>
+                    <div class="module-desc">Отслеживание привычек</div>
+                </div>
+                <div class="module-card fade-in" data-module="games">
+                    <div class="module-icon">🎮</div>
+                    <div class="module-title">BrainGames</div>
+                    <div class="module-desc">Тренировка мозга</div>
+                </div>
+                <div class="module-card fade-in" data-module="math">
+                    <div class="module-icon">🧮</div>
+                    <div class="module-title">MathGym</div>
+                    <div class="module-desc">Математика</div>
+                </div>
+            </div>
+
+            <div class="achievements-section fade-in">
+                <div class="section-title">Ближайшие достижения</div>
+                <div class="achievements-list" id="achievements-list">
+                    <!-- achievements will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            LifeCraft • Развивайтесь каждый день
+        </div>
+    </div>
+
+    <!-- Модуль WordMaster -->
+    <div id="words-screen" class="screen">
+        <div class="nav-header">
+            <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
+            <div class="section-title">WordMaster</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div class="module-content">
+            <div class="card">
+                <div class="progress-header">
+                    <div>Прогресс изучения</div>
+                    <div id="words-progress">0%</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="words-progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="card word-card" id="word-card">
+                <div class="word-original" id="current-word">Загрузка...</div>
+                <div class="word-translation" id="current-translation" style="display: none;"></div>
+            </div>
+
+            <div class="buttons-row">
+                <button class="btn btn-danger" onclick="markWordAsHard()">Сложно</button>
+                <button class="btn btn-primary" onclick="showTranslation()">Показать перевод</button>
+                <button class="btn btn-success" onclick="markWordAsKnown()">Знаю</button>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Статистика</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="words-learned">0</div>
+                        <div class="stat-label">Изучено слов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="words-total">100</div>
+                        <div class="stat-label">Всего слов</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модуль HabitTracker -->
+    <div id="habits-screen" class="screen">
+        <div class="nav-header">
+            <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
+            <div class="section-title">HabitTracker</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div class="module-content">
+            <div class="card">
+                <div class="section-title">Мои привычки</div>
+                <div id="habits-list">
+                    <!-- habits will be populated by JS -->
+                </div>
+                <button class="btn btn-primary" onclick="addNewHabit()" style="margin-top: 16px; width: 100%;">
+                    + Добавить привычку
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Статистика</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-streak">0</div>
+                        <div class="stat-label">Текущая серия</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completion-rate">0%</div>
+                        <div class="stat-label">Выполнение</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модуль BrainGames -->
+    <div id="games-screen" class="screen">
+        <div class="nav-header">
+            <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
+            <div class="section-title">BrainGames</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div class="module-content">
+            <div class="modules-grid">
+                <div class="module-card" onclick="startGame('memory')">
+                    <div class="module-icon">🎴</div>
+                    <div class="module-title">Мемори</div>
+                    <div class="module-desc">Тренировка памяти</div>
+                </div>
+                <div class="module-card" onclick="startGame('math')">
+                    <div class="module-icon">⚡</div>
+                    <div class="module-title">Матеблиц</div>
+                    <div class="module-desc">Примеры на время</div>
+                </div>
+                <div class="module-card" onclick="startGame('reaction')">
+                    <div class="module-icon">🎯</div>
+                    <div class="module-title">Реакция</div>
+                    <div class="module-desc">Тест скорости</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Рекорды</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="memory-record">0</div>
+                        <div class="stat-label">Мемори</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="math-record">0</div>
+                        <div class="stat-label">Матеблиц</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="reaction-record">0</div>
+                        <div class="stat-label">Реакция</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модуль MathGym -->
+    <div id="math-screen" class="screen">
+        <div class="nav-header">
+            <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
+            <div class="section-title">MathGym</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div class="module-content">
+            <div class="card">
+                <div class="section-title">Математическая тренировка</div>
+                <div class="math-problem" id="math-problem">5 + 3 = ?</div>
+                <input type="number" class="answer-input" id="math-answer" placeholder="Введите ответ">
+                <button class="btn btn-primary" onclick="checkMathAnswer()" style="width: 100%;">
+                    Проверить
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="timer" id="math-timer">Время: 0с</div>
+                <div class="progress-header">
+                    <div>Прогресс</div>
+                    <div id="math-progress">0/10</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="math-progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">Статистика</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="math-correct">0</div>
+                        <div class="stat-label">Правильно</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="math-total">0</div>
+                        <div class="stat-label">Всего решено</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ =====
+
+        // Инициализация приложения
+        document.addEventListener('DOMContentLoaded', function() {
+            initApp();
+        });
+
+        function initApp() {
+            // Инициализация Telegram WebApp
+            const tg = window.Telegram?.WebApp;
+            
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                
+                // Получение данных пользователя из Telegram
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    document.getElementById('user-name').textContent = user.first_name || 'Пользователь';
+                    document.getElementById('user-avatar').textContent = user.first_name ? user.first_name[0].toUpperCase() : 'U';
+                    
+                    if (user.photo_url) {
+                        document.getElementById('user-avatar').style.backgroundImage = `url(${user.photo_url})`;
+                        document.getElementById('user-avatar').style.backgroundSize = 'cover';
+                    }
+                }
+                
+                // Применение цветовой схемы Telegram
+                applyTelegramTheme();
+            }
+            
+            // Загрузка данных пользователя
+            loadUserData();
+            initWordMaster();
+            initHabitTracker();
+            initBrainGames();
+            initMathGym();
+            
+            // Обработчики кликов по модулям
+            document.querySelectorAll('.module-card[data-module]').forEach(card => {
+                card.addEventListener('click', function() {
+                    const module = this.getAttribute('data-module');
+                    showScreen(module + '-screen');
+                });
+            });
+        }
+
+        // ===== ОБЩИЕ ФУНКЦИИ =====
+
+        function applyTelegramTheme() {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) return;
+            
+            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#000000');
+            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
+            document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#2481cc');
+            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#2481cc');
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color || '#f1f1f1');
+        }
+
+        function showScreen(screenId) {
+            // Скрыть все экраны
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Показать выбранный экран
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function addExperience(amount) {
+            const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
+            
+            if (!userData.xp) {
+                userData.xp = { current: 0, required: 200 };
+            }
+            
+            userData.xp.current += amount;
+            
+            // Проверка повышения уровня
+            if (userData.xp.current >= userData.xp.required) {
+                userData.level = (userData.level || 1) + 1;
+                userData.xp.current = userData.xp.current - userData.xp.required;
+                userData.xp.required = Math.floor(userData.xp.required * 1.2);
+                
+                showLevelUpNotification(userData.level);
+            }
+            
+            localStorage.setItem('lifecraft_user', JSON.stringify(userData));
+            loadUserData();
+        }
+
+        function showLevelUpNotification(level) {
+            alert(`🎉 Поздравляем! Вы достигли уровня ${level}!`);
+        }
+
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
+            
+            if (userData.level) {
+                document.getElementById('user-level').textContent = userData.level;
+            }
+            
+            if (userData.xp) {
+                document.getElementById('user-xp').textContent = `${userData.xp.current || 0}/${userData.xp.required || 200} XP`;
+                const progressPercent = ((userData.xp.current || 0) / (userData.xp.required || 200)) * 100;
+                document.querySelector('.progress-fill').style.width = `${Math.min(progressPercent, 100)}%`;
+            }
+        }
+
+        // ===== МОДУЛЬ WORDMASTER =====
+
+        let currentWordIndex = 0;
+        let wordsData = [];
+
+        function initWordMaster() {
+            // Загрузка слов из localStorage или создание начального набора
+            const savedWords = localStorage.getItem('lifecraft_words');
+            if (savedWords) {
+                wordsData = JSON.parse(savedWords);
+            } else {
+                // Начальный набор слов
+                wordsData = [
+                    { id: 1, original: "Hello", translation: "Привет", learned: false },
+                    { id: 2, original: "World", translation: "Мир", learned: false },
+                    { id: 3, original: "Book", translation: "Книга", learned: false },
+                    { id: 4, original: "Computer", translation: "Компьютер", learned: false },
+                    { id: 5, original: "Language", translation: "Язык", learned: false }
+                ];
+                localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+            }
+            
+            showNextWord();
+            updateWordStats();
+        }
+
+        function showNextWord() {
+            if (wordsData.length === 0) return;
+            
+            const word = wordsData[currentWordIndex];
+            document.getElementById('current-word').textContent = word.original;
+            document.getElementById('current-translation').textContent = word.translation;
+            document.getElementById('current-translation').style.display = 'none';
+        }
+
+        function showTranslation() {
+            document.getElementById('current-translation').style.display = 'block';
+            document.getElementById('word-card').classList.add('pulse');
+            setTimeout(() => {
+                document.getElementById('word-card').classList.remove('pulse');
+            }, 500);
+        }
+
+        function markWordAsKnown() {
+            wordsData[currentWordIndex].learned = true;
+            localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+            
+            addExperience(5);
+            currentWordIndex = (currentWordIndex + 1) % wordsData.length;
+            showNextWord();
+            updateWordStats();
+        }
+
+        function markWordAsHard() {
+            addExperience(1);
+            currentWordIndex = (currentWordIndex + 1) % wordsData.length;
+            showNextWord();
+        }
+
+        function updateWordStats() {
+            const learnedWords = wordsData.filter(word => word.learned).length;
+            const totalWords = wordsData.length;
+            const progress = totalWords > 0 ? Math.round((learnedWords / totalWords) * 100) : 0;
+            
+            document.getElementById('words-learned').textContent = learnedWords;
+            document.getElementById('words-total').textContent = totalWords;
+            document.getElementById('words-progress').textContent = progress + '%';
+            document.getElementById('words-progress-bar').style.width = progress + '%';
+        }
+
+        // ===== МОДУЛЬ HABITTRACKER =====
+
+        function initHabitTracker() {
+            updateHabitsDisplay();
+        }
+
+        function addNewHabit() {
+            const habitName = prompt("Введите название привычки:");
+            if (habitName) {
+                const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
+                habits.push({
+                    id: Date.now(),
+                    name: habitName,
+                    days: Array(30).fill(0) // 0 - пусто, 1 - выполнено, -1 - пропущено
+                });
+                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
+                updateHabitsDisplay();
+            }
+        }
+
+        function updateHabitsDisplay() {
+            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
+            const habitsList = document.getElementById('habits-list');
+            
+            if (habits.length === 0) {
+                habitsList.innerHTML = '<p style="text-align: center; color: var(--tg-theme-hint-color);">Добавьте свою первую привычку</p>';
+                return;
+            }
+            
+            habitsList.innerHTML = habits.map(habit => `
+                <div class="card" style="margin-bottom: 16px;">
+                    <div style="font-weight: bold; margin-bottom: 12px;">${habit.name}</div>
+                    <div class="habit-grid">
+                        ${habit.days.map((day, index) => `
+                            <div class="habit-day ${day === 1 ? 'habit-completed' : day === -1 ? 'habit-missed' : 'habit-empty'}" 
+                                 onclick="toggleHabitDay(${habit.id}, ${index})">
+                                ${index + 1}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            updateHabitStats();
+        }
+
+        function toggleHabitDay(habitId, dayIndex) {
+            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
+            const habit = habits.find(h => h.id === habitId);
+            
+            if (habit) {
+                // Цикл: 0 -> 1 -> -1 -> 0
+                if (habit.days[dayIndex] === 0) {
+                    habit.days[dayIndex] = 1;
+                    addExperience(2);
+                } else if (habit.days[dayIndex] === 1) {
+                    habit.days[dayIndex] = -1;
+                } else {
+                    habit.days[dayIndex] = 0;
+                }
+                
+                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
+                updateHabitsDisplay();
+            }
+        }
+
+        function updateHabitStats() {
+            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
+            let totalDays = 0;
+            let completedDays = 0;
+            let currentStreak = 0;
+            
+            habits.forEach(habit => {
+                habit.days.forEach(day => {
+                    if (day !== 0) totalDays++;
+                    if (day === 1) completedDays++;
+                });
+            });
+            
+            const completionRate = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
+            
+            document.getElementById('current-streak').textContent = currentStreak;
+            document.getElementById('completion-rate').textContent = completionRate + '%';
+        }
+
+        // ===== МОДУЛЬ BRAINGAMES =====
+
+        function initBrainGames() {
+            // Загрузка рекордов
+            const records = JSON.parse(localStorage.getItem('lifecraft_game_records') || '{}');
+            document.getElementById('memory-record').textContent = records.memory || 0;
+            document.getElementById('math-record').textContent = records.math || 0;
+            document.getElementById('reaction-record').textContent = records.reaction || 0;
+        }
+
+        function startGame(gameType) {
+            alert(`Запуск игры: ${gameType}`);
+            // Здесь будет логика для каждой игры
+        }
+
+        // ===== МОДУЛЬ MATHGYM =====
+
+        let mathScore = 0;
+        let mathTotal = 0;
+        let mathTimer = 0;
+        let mathInterval;
+
+        function initMathGym() {
+            generateMathProblem();
+            startMathTimer();
+        }
+
+        function generateMathProblem() {
+            const a = Math.floor(Math.random() * 20) + 1;
+            const b = Math.floor(Math.random() * 20) + 1;
+            const operators = ['+', '-', '×'];
+            const operator = operators[Math.floor(Math.random() * operators.length)];
+            
+            let answer;
+            switch (operator) {
+                case '+': answer = a + b; break;
+                case '-': answer = a - b; break;
+                case '×': answer = a * b; break;
+            }
+            
+            document.getElementById('math-problem').textContent = `${a} ${operator} ${b} = ?`;
+            document.getElementById('math-problem').dataset.answer = answer;
+            document.getElementById('math-answer').value = '';
+            document.getElementById('math-answer').focus();
+        }
+
+        function checkMathAnswer() {
+            const userAnswer = parseInt(document.getElementById('math-answer').value);
+            const correctAnswer = parseInt(document.getElementById('math-problem').dataset.answer);
+            
+            if (userAnswer === correctAnswer) {
+                mathScore++;
+                addExperience(3);
+                document.getElementById('math-answer').style.borderColor = 'var(--success-color)';
+            } else {
+                document.getElementById('math-answer').style.borderColor = 'var(--danger-color)';
+            }
+            
+            mathTotal++;
+            updateMathStats();
+            
+            setTimeout(() => {
+                document.getElementById('math-answer').style.borderColor = '';
+                generateMathProblem();
+            }, 1000);
+        }
+
+        function updateMathStats() {
+            document.getElementById('math-correct').textContent = mathScore;
+            document.getElementById('math-total').textContent = mathTotal;
+            const progress = Math.min((mathTotal / 10) * 100, 100);
+            document.getElementById('math-progress').textContent = `${mathTotal}/10`;
+            document.getElementById('math-progress-bar').style.width = `${progress}%`;
+        }
+
+        function startMathTimer() {
+            mathInterval = setInterval(() => {
+                mathTimer++;
+                document.getElementById('math-timer').textContent = `Время: ${mathTimer}с`;
+            }, 1000);
+        }
+
+        // Эмуляция Telegram WebApp API для демонстрации
+        if (!window.Telegram) {
+            window.Telegram = {
+                WebApp: {
+                    initDataUnsafe: {
+                        user: {
+                            first_name: "Алексей",
+                            photo_url: ""
+                        }
+                    },
+                    expand: function() {},
+                    ready: function() {},
+                    themeParams: {
+                        bg_color: "#ffffff",
+                        text_color: "#000000",
+                        hint_color: "#999999",
+                        link_color: "#2481cc",
+                        button_color: "#2481cc",
+                        button_text_color: "#ffffff",
+                        secondary_bg_color: "#f1f1f1"
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+</html>
