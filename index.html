@@ -329,6 +329,26 @@
             padding: 40px 20px;
             color: var(--tg-theme-hint-color);
         }
+
+        .tap-area {
+            width: 200px;
+            height: 200px;
+            background: var(--primary-color);
+            border-radius: 100px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .tap-area:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -500,7 +520,6 @@
         function sendToBot(message) {
             const tg = window.Telegram?.WebApp;
             if (tg && tg.sendData) {
-                // Отправляем данные боту
                 const data = {
                     action: 'notification',
                     message: message,
@@ -510,9 +529,8 @@
                 tg.sendData(JSON.stringify(data));
             }
             
-            // Альтернативный способ - через WebApp.showAlert
             if (tg && tg.showAlert) {
-                tg.showAlert(message);
+                tg.showAlert("📢 " + message);
             }
             
             console.log('Bot notification:', message);
@@ -521,47 +539,35 @@
         // ===== USER REGISTRATION =====
         function initRegistration() {
             const tg = window.Telegram?.WebApp;
-            console.log('Telegram WebApp:', tg);
             
             if (tg) {
                 tg.expand();
                 tg.ready();
                 
                 const user = tg.initDataUnsafe?.user;
-                console.log('User data:', user);
                 
                 if (user) {
                     let displayName = 'Пользователь';
                     let avatarText = 'U';
                     
-                    // ПРИОРИТЕТ: username -> first_name -> last_name
                     if (user.username) {
                         displayName = '@' + user.username;
                         avatarText = user.username.charAt(0).toUpperCase();
                     } else if (user.first_name) {
                         displayName = user.first_name;
                         avatarText = user.first_name.charAt(0).toUpperCase();
-                    } else if (user.last_name) {
-                        displayName = user.last_name;
-                        avatarText = user.last_name.charAt(0).toUpperCase();
                     }
                     
-                    console.log('Display name:', displayName);
-                    
-                    // Обновляем интерфейс
                     document.getElementById('user-name').textContent = displayName;
                     document.getElementById('user-avatar').textContent = avatarText;
                     
-                    // Сохраняем данные
                     const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
                     userData.telegramId = user.id;
                     userData.username = user.username;
                     userData.first_name = user.first_name;
-                    userData.last_name = user.last_name;
                     userData.displayName = displayName;
                     localStorage.setItem('lifecraft_user', JSON.stringify(userData));
                     
-                    // Отправляем приветствие боту
                     sendToBot(`👋 Пользователь ${displayName} запустил приложение!`);
                     
                 } else {
@@ -916,20 +922,32 @@
                     initDataUnsafe: {
                         user: {
                             id: 123456,
-                            first_name: "Тест",
-                            username: "test_user"
+                            first_name: "Иван",
+                            username: "super_coder"
                         }
                     },
-                    expand: function() {},
-                    ready: function() {},
+                    expand: function() {
+                        console.log('App expanded');
+                    },
+                    ready: function() {
+                        console.log('App ready');
+                    },
                     sendData: function(data) {
-                        console.log('Data sent to bot:', data);
+                        const parsed = JSON.parse(data);
+                        console.log('📨 Sent to bot:', parsed);
+                        alert('🤖 Бот получил: ' + parsed.message);
                     },
                     showAlert: function(message) {
-                        alert('Bot: ' + message);
+                        alert('🤖 Бот: ' + message);
                     }
                 }
             };
+            
+            // Принудительный запуск
+            setTimeout(() => {
+                initRegistration();
+                console.log('🔄 Принудительная инициализация');
+            }, 100);
         }
     </script>
 </body>
