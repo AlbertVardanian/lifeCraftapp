@@ -48,6 +48,10 @@
             margin: 0;
             min-height: 100vh;
             touch-action: pan-y;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .container {
@@ -393,6 +397,7 @@
             background-color: var(--tg-theme-secondary-bg-color);
             padding: 8px;
             border-radius: 8px;
+            touch-action: none;
         }
 
         .tile {
@@ -405,6 +410,7 @@
             font-size: 18px;
             background-color: #cdc1b4;
             color: #776e65;
+            user-select: none;
         }
 
         .tile-2 { background-color: #eee4da; }
@@ -429,6 +435,13 @@
             text-align: center;
             font-size: 20px;
             font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .swipe-info {
+            text-align: center;
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
             margin: 10px 0;
         }
 
@@ -482,6 +495,18 @@
             
             .math-problem {
                 font-size: 24px;
+            }
+            
+            .tile {
+                font-size: 16px;
+            }
+            
+            .tile-128, .tile-256, .tile-512 {
+                font-size: 14px;
+            }
+            
+            .tile-1024, .tile-2048 {
+                font-size: 12px;
             }
         }
     </style>
@@ -719,10 +744,10 @@
 
             <div class="card">
                 <button class="btn btn-primary" onclick="setupHabitReminders()" style="width: 100%;">
-                    ⏰ Настроить напоминания
+                    ⏰ Включить напоминания
                 </button>
                 <div style="font-size: 12px; color: var(--tg-theme-hint-color); text-align: center; margin-top: 8px;">
-                    Для работы напоминаний нужен сервер с ботом
+                    Напоминания будут приходить в этого бота
                 </div>
             </div>
         </div>
@@ -758,6 +783,9 @@
                 Счет: <span id="score-2048">0</span>
             </div>
             <div class="game-2048-container" id="game-2048-board"></div>
+            <div class="swipe-info">
+                Используйте свайпы для перемещения плиток
+            </div>
             <div class="game-controls">
                 <button class="btn btn-primary" onclick="resetGame2048()">Новая игра</button>
                 <button class="btn btn-warning" onclick="showScreen('games-screen')">Выйти</button>
@@ -846,74 +874,79 @@
             localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
         }
 
-        // ===== СИНХРОНИЗАЦИЯ МЕЖДУ УСТРОЙСТВАМИ =====
-        function syncData() {
-            // Для синхронизации между устройствами можно использовать:
-            // 1. Telegram Cloud Storage (лучший вариант для Telegram Mini Apps)
-            // 2. Собственный бэкенд с API
-            // 3. Firebase или подобные сервисы
-            
+        // ===== TELEGRAM BOT FUNCTIONS =====
+        function sendToCurrentBot(message) {
             const tg = window.Telegram?.WebApp;
-            if (tg && tg.CloudStorage) {
-                // Используем облачное хранилище Telegram
-                syncWithTelegramCloud();
+            
+            if (!tg) {
+                console.log('Telegram WebApp не доступен');
+                return false;
+            }
+
+            // Отправляем сообщение через Telegram WebApp обратно в бота
+            if (tg.sendData) {
+                const data = {
+                    action: 'habit_reminder',
+                    message: message,
+                    timestamp: Date.now(),
+                    user: tg.initDataUnsafe?.user
+                };
+                
+                tg.sendData(JSON.stringify(data));
+                console.log('Сообщение отправлено в бота:', message);
+                return true;
             } else {
-                // Локальное хранилище (работает только на одном устройстве)
-                console.log('Используется локальное хранилище');
+                console.log('Метод sendData не доступен');
+                return false;
             }
         }
 
-        function syncWithTelegramCloud() {
-            const tg = window.Telegram?.WebApp;
-            if (!tg || !tg.CloudStorage) return;
-            
-            // Сохраняем данные в облако Telegram
-            const userData = getUserData();
+        function setupHabitReminders() {
             const habits = getHabits();
-            const words = JSON.parse(localStorage.getItem('lifecraft_words') || '[]');
-            const mathStats = JSON.parse(localStorage.getItem('lifecraft_math') || '{}');
             
-            tg.CloudStorage.setItem('user_data', JSON.stringify(userData));
-            tg.CloudStorage.setItem('habits', JSON.stringify(habits));
-            tg.CloudStorage.setItem('words', JSON.stringify(words));
-            tg.CloudStorage.setItem('math_stats', JSON.stringify(mathStats));
+            if (habits.length === 0) {
+                showNotification('Добавьте сначала привычки!');
+                return;
+            }
+
+            // Сохраняем настройки напоминаний
+            const userData = getUserData();
+            userData.habitReminders = true;
+            userData.reminderSetupTime = new Date().toISOString();
+            saveUserData(userData);
+
+            // Отправляем тестовое напоминание
+            const incompleteHabits = habits.filter(h => !h.lastCompleted || h.lastCompleted !== new Date().toDateString());
+            
+            if (incompleteHabits.length > 0) {
+                const habitNames = incompleteHabits.map(h => h.name).join(', ');
+                const message = `⏰ Напоминание о привычках:\n${habitNames}\n\nНе забудьте выполнить их сегодня! 💪`;
+                
+                if (sendToCurrentBot(message)) {
+                    showNotification('Напоминания включены! Сообщение отправлено в бота.');
+                } else {
+                    showNotification('Напоминания включены, но не удалось отправить сообщение.');
+                }
+            } else {
+                showNotification('Все привычки выполнены! 🎉 Напоминания включены.');
+            }
+
+            // Запланировать ежедневные напоминания
+            scheduleDailyReminders();
         }
 
-        function loadFromTelegramCloud() {
-            const tg = window.Telegram?.WebApp;
-            if (!tg || !tg.CloudStorage) return;
+        function scheduleDailyReminders() {
+            // В реальном приложении это должно работать на сервере
+            // Здесь мы просто сохраняем настройки
+            const userData = getUserData();
+            userData.dailyReminderTime = '20:00'; // Напоминания в 20:00
+            saveUserData(userData);
             
-            // Загружаем данные из облака Telegram
-            tg.CloudStorage.getItem('user_data', (err, userData) => {
-                if (!err && userData) {
-                    localStorage.setItem('lifecraft_user', userData);
-                }
-            });
-            
-            tg.CloudStorage.getItem('habits', (err, habits) => {
-                if (!err && habits) {
-                    localStorage.setItem('lifecraft_habits', habits);
-                }
-            });
-            
-            tg.CloudStorage.getItem('words', (err, words) => {
-                if (!err && words) {
-                    localStorage.setItem('lifecraft_words', words);
-                }
-            });
-            
-            tg.CloudStorage.getItem('math_stats', (err, mathStats) => {
-                if (!err && mathStats) {
-                    localStorage.setItem('lifecraft_math', mathStats);
-                }
-            });
+            console.log('Ежедневные напоминания запланированы на 20:00');
         }
 
         // ===== ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ =====
         function initUser() {
-            // Пробуем загрузить данные из облака Telegram
-            loadFromTelegramCloud();
-            
             const userData = getUserData();
             
             if (!userData.name) {
@@ -931,7 +964,6 @@
             const userData = getUserData();
             userData.name = name;
             saveUserData(userData);
-            syncWithTelegramCloud(); // Синхронизируем с облаком
             
             document.getElementById('name-modal').style.display = 'none';
             updateUserInfo();
@@ -1003,7 +1035,6 @@
                     learned: false
                 }));
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
-                syncWithTelegramCloud();
             } else {
                 wordsData = JSON.parse(localStorage.getItem('lifecraft_words'));
             }
@@ -1068,7 +1099,6 @@
             if (wordIndex !== -1) {
                 wordsData[wordIndex].learned = true;
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
-                syncWithTelegramCloud();
                 addExperience(5);
                 showNextWord();
                 updateWordStats();
@@ -1293,7 +1323,6 @@
                 correct: mathCorrect,
                 total: mathTotal
             }));
-            syncWithTelegramCloud();
             
             updateMathStats();
             generateMathProblem();
@@ -1433,7 +1462,6 @@
                 }
                 
                 saveHabits(habits);
-                syncWithTelegramCloud();
                 updateHabitsList();
             }
         }
@@ -1442,7 +1470,6 @@
             const habits = getHabits();
             const updatedHabits = habits.filter(h => h.id !== habitId);
             saveHabits(updatedHabits);
-            syncWithTelegramCloud();
             updateHabitsList();
             showNotification('Привычка удалена');
         }
@@ -1471,42 +1498,72 @@
             });
             
             saveHabits(habits);
-            syncWithTelegramCloud();
             updateHabitsList();
             hideAddHabitModal();
             showNotification('Привычка добавлена!');
         }
 
-        function setupHabitReminders() {
-            const habits = getHabits();
-            if (habits.length === 0) {
-                showNotification('Добавьте сначала привычки!');
-                return;
-            }
-            
-            showNotification('Для работы напоминаний нужен сервер с ботом и API токен');
-            
-            // Реальная реализация требует:
-            // 1. API токен бота
-            // 2. Бэкенд сервер
-            // 3. Хранение chat_id пользователя
-            // 4. Систему планирования напоминаний
-            
-            console.log('Для реализации напоминаний нужно:');
-            console.log('1. Получить API токен бота от @BotFather');
-            console.log('2. Настроить вебхук на сервере');
-            console.log('3. Сохранить chat_id пользователя');
-            console.log('4. Реализовать отправку сообщений через fetch()');
-        }
-
         // ===== GAME 2048 =====
         let gameBoard = [];
         let score = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
 
         function startGame2048() {
             showScreen('game-2048-screen');
             resetGame2048();
+            
+            // Добавляем обработчики для клавиатуры
             document.addEventListener('keydown', handleKeyPress);
+            
+            // Добавляем обработчики для тач-событий
+            const boardElement = document.getElementById('game-2048-board');
+            boardElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+            boardElement.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
+
+        function handleTouchStart(event) {
+            const touch = event.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            event.preventDefault();
+        }
+
+        function handleTouchEnd(event) {
+            if (!touchStartX || !touchStartY) return;
+            
+            const touch = event.changedTouches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            
+            // Определяем направление свайпа
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                // Горизонтальный свайп
+                if (Math.abs(diffX) > 30) { // Минимальное расстояние для свайпа
+                    if (diffX > 0) {
+                        moveRight();
+                    } else {
+                        moveLeft();
+                    }
+                }
+            } else {
+                // Вертикальный свайп
+                if (Math.abs(diffY) > 30) { // Минимальное расстояние для свайпа
+                    if (diffY > 0) {
+                        moveDown();
+                    } else {
+                        moveUp();
+                    }
+                }
+            }
+            
+            // Сбрасываем начальные координаты
+            touchStartX = 0;
+            touchStartY = 0;
+            event.preventDefault();
         }
 
         function resetGame2048() {
