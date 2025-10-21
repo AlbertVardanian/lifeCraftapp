@@ -718,11 +718,11 @@
             </div>
 
             <div class="card">
-                <button class="btn btn-primary" onclick="enableHabitReminders()" style="width: 100%;">
-                    ⏰ Включить напоминания
+                <button class="btn btn-primary" onclick="setupHabitReminders()" style="width: 100%;">
+                    ⏰ Настроить напоминания
                 </button>
                 <div style="font-size: 12px; color: var(--tg-theme-hint-color); text-align: center; margin-top: 8px;">
-                    Бот будет отправлять напоминания каждый день в 20:00
+                    Для работы напоминаний нужен сервер с ботом
                 </div>
             </div>
         </div>
@@ -736,14 +736,6 @@
             <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
-            <div class="card game-card" onclick="startTapGame()">
-                <div style="text-align: center;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">👆</div>
-                    <div style="font-weight: bold;">Тапы</div>
-                    <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Простая игра на клики</div>
-                </div>
-            </div>
-
             <div class="card game-card" onclick="startGame2048()">
                 <div style="text-align: center;">
                     <div style="font-size: 24px; margin-bottom: 8px;">🎯</div>
@@ -854,12 +846,77 @@
             localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
         }
 
+        // ===== СИНХРОНИЗАЦИЯ МЕЖДУ УСТРОЙСТВАМИ =====
+        function syncData() {
+            // Для синхронизации между устройствами можно использовать:
+            // 1. Telegram Cloud Storage (лучший вариант для Telegram Mini Apps)
+            // 2. Собственный бэкенд с API
+            // 3. Firebase или подобные сервисы
+            
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.CloudStorage) {
+                // Используем облачное хранилище Telegram
+                syncWithTelegramCloud();
+            } else {
+                // Локальное хранилище (работает только на одном устройстве)
+                console.log('Используется локальное хранилище');
+            }
+        }
+
+        function syncWithTelegramCloud() {
+            const tg = window.Telegram?.WebApp;
+            if (!tg || !tg.CloudStorage) return;
+            
+            // Сохраняем данные в облако Telegram
+            const userData = getUserData();
+            const habits = getHabits();
+            const words = JSON.parse(localStorage.getItem('lifecraft_words') || '[]');
+            const mathStats = JSON.parse(localStorage.getItem('lifecraft_math') || '{}');
+            
+            tg.CloudStorage.setItem('user_data', JSON.stringify(userData));
+            tg.CloudStorage.setItem('habits', JSON.stringify(habits));
+            tg.CloudStorage.setItem('words', JSON.stringify(words));
+            tg.CloudStorage.setItem('math_stats', JSON.stringify(mathStats));
+        }
+
+        function loadFromTelegramCloud() {
+            const tg = window.Telegram?.WebApp;
+            if (!tg || !tg.CloudStorage) return;
+            
+            // Загружаем данные из облака Telegram
+            tg.CloudStorage.getItem('user_data', (err, userData) => {
+                if (!err && userData) {
+                    localStorage.setItem('lifecraft_user', userData);
+                }
+            });
+            
+            tg.CloudStorage.getItem('habits', (err, habits) => {
+                if (!err && habits) {
+                    localStorage.setItem('lifecraft_habits', habits);
+                }
+            });
+            
+            tg.CloudStorage.getItem('words', (err, words) => {
+                if (!err && words) {
+                    localStorage.setItem('lifecraft_words', words);
+                }
+            });
+            
+            tg.CloudStorage.getItem('math_stats', (err, mathStats) => {
+                if (!err && mathStats) {
+                    localStorage.setItem('lifecraft_math', mathStats);
+                }
+            });
+        }
+
         // ===== ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ =====
         function initUser() {
+            // Пробуем загрузить данные из облака Telegram
+            loadFromTelegramCloud();
+            
             const userData = getUserData();
             
             if (!userData.name) {
-                // Показываем модальное окно для ввода имени
                 document.getElementById('name-modal').style.display = 'flex';
             } else {
                 document.getElementById('name-modal').style.display = 'none';
@@ -874,6 +931,7 @@
             const userData = getUserData();
             userData.name = name;
             saveUserData(userData);
+            syncWithTelegramCloud(); // Синхронизируем с облаком
             
             document.getElementById('name-modal').style.display = 'none';
             updateUserInfo();
@@ -926,7 +984,7 @@
                     ["chocolate", "шоколад"], ["ice cream", "мороженое"], ["home", "дом"], ["room", "комната"],
                     ["kitchen", "кухня"], ["bedroom", "спальня"], ["bathroom", "ванная"], ["living room", "гостиная"],
                     ["door", "дверь"], ["window", "окно"], ["floor", "пол"], ["wall", "стена"], ["ceiling", "потолок"],
-                    ["roof", " крыша"], ["stairs", "лестница"], ["furniture", "мебель"], ["table", "стол"], ["chair", "стул"],
+                    ["roof", "крыша"], ["stairs", "лестница"], ["furniture", "мебель"], ["table", "стол"], ["chair", "стул"],
                     ["bed", "кровать"], ["sofa", "диван"], ["wardrobe", "гардероб"], ["shelf", "полка"], ["mirror", "зеркало"],
                     ["lamp", "лампа"], ["light", "свет"], ["key", "ключ"], ["garden", "сад"], ["fence", "забор"],
                     ["street", "улица"], ["road", "дорога"], ["square", "площадь"], ["park", "парк"], ["bridge", "мост"],
@@ -945,6 +1003,7 @@
                     learned: false
                 }));
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+                syncWithTelegramCloud();
             } else {
                 wordsData = JSON.parse(localStorage.getItem('lifecraft_words'));
             }
@@ -1009,6 +1068,7 @@
             if (wordIndex !== -1) {
                 wordsData[wordIndex].learned = true;
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+                syncWithTelegramCloud();
                 addExperience(5);
                 showNextWord();
                 updateWordStats();
@@ -1233,6 +1293,7 @@
                 correct: mathCorrect,
                 total: mathTotal
             }));
+            syncWithTelegramCloud();
             
             updateMathStats();
             generateMathProblem();
@@ -1372,6 +1433,7 @@
                 }
                 
                 saveHabits(habits);
+                syncWithTelegramCloud();
                 updateHabitsList();
             }
         }
@@ -1380,6 +1442,7 @@
             const habits = getHabits();
             const updatedHabits = habits.filter(h => h.id !== habitId);
             saveHabits(updatedHabits);
+            syncWithTelegramCloud();
             updateHabitsList();
             showNotification('Привычка удалена');
         }
@@ -1408,32 +1471,32 @@
             });
             
             saveHabits(habits);
+            syncWithTelegramCloud();
             updateHabitsList();
             hideAddHabitModal();
             showNotification('Привычка добавлена!');
         }
 
-        function enableHabitReminders() {
+        function setupHabitReminders() {
             const habits = getHabits();
             if (habits.length === 0) {
                 showNotification('Добавьте сначала привычки!');
                 return;
             }
             
-            const userData = getUserData();
-            userData.habitReminders = true;
-            saveUserData(userData);
+            showNotification('Для работы напоминаний нужен сервер с ботом и API токен');
             
-            showNotification('Напоминания включены! Бот будет напоминать о привычках.');
+            // Реальная реализация требует:
+            // 1. API токен бота
+            // 2. Бэкенд сервер
+            // 3. Хранение chat_id пользователя
+            // 4. Систему планирования напоминаний
             
-            // Имитируем отправку запроса боту на напоминания
-            setTimeout(() => {
-                const incompleteHabits = habits.filter(h => !h.lastCompleted || h.lastCompleted !== new Date().toDateString());
-                if (incompleteHabits.length > 0) {
-                    const habitNames = incompleteHabits.map(h => h.name).join(', ');
-                    console.log(`Бот отправил напоминание: "Не забудьте выполнить привычки: ${habitNames}"`);
-                }
-            }, 2000);
+            console.log('Для реализации напоминаний нужно:');
+            console.log('1. Получить API токен бота от @BotFather');
+            console.log('2. Настроить вебхук на сервере');
+            console.log('3. Сохранить chat_id пользователя');
+            console.log('4. Реализовать отправку сообщений через fetch()');
         }
 
         // ===== GAME 2048 =====
@@ -1605,69 +1668,6 @@
                 }
             }
             return moved;
-        }
-
-        // ===== TAP GAME =====
-        function startTapGame() {
-            showScreen('games-screen');
-            
-            const gameHTML = `
-                <div class="card">
-                    <div style="font-weight: bold; margin-bottom: 16px;">Игра в Тапы</div>
-                    <div style="background-color: var(--primary-color); color: white; padding: 40px; text-align: center; border-radius: 12px; font-size: 20px; font-weight: bold; margin: 20px 0; cursor: pointer;" 
-                         id="tap-area" onclick="handleTap()">
-                        Нажми!
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="tap-count">0</div>
-                            <div class="stat-label">Кликов</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="tap-time">30</div>
-                            <div class="stat-label">Секунд</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="startTapGame()" style="width: 100%;">
-                        Начать заново
-                    </button>
-                </div>
-            `;
-            
-            document.querySelector('#games-screen .module-content').innerHTML = gameHTML;
-            
-            let tapCount = 0;
-            let tapTimeLeft = 30;
-            let tapTimer;
-            
-            function handleTap() {
-                tapCount++;
-                document.getElementById('tap-count').textContent = tapCount;
-                
-                const tapArea = document.getElementById('tap-area');
-                tapArea.style.backgroundColor = 'var(--success-color)';
-                setTimeout(() => {
-                    tapArea.style.backgroundColor = 'var(--primary-color)';
-                }, 100);
-            }
-            
-            window.handleTap = handleTap;
-            
-            clearInterval(tapTimer);
-            tapTimer = setInterval(() => {
-                tapTimeLeft--;
-                document.getElementById('tap-time').textContent = tapTimeLeft;
-                
-                if (tapTimeLeft <= 0) {
-                    clearInterval(tapTimer);
-                    document.getElementById('tap-area').onclick = null;
-                    document.getElementById('tap-area').textContent = 'Время вышло!';
-                    
-                    const xp = Math.floor(tapCount / 2);
-                    addExperience(xp);
-                    showNotification(`Игра окончена! Тапов: ${tapCount} (+${xp} XP)`);
-                }
-            }, 1000);
         }
 
         // ===== INITIALIZATION =====
