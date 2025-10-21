@@ -330,17 +330,17 @@
         </div>
 
         <div class="modules-grid">
-            <div class="module-card" onclick="showScreen('words-screen'); initWordMaster();">
+            <div class="module-card" onclick="showScreen('words-screen'); setTimeout(initWordMaster, 100);">
                 <div class="module-icon">📚</div>
                 <div style="font-weight: bold; margin-bottom: 5px;">WordMaster</div>
                 <div style="font-size: 14px; color: #666;">Изучение английского</div>
             </div>
-            <div class="module-card" onclick="showScreen('math-screen'); initMath();">
+            <div class="module-card" onclick="showScreen('math-screen'); setTimeout(initMath, 100);">
                 <div class="module-icon">🔢</div>
                 <div style="font-weight: bold; margin-bottom: 5px;">Математика</div>
                 <div style="font-size: 14px; color: #666;">Практика и теория</div>
             </div>
-            <div class="module-card" onclick="showScreen('habits-screen'); initHabits();">
+            <div class="module-card" onclick="showScreen('habits-screen'); setTimeout(initHabits, 100);">
                 <div class="module-icon">✅</div>
                 <div style="font-weight: bold; margin-bottom: 5px;">Привычки</div>
                 <div style="font-size: 14px; color: #666;">Трекер привычек</div>
@@ -619,6 +619,7 @@
                 const data = localStorage.getItem('lifecraft_user');
                 return data ? JSON.parse(data) : {};
             } catch (e) {
+                console.error('Ошибка загрузки данных пользователя:', e);
                 return {};
             }
         }
@@ -626,8 +627,10 @@
         function saveUserData(data) {
             try {
                 localStorage.setItem('lifecraft_user', JSON.stringify(data));
+                return true;
             } catch (e) {
-                console.error('Ошибка сохранения данных:', e);
+                console.error('Ошибка сохранения данных пользователя:', e);
+                return false;
             }
         }
 
@@ -636,6 +639,7 @@
                 const data = localStorage.getItem('lifecraft_habits');
                 return data ? JSON.parse(data) : [];
             } catch (e) {
+                console.error('Ошибка загрузки привычек:', e);
                 return [];
             }
         }
@@ -643,8 +647,10 @@
         function saveHabits(habits) {
             try {
                 localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
+                return true;
             } catch (e) {
                 console.error('Ошибка сохранения привычек:', e);
+                return false;
             }
         }
 
@@ -717,7 +723,7 @@
         function showNextWord() {
             const unlearnedWords = wordsData.filter(word => !word.learned);
             if (unlearnedWords.length === 0) {
-                document.getElementById('current-word').textContent = "Все слова изучены!";
+                document.getElementById('current-word').textContent = "Все слова изучены! 🎉";
                 document.getElementById('current-translation').style.display = 'none';
                 return;
             }
@@ -731,24 +737,38 @@
         }
 
         function showTranslation() {
-            document.getElementById('current-translation').style.display = 'block';
+            const translation = document.getElementById('current-translation');
+            translation.style.display = 'block';
         }
 
         function markWordAsHard() {
             showNextWord();
+            showNotification('Продолжаем учиться! 💪');
         }
 
         function markWordAsKnown() {
             const currentWordText = document.getElementById('current-word').textContent;
             const word = wordsData.find(w => w.original === currentWordText);
-            if (word) {
+            if (word && !word.learned) {
                 word.learned = true;
-                localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
-                addExperience(5);
-                showNotification('Слово изучено! +5 XP');
-                updateWordStats();
+                if (saveWordsData()) {
+                    addExperience(5);
+                    showNotification('Слово изучено! +5 XP');
+                    updateWordStats();
+                }
             }
             showNextWord();
+        }
+
+        function saveWordsData() {
+            try {
+                localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+                return true;
+            } catch (e) {
+                console.error('Ошибка сохранения слов:', e);
+                showNotification('Ошибка сохранения прогресса');
+                return false;
+            }
         }
 
         function showLearnedWords() {
@@ -771,10 +791,12 @@
 
         function updateWordStats() {
             const learnedCount = wordsData.filter(word => word.learned).length;
-            const progress = Math.round((learnedCount / wordsData.length) * 100);
+            const totalCount = wordsData.length;
+            const progress = Math.round((learnedCount / totalCount) * 100);
             
             document.getElementById('words-learned').textContent = learnedCount;
             document.getElementById('words-progress').textContent = progress + '%';
+            document.getElementById('words-total').textContent = totalCount;
         }
 
         // ===== МАТЕМАТИКА =====
@@ -848,6 +870,7 @@
             currentMathProblem = { a, b, operation, answer };
             document.getElementById('math-problem').textContent = `${a} ${operation} ${b} = ?`;
             document.getElementById('math-answer').value = '';
+            document.getElementById('math-answer').focus();
         }
 
         function checkMathAnswer() {
@@ -855,6 +878,7 @@
             
             if (isNaN(userAnswer)) {
                 showNotification('Введите число!');
+                document.getElementById('math-answer').focus();
                 return;
             }
             
@@ -912,7 +936,7 @@
                                          onclick="toggleHabit(${habit.id})">
                                         ${isCompleted ? '✓' : ''}
                                     </div>
-                                    <div style="color: #e74c3c; cursor: pointer;" onclick="deleteHabit(${habit.id})">🗑️</div>
+                                    <div style="color: #e74c3c; cursor: pointer; font-size: 18px;" onclick="deleteHabit(${habit.id})">🗑️</div>
                                 </div>
                             </div>
                         `;
@@ -949,8 +973,9 @@
                         showNotification(`Привычка "${habit.name}" выполнена! +10 XP`);
                     }
                     
-                    saveHabits(habits);
-                    updateHabitsList();
+                    if (saveHabits(habits)) {
+                        updateHabitsList();
+                    }
                 }
             } catch (e) {
                 console.error('Ошибка переключения привычки:', e);
@@ -964,9 +989,10 @@
                 const habit = habits.find(h => h.id === habitId);
                 if (habit && confirm(`Удалить привычку "${habit.name}"?`)) {
                     const updatedHabits = habits.filter(h => h.id !== habitId);
-                    saveHabits(updatedHabits);
-                    updateHabitsList();
-                    showNotification('Привычка удалена');
+                    if (saveHabits(updatedHabits)) {
+                        updateHabitsList();
+                        showNotification('Привычка удалена');
+                    }
                 }
             } catch (e) {
                 console.error('Ошибка удаления привычки:', e);
@@ -976,6 +1002,7 @@
 
         function showAddHabitModal() {
             document.getElementById('add-habit-modal').style.display = 'flex';
+            document.getElementById('new-habit-name').focus();
         }
 
         function hideAddHabitModal() {
@@ -985,9 +1012,18 @@
 
         function addNewHabit() {
             try {
-                const name = document.getElementById('new-habit-name').value.trim();
+                const nameInput = document.getElementById('new-habit-name');
+                const name = nameInput.value.trim();
+                
                 if (!name) {
                     showNotification('Введите название привычки!');
+                    nameInput.focus();
+                    return;
+                }
+                
+                if (name.length > 50) {
+                    showNotification('Название привычки слишком длинное!');
+                    nameInput.focus();
                     return;
                 }
                 
@@ -1001,10 +1037,11 @@
                     lastCompleted: null
                 });
                 
-                saveHabits(habits);
-                updateHabitsList();
-                hideAddHabitModal();
-                showNotification('Привычка добавлена!');
+                if (saveHabits(habits)) {
+                    updateHabitsList();
+                    hideAddHabitModal();
+                    showNotification('Привычка добавлена!');
+                }
             } catch (e) {
                 console.error('Ошибка добавления привычки:', e);
                 showNotification('Ошибка добавления привычки');
@@ -1032,19 +1069,19 @@
         function startAutomaticReminders() {
             const userData = getUserData();
             userData.automaticReminders = true;
-            saveUserData(userData);
-
-            updateReminderStatus();
-            showNotification('Автоматические напоминания включены!');
+            if (saveUserData(userData)) {
+                updateReminderStatus();
+                showNotification('Автоматические напоминания включены!');
+            }
         }
 
         function stopAutomaticReminders() {
             const userData = getUserData();
             userData.automaticReminders = false;
-            saveUserData(userData);
-
-            updateReminderStatus();
-            showNotification('Автоматические напоминания выключены');
+            if (saveUserData(userData)) {
+                updateReminderStatus();
+                showNotification('Автоматические напоминания выключены');
+            }
         }
 
         function updateReminderStatus() {
@@ -1062,7 +1099,7 @@
 
         // ===== ИГРА 2048 =====
         function startGame2048() {
-            showNotification('Игра 2048 скоро будет добавлена!');
+            showNotification('Игра 2048 скоро будет добавлена! 🎮');
         }
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
@@ -1072,6 +1109,7 @@
                 
                 if (!userData.name) {
                     document.getElementById('name-modal').style.display = 'flex';
+                    document.getElementById('user-name-input').focus();
                 } else {
                     document.getElementById('name-modal').style.display = 'none';
                     updateUserInfo();
@@ -1084,9 +1122,18 @@
 
         function saveUserName() {
             try {
-                const name = document.getElementById('user-name-input').value.trim();
+                const nameInput = document.getElementById('user-name-input');
+                const name = nameInput.value.trim();
+                
                 if (!name) {
                     showNotification('Введите имя!');
+                    nameInput.focus();
+                    return;
+                }
+                
+                if (name.length > 20) {
+                    showNotification('Имя слишком длинное!');
+                    nameInput.focus();
                     return;
                 }
                 
@@ -1094,20 +1141,28 @@
                 userData.name = name;
                 userData.xp = userData.xp || 0;
                 userData.level = userData.level || 1;
-                saveUserData(userData);
                 
-                document.getElementById('name-modal').style.display = 'none';
-                updateUserInfo();
-                showNotification(`Добро пожаловать, ${name}!`);
+                if (saveUserData(userData)) {
+                    document.getElementById('name-modal').style.display = 'none';
+                    updateUserInfo();
+                    showNotification(`Добро пожаловать, ${name}!`);
+                }
             } catch (e) {
                 console.error('Ошибка сохранения имени:', e);
                 showNotification('Ошибка сохранения имени');
             }
         }
 
+        // Авто-фокус на поле ввода при открытии модального окна имени
+        document.getElementById('name-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('user-name-input').focus();
+            }
+        });
+
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Приложение загружено!');
+            console.log('Приложение LifeCraft загружено!');
             initUser();
         });
     </script>
