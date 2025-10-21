@@ -700,7 +700,7 @@
                 <div class="card">
                     <div class="theory-content">
                         <h3>Основы математики</h3>
-                        <p>Математика - это наука о структурах, порядке и отношениях.</p>
+                        <p>Математика - это наука о структурах, порядка и отношениях.</p>
                         
                         <h3>Арифметические операции</h3>
                         <ul>
@@ -756,20 +756,6 @@
                     Автоматические напоминания каждые 2 часа (8:00-22:00)
                 </div>
                 <div id="reminder-status" style="font-size: 12px; color: var(--success-color); text-align: center; margin-top: 8px;"></div>
-            </div>
-
-            <div class="card">
-                <div class="modal-title">Настройка Telegram уведомлений</div>
-                <input type="text" class="modal-input" id="bot-token-input" placeholder="Токен бота" value="8241569227:AAEqD43ON8C9fQiBODfCFnrHeUIdgrhm_Zg">
-                <button class="btn btn-success" onclick="saveTelegramSettings()" style="width: 100%; margin-top: 10px;">
-                    Сохранить настройки
-                </button>
-                <button class="btn btn-primary" onclick="testTelegramNotification()" style="width: 100%; margin-top: 10px;">
-                    Тестовое уведомление всем
-                </button>
-                <div style="font-size: 12px; color: var(--tg-theme-hint-color); text-align: center; margin-top: 8px;">
-                    Бот отправит сообщение всем пользователям, которые запустили бота
-                </div>
             </div>
         </div>
     </div>
@@ -941,38 +927,7 @@
         }
 
         // ===== TELEGRAM УВЕДОМЛЕНИЯ =====
-        async function getAllChatIds() {
-            const settings = getTelegramSettings();
-            
-            if (!settings.botToken) {
-                console.error('Telegram токен не задан');
-                return [];
-            }
-
-            try {
-                const url = `https://api.telegram.org/bot${settings.botToken}/getUpdates`;
-                const response = await fetch(url);
-                const result = await response.json();
-
-                if (result.ok) {
-                    // Извлекаем все уникальные Chat ID из обновлений
-                    const chatIds = [...new Set(result.result
-                        .filter(update => update.message && update.message.chat)
-                        .map(update => update.message.chat.id)
-                    )];
-                    console.log('Найдены Chat ID:', chatIds);
-                    return chatIds;
-                } else {
-                    console.error('Ошибка получения обновлений:', result);
-                    return [];
-                }
-            } catch (error) {
-                console.error('Ошибка сети:', error);
-                return [];
-            }
-        }
-
-        async function sendTelegramMessageToUser(message, chatId) {
+        async function sendTelegramMessage(message) {
             const settings = getTelegramSettings();
             
             if (!settings.botToken) {
@@ -981,6 +936,19 @@
             }
 
             try {
+                // Получаем chatId из Telegram WebApp
+                const tg = window.Telegram?.WebApp;
+                if (!tg) {
+                    console.error('Telegram WebApp не доступен');
+                    return false;
+                }
+
+                const chatId = tg.initDataUnsafe?.user?.id || tg.initDataUnsafe?.chat?.id;
+                if (!chatId) {
+                    console.error('Chat ID не доступен');
+                    return false;
+                }
+
                 const url = `https://api.telegram.org/bot${settings.botToken}/sendMessage`;
                 const response = await fetch(url, {
                     method: 'POST',
@@ -999,59 +967,12 @@
                     console.log('Сообщение отправлено пользователю:', chatId);
                     return true;
                 } else {
-                    console.error('Ошибка отправки пользователю', chatId, ':', result);
+                    console.error('Ошибка отправки:', result);
                     return false;
                 }
             } catch (error) {
-                console.error('Ошибка сети при отправке пользователю', chatId, ':', error);
+                console.error('Ошибка сети:', error);
                 return false;
-            }
-        }
-
-        async function sendTelegramMessageToAll(message) {
-            const chatIds = await getAllChatIds();
-            let successCount = 0;
-            
-            if (chatIds.length === 0) {
-                showNotification('Нет пользователей для отправки');
-                return 0;
-            }
-
-            showNotification(`Отправка ${chatIds.length} пользователям...`);
-
-            for (const chatId of chatIds) {
-                const success = await sendTelegramMessageToUser(message, chatId);
-                if (success) {
-                    successCount++;
-                }
-                // Небольшая задержка чтобы не превысить лимиты Telegram
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-
-            return successCount;
-        }
-
-        function saveTelegramSettings() {
-            const botToken = document.getElementById('bot-token-input').value.trim();
-            
-            if (!botToken) {
-                showNotification('Введите токен бота!');
-                return;
-            }
-
-            const settings = { botToken };
-            saveTelegramSettings(settings);
-            showNotification('Настройки сохранены!');
-        }
-
-        async function testTelegramNotification() {
-            const message = '🔔 <b>Тестовое уведомление от LifeCraft</b>\n\nЭто тестовое сообщение для проверки работы системы напоминаний! 🎯';
-            const successCount = await sendTelegramMessageToAll(message);
-            
-            if (successCount > 0) {
-                showNotification(`Сообщение отправлено ${successCount} пользователям!`);
-            } else {
-                showNotification('Ошибка отправки. Проверьте токен бота.');
             }
         }
 
@@ -1076,13 +997,20 @@
                 !h.lastCompleted || h.lastCompleted !== today
             );
 
+            // Если все привычки выполнены, выключаем напоминания
+            if (incompleteHabits.length === 0) {
+                console.log('Все привычки выполнены, напоминания выключены');
+                stopAutomaticReminders();
+                return;
+            }
+
             if (incompleteHabits.length > 0) {
                 const habitNames = incompleteHabits.map(h => `• ${h.name}`).join('\n');
                 const message = `⏰ <b>Напоминание о привычках</b>\n\nНе забудьте выполнить сегодня:\n${habitNames}\n\n💪 У вас всё получится!`;
                 
-                const successCount = await sendTelegramMessageToAll(message);
-                if (successCount > 0) {
-                    console.log('Автоматическое напоминание отправлено', successCount, 'пользователям:', new Date().toLocaleTimeString());
+                const success = await sendTelegramMessage(message);
+                if (success) {
+                    console.log('Автоматическое напоминание отправлено:', new Date().toLocaleTimeString());
                 }
             }
         }
@@ -1092,9 +1020,6 @@
             if (reminderInterval) {
                 clearInterval(reminderInterval);
             }
-
-            // Отправляем первое напоминание сразу
-            sendReminder();
 
             // Запускаем интервал каждые 2 часа
             reminderInterval = setInterval(() => {
@@ -1569,9 +1494,6 @@
         // ===== ПРИВЫЧКИ =====
         function initHabits() {
             updateHabitsList();
-            // Загружаем настройки Telegram
-            const settings = getTelegramSettings();
-            document.getElementById('bot-token-input').value = settings.botToken || '';
             
             // Восстанавливаем статус напоминаний
             updateReminderStatus();
@@ -1628,12 +1550,13 @@
                     // Снимаем отметку
                     habit.lastCompleted = null;
                     habit.streak = Math.max(0, (habit.streak || 0) - 1);
+                    showNotification(`Привычка "${habit.name}" отменена`);
                 } else {
                     // Отмечаем выполнение
                     habit.lastCompleted = today;
                     habit.streak = (habit.streak || 0) + 1;
                     addExperience(10);
-                    showNotification(`Привычка выполнена! +10 XP`);
+                    showNotification(`Привычка "${habit.name}" выполнена! +10 XP`);
                 }
                 
                 saveHabits(habits);
@@ -1643,10 +1566,13 @@
 
         function deleteHabit(habitId) {
             const habits = getHabits();
-            const updatedHabits = habits.filter(h => h.id !== habitId);
-            saveHabits(updatedHabits);
-            updateHabitsList();
-            showNotification('Привычка удалена');
+            const habit = habits.find(h => h.id === habitId);
+            if (habit && confirm(`Удалить привычку "${habit.name}"?`)) {
+                const updatedHabits = habits.filter(h => h.id !== habitId);
+                saveHabits(updatedHabits);
+                updateHabitsList();
+                showNotification('Привычка удалена');
+            }
         }
 
         function showAddHabitModal() {
@@ -1660,7 +1586,10 @@
 
         function addNewHabit() {
             const name = document.getElementById('new-habit-name').value.trim();
-            if (!name) return;
+            if (!name) {
+                showNotification('Введите название привычки!');
+                return;
+            }
             
             const habits = getHabits();
             const newId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
