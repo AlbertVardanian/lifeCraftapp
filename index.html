@@ -562,9 +562,9 @@
         </div>
         <div class="module-content">
             <div class="mode-tabs">
-                <div class="mode-tab active" data-mode="cards">Карточки</div>
-                <div class="mode-tab" data-mode="test">Тест</div>
-                <div class="mode-tab" data-mode="learned">Изученные</div>
+                <div class="mode-tab active" onclick="setWordMode('cards')">Карточки</div>
+                <div class="mode-tab" onclick="setWordMode('test')">Тест</div>
+                <div class="mode-tab" onclick="setWordMode('learned')">Изученные</div>
             </div>
 
             <div id="cards-mode">
@@ -580,9 +580,9 @@
                 </div>
 
                 <div class="buttons-row">
-                    <button class="btn btn-danger" id="hard-btn">Сложно</button>
-                    <button class="btn btn-warning" id="show-btn">Показать</button>
-                    <button class="btn btn-success" id="know-btn">Знаю</button>
+                    <button class="btn btn-danger" onclick="markWordAsHard()">Сложно</button>
+                    <button class="btn btn-warning" onclick="showTranslation()">Показать</button>
+                    <button class="btn btn-success" onclick="markWordAsKnown()">Знаю</button>
                 </div>
             </div>
 
@@ -603,7 +603,7 @@
                     <div class="card">
                         <div style="font-size: 32px; text-align: center; margin: 10px 0;" id="test-score">0%</div>
                         <div style="text-align: center; margin-bottom: 20px;" id="test-accuracy">Правильно: 0/10</div>
-                        <button class="btn btn-primary" id="restart-test-btn">Пройти тест еще раз</button>
+                        <button class="btn btn-primary" onclick="startNewTest()">Пройти тест еще раз</button>
                     </div>
                 </div>
             </div>
@@ -639,9 +639,9 @@
         </div>
         <div class="module-content">
             <div class="mode-tabs">
-                <div class="mode-tab math-tab active" data-math-mode="practice">Практика</div>
-                <div class="mode-tab math-tab" data-math-mode="test">Тест</div>
-                <div class="mode-tab math-tab" data-math-mode="theory">Теория</div>
+                <div class="mode-tab math-tab active" onclick="setMathMode('practice')">Практика</div>
+                <div class="mode-tab math-tab" onclick="setMathMode('test')">Тест</div>
+                <div class="mode-tab math-tab" onclick="setMathMode('theory')">Теория</div>
             </div>
 
             <div id="math-practice-mode">
@@ -652,7 +652,7 @@
                 <div class="card">
                     <div class="math-problem" id="math-problem">2 + 2 = ?</div>
                     <input type="number" class="math-answer-input" id="math-answer" placeholder="Введите ответ">
-                    <button class="btn btn-math" id="check-math-btn" style="width: 100%;">Проверить</button>
+                    <button class="btn btn-math" onclick="checkMathAnswer()" style="width: 100%;">Проверить</button>
                 </div>
 
                 <div class="card">
@@ -678,14 +678,14 @@
                 <div class="card">
                     <div class="math-problem" id="math-test-problem">2 + 2 = ?</div>
                     <input type="number" class="math-answer-input" id="math-test-answer" placeholder="Введите ответ">
-                    <button class="btn btn-math" id="check-math-test-btn" style="width: 100%;">Ответить</button>
+                    <button class="btn btn-math" onclick="checkMathTestAnswer()" style="width: 100%;">Ответить</button>
                 </div>
 
                 <div id="math-test-results" style="display: none;">
                     <div class="card">
                         <div style="font-size: 32px; text-align: center; margin: 10px 0;" id="math-test-score">0%</div>
                         <div style="text-align: center; margin-bottom: 20px;" id="math-test-accuracy">Правильно: 0/10</div>
-                        <button class="btn btn-math" id="restart-math-test-btn">Пройти тест еще раз</button>
+                        <button class="btn btn-math" onclick="restartMathTest()">Пройти тест еще раз</button>
                     </div>
                 </div>
             </div>
@@ -822,6 +822,24 @@
         const NIGHT_START = 22; // 22:00
         const NIGHT_END = 8;    // 8:00
 
+        // WordMaster переменные
+        let wordsData = [];
+        let currentWordIndex = 0;
+        let wordMode = 'cards';
+        let testWords = [];
+        let currentTestQuestion = 0;
+        let testScore = 0;
+        let totalTestQuestions = 10;
+
+        // Математика переменные
+        let mathMode = 'practice';
+        let currentMathProblem = null;
+        let mathCorrectAnswers = 0;
+        let mathTotalAnswers = 0;
+        let mathTestProblems = [];
+        let currentMathTestIndex = 0;
+        let mathTestScore = 0;
+
         // ===== ОСНОВНЫЕ ФУНКЦИИ =====
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -879,177 +897,14 @@
             localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
         }
 
-        // ===== TELEGRAM BOT FUNCTIONS =====
-        function sendToCurrentBot(message) {
-            const tg = window.Telegram?.WebApp;
-            
-            if (!tg) {
-                console.log('Telegram WebApp не доступен');
-                return false;
-            }
-
-            if (tg.sendData) {
-                const data = {
-                    action: 'habit_reminder',
-                    message: message,
-                    timestamp: Date.now(),
-                    user: tg.initDataUnsafe?.user
-                };
-                
-                tg.sendData(JSON.stringify(data));
-                console.log('Сообщение отправлено в бота:', message);
-                return true;
-            } else {
-                console.log('Метод sendData не доступен');
-                return false;
-            }
-        }
-
-        // ===== АВТОМАТИЧЕСКИЕ НАПОМИНАНИЯ =====
-        function isDayTime() {
-            const now = new Date();
-            const hours = now.getHours();
-            return hours >= NIGHT_END && hours < NIGHT_START;
-        }
-
-        function sendReminder() {
-            if (!isDayTime()) {
-                console.log('Ночное время, напоминание не отправляется');
-                return;
-            }
-
-            const habits = getHabits();
-            if (habits.length === 0) return;
-
-            const incompleteHabits = habits.filter(h => 
-                !h.lastCompleted || h.lastCompleted !== new Date().toDateString()
-            );
-
-            if (incompleteHabits.length > 0) {
-                const habitNames = incompleteHabits.map(h => h.name).join(', ');
-                const message = `⏰ Напоминание о привычках:\n${habitNames}\n\nНе забудьте выполнить их сегодня! 💪`;
-                
-                sendToCurrentBot(message);
-                console.log('Автоматическое напоминание отправлено:', new Date().toLocaleTimeString());
-            }
-        }
-
-        function startAutomaticReminders() {
-            // Останавливаем предыдущий интервал если есть
-            if (reminderInterval) {
-                clearInterval(reminderInterval);
-            }
-
-            // Отправляем первое напоминание сразу
-            sendReminder();
-
-            // Запускаем интервал каждые 2 часа
-            reminderInterval = setInterval(() => {
-                sendReminder();
-            }, 2 * 60 * 60 * 1000); // 2 часа
-
-            // Сохраняем статус
-            const userData = getUserData();
-            userData.automaticReminders = true;
-            userData.remindersStartTime = new Date().toISOString();
-            saveUserData(userData);
-
-            updateReminderStatus();
-            showNotification('Автоматические напоминания включены!');
-        }
-
-        function stopAutomaticReminders() {
-            if (reminderInterval) {
-                clearInterval(reminderInterval);
-                reminderInterval = null;
-            }
-
-            const userData = getUserData();
-            userData.automaticReminders = false;
-            saveUserData(userData);
-
-            updateReminderStatus();
-            showNotification('Автоматические напоминания выключены');
-        }
-
-        function updateReminderStatus() {
-            const userData = getUserData();
-            const statusElement = document.getElementById('reminder-status');
-            
-            if (userData.automaticReminders) {
-                statusElement.textContent = '✅ Напоминания активны (каждые 2 часа, 8:00-22:00)';
-                statusElement.style.color = 'var(--success-color)';
-            } else {
-                statusElement.textContent = '❌ Напоминания выключены';
-                statusElement.style.color = 'var(--danger-color)';
-            }
-        }
-
-        function setupHabitReminders() {
-            const habits = getHabits();
-            
-            if (habits.length === 0) {
-                showNotification('Добавьте сначала привычки!');
-                return;
-            }
-
-            const userData = getUserData();
-            
-            if (userData.automaticReminders) {
-                stopAutomaticReminders();
-            } else {
-                startAutomaticReminders();
-            }
-        }
-
-        // ===== ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ =====
-        function initUser() {
-            const userData = getUserData();
-            
-            if (!userData.name) {
-                document.getElementById('name-modal').style.display = 'flex';
-            } else {
-                document.getElementById('name-modal').style.display = 'none';
-                updateUserInfo();
-            }
-
-            // Восстанавливаем статус напоминаний
-            updateReminderStatus();
-            
-            // Автоматически запускаем напоминания если они были включены
-            if (userData.automaticReminders) {
-                startAutomaticReminders();
-            }
-        }
-
-        function saveUserName() {
-            const name = document.getElementById('user-name-input').value.trim();
-            if (!name) return;
-            
-            const userData = getUserData();
-            userData.name = name;
-            saveUserData(userData);
-            
-            document.getElementById('name-modal').style.display = 'none';
-            updateUserInfo();
-            showNotification(`Добро пожаловать, ${name}!`);
-        }
-
         // ===== WORDMASTER =====
-        let wordsData = [];
-        let currentWordIndex = 0;
-        let wordMode = 'cards';
-        let testWords = [];
-        let currentTestQuestion = 0;
-        let testScore = 0;
-        let totalTestQuestions = 10;
-
         function initWordMaster() {
             if (!localStorage.getItem('lifecraft_words')) {
                 wordsData = [
-                    ["man", "мужчина"], ["woman", "женщина"], ["child", "ребёнок"], 
-                    // ... (полный список слов из предыдущего кода)
-                    ["microscopic", "микроскопический"]
+                    ["man", "мужчина"], ["woman", "женщина"], ["child", "ребёнок"],
+                    ["house", "дом"], ["car", "машина"], ["book", "книга"],
+                    ["water", "вода"], ["food", "еда"], ["time", "время"],
+                    ["day", "день"], ["night", "ночь"], ["year", "год"]
                 ].map(([en, ru], index) => ({
                     id: index + 1,
                     original: en,
@@ -1065,9 +920,333 @@
             updateWordStats();
         }
 
-        // ... (все функции WordMaster из предыдущего кода) ...
+        function setWordMode(mode) {
+            wordMode = mode;
+            
+            // Обновляем активные вкладки
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Показываем соответствующий режим
+            document.getElementById('cards-mode').style.display = mode === 'cards' ? 'block' : 'none';
+            document.getElementById('test-mode').style.display = mode === 'test' ? 'block' : 'none';
+            document.getElementById('learned-mode').style.display = mode === 'learned' ? 'block' : 'none';
+            
+            if (mode === 'cards') {
+                showNextWord();
+            } else if (mode === 'test') {
+                startNewTest();
+            } else if (mode === 'learned') {
+                showLearnedWords();
+            }
+        }
 
-        // ===== HABIT TRACKER =====
+        function showNextWord() {
+            const unlearnedWords = wordsData.filter(word => !word.learned);
+            if (unlearnedWords.length === 0) {
+                document.getElementById('current-word').textContent = "Все слова изучены!";
+                document.getElementById('current-translation').style.display = 'none';
+                return;
+            }
+            
+            currentWordIndex = Math.floor(Math.random() * unlearnedWords.length);
+            const word = unlearnedWords[currentWordIndex];
+            
+            document.getElementById('current-word').textContent = word.original;
+            document.getElementById('current-translation').textContent = word.translation;
+            document.getElementById('current-translation').style.display = 'none';
+        }
+
+        function showTranslation() {
+            document.getElementById('current-translation').style.display = 'block';
+        }
+
+        function markWordAsHard() {
+            showNextWord();
+        }
+
+        function markWordAsKnown() {
+            const currentWord = document.getElementById('current-word').textContent;
+            const word = wordsData.find(w => w.original === currentWord);
+            if (word) {
+                word.learned = true;
+                localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
+                addExperience(5);
+                showNotification('Слово изучено! +5 XP');
+                updateWordStats();
+            }
+            showNextWord();
+        }
+
+        function startNewTest() {
+            const learnedWords = wordsData.filter(word => word.learned);
+            if (learnedWords.length < 3) {
+                document.getElementById('test-word').textContent = "Нужно изучить минимум 3 слова";
+                document.getElementById('test-options').innerHTML = '';
+                return;
+            }
+            
+            testWords = [];
+            currentTestQuestion = 0;
+            testScore = 0;
+            
+            // Выбираем случайные слова для теста
+            for (let i = 0; i < Math.min(totalTestQuestions, learnedWords.length); i++) {
+                const randomIndex = Math.floor(Math.random() * learnedWords.length);
+                testWords.push(learnedWords[randomIndex]);
+            }
+            
+            showTestQuestion();
+        }
+
+        function showTestQuestion() {
+            if (currentTestQuestion >= testWords.length) {
+                showTestResults();
+                return;
+            }
+            
+            const word = testWords[currentTestQuestion];
+            document.getElementById('test-word').textContent = word.original;
+            document.getElementById('test-progress').textContent = `${currentTestQuestion + 1}/${testWords.length}`;
+            
+            // Создаем варианты ответов
+            const correctAnswer = word.translation;
+            const wrongAnswers = wordsData
+                .filter(w => w.translation !== correctAnswer)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3)
+                .map(w => w.translation);
+            
+            const allAnswers = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            
+            let optionsHtml = '';
+            allAnswers.forEach(answer => {
+                optionsHtml += `<button class="btn btn-primary" onclick="checkTestAnswer('${answer}')" style="margin: 5px; width: 100%;">${answer}</button>`;
+            });
+            
+            document.getElementById('test-options').innerHTML = optionsHtml;
+        }
+
+        function checkTestAnswer(selectedAnswer) {
+            const correctAnswer = testWords[currentTestQuestion].translation;
+            if (selectedAnswer === correctAnswer) {
+                testScore++;
+                showNotification('Правильно!');
+            } else {
+                showNotification(`Неправильно! Правильный ответ: ${correctAnswer}`);
+            }
+            
+            currentTestQuestion++;
+            showTestQuestion();
+        }
+
+        function showTestResults() {
+            const percentage = Math.round((testScore / testWords.length) * 100);
+            document.getElementById('test-score').textContent = percentage + '%';
+            document.getElementById('test-accuracy').textContent = `Правильно: ${testScore}/${testWords.length}`;
+            document.getElementById('test-results').style.display = 'block';
+            
+            if (percentage >= 80) {
+                addExperience(20);
+            }
+        }
+
+        function showLearnedWords() {
+            const learnedWords = wordsData.filter(word => word.learned);
+            let html = '';
+            
+            if (learnedWords.length === 0) {
+                html = '<div class="empty-state">Вы еще не изучили ни одного слова</div>';
+            } else {
+                learnedWords.forEach(word => {
+                    html += `<div style="padding: 8px 0; border-bottom: 1px solid var(--tg-theme-secondary-bg-color);">
+                        <div style="font-weight: bold;">${word.original}</div>
+                        <div style="color: var(--tg-theme-hint-color);">${word.translation}</div>
+                    </div>`;
+                });
+            }
+            
+            document.getElementById('learned-words-list').innerHTML = html;
+        }
+
+        function updateWordStats() {
+            const learnedCount = wordsData.filter(word => word.learned).length;
+            const progress = Math.round((learnedCount / wordsData.length) * 100);
+            
+            document.getElementById('words-learned').textContent = learnedCount;
+            document.getElementById('words-progress').textContent = progress + '%';
+        }
+
+        // ===== МАТЕМАТИКА =====
+        function initMath() {
+            setMathMode('practice');
+            updateMathStats();
+        }
+
+        function setMathMode(mode) {
+            mathMode = mode;
+            
+            // Обновляем активные вкладки
+            document.querySelectorAll('.mode-tab.math-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Показываем соответствующий режим
+            document.getElementById('math-practice-mode').style.display = mode === 'practice' ? 'block' : 'none';
+            document.getElementById('math-test-mode').style.display = mode === 'test' ? 'block' : 'none';
+            document.getElementById('math-theory-mode').style.display = mode === 'theory' ? 'block' : 'none';
+            
+            if (mode === 'practice') {
+                generateMathProblem();
+            } else if (mode === 'test') {
+                startMathTest();
+            }
+        }
+
+        function generateMathProblem() {
+            const operations = ['+', '-', '*'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            
+            let a, b, answer;
+            
+            switch(operation) {
+                case '+':
+                    a = Math.floor(Math.random() * 50) + 1;
+                    b = Math.floor(Math.random() * 50) + 1;
+                    answer = a + b;
+                    break;
+                case '-':
+                    a = Math.floor(Math.random() * 50) + 1;
+                    b = Math.floor(Math.random() * a) + 1;
+                    answer = a - b;
+                    break;
+                case '*':
+                    a = Math.floor(Math.random() * 10) + 1;
+                    b = Math.floor(Math.random() * 10) + 1;
+                    answer = a * b;
+                    break;
+            }
+            
+            currentMathProblem = { a, b, operation, answer };
+            document.getElementById('math-problem').textContent = `${a} ${operation} ${b} = ?`;
+            document.getElementById('math-answer').value = '';
+        }
+
+        function checkMathAnswer() {
+            const userAnswer = parseInt(document.getElementById('math-answer').value);
+            
+            if (isNaN(userAnswer)) {
+                showNotification('Введите число!');
+                return;
+            }
+            
+            mathTotalAnswers++;
+            
+            if (userAnswer === currentMathProblem.answer) {
+                mathCorrectAnswers++;
+                showNotification('Правильно! +5 XP');
+                addExperience(5);
+            } else {
+                showNotification(`Неправильно! Правильный ответ: ${currentMathProblem.answer}`);
+            }
+            
+            updateMathStats();
+            generateMathProblem();
+        }
+
+        function updateMathStats() {
+            document.getElementById('math-correct').textContent = mathCorrectAnswers;
+            document.getElementById('math-total').textContent = mathTotalAnswers;
+            document.getElementById('math-progress').textContent = mathTotalAnswers;
+        }
+
+        function startMathTest() {
+            mathTestProblems = [];
+            currentMathTestIndex = 0;
+            mathTestScore = 0;
+            
+            for (let i = 0; i < 10; i++) {
+                const operations = ['+', '-', '*'];
+                const operation = operations[Math.floor(Math.random() * operations.length)];
+                
+                let a, b, answer;
+                
+                switch(operation) {
+                    case '+':
+                        a = Math.floor(Math.random() * 50) + 1;
+                        b = Math.floor(Math.random() * 50) + 1;
+                        answer = a + b;
+                        break;
+                    case '-':
+                        a = Math.floor(Math.random() * 50) + 1;
+                        b = Math.floor(Math.random() * a) + 1;
+                        answer = a - b;
+                        break;
+                    case '*':
+                        a = Math.floor(Math.random() * 10) + 1;
+                        b = Math.floor(Math.random() * 10) + 1;
+                        answer = a * b;
+                        break;
+                }
+                
+                mathTestProblems.push({ a, b, operation, answer });
+            }
+            
+            showMathTestProblem();
+        }
+
+        function showMathTestProblem() {
+            if (currentMathTestIndex >= mathTestProblems.length) {
+                showMathTestResults();
+                return;
+            }
+            
+            const problem = mathTestProblems[currentMathTestIndex];
+            document.getElementById('math-test-problem').textContent = `${problem.a} ${problem.operation} ${problem.b} = ?`;
+            document.getElementById('math-test-answer').value = '';
+            document.getElementById('math-test-progress').textContent = `${currentMathTestIndex + 1}/${mathTestProblems.length}`;
+        }
+
+        function checkMathTestAnswer() {
+            const userAnswer = parseInt(document.getElementById('math-test-answer').value);
+            const problem = mathTestProblems[currentMathTestIndex];
+            
+            if (isNaN(userAnswer)) {
+                showNotification('Введите число!');
+                return;
+            }
+            
+            if (userAnswer === problem.answer) {
+                mathTestScore++;
+                showNotification('Правильно!');
+            } else {
+                showNotification(`Неправильно! Правильный ответ: ${problem.answer}`);
+            }
+            
+            currentMathTestIndex++;
+            showMathTestProblem();
+        }
+
+        function showMathTestResults() {
+            const percentage = Math.round((mathTestScore / mathTestProblems.length) * 100);
+            document.getElementById('math-test-score').textContent = percentage + '%';
+            document.getElementById('math-test-accuracy').textContent = `Правильно: ${mathTestScore}/${mathTestProblems.length}`;
+            document.getElementById('math-test-results').style.display = 'block';
+            
+            if (percentage >= 80) {
+                addExperience(25);
+            }
+        }
+
+        function restartMathTest() {
+            document.getElementById('math-test-results').style.display = 'none';
+            startMathTest();
+        }
+
+        // ===== ПРИВЫЧКИ =====
         function initHabits() {
             updateHabitsList();
         }
@@ -1075,32 +1254,33 @@
         function updateHabitsList() {
             const habits = getHabits();
             const habitsList = document.getElementById('habits-list');
+            const today = new Date().toDateString();
             
             if (habits.length === 0) {
                 habitsList.innerHTML = '<div class="empty-state">У вас пока нет привычек</div>';
             } else {
-                const today = new Date().toDateString();
-                habitsList.innerHTML = habits.map(habit => {
-                    const isToday = habit.lastCompleted === today;
-                    return `
+                let html = '';
+                habits.forEach(habit => {
+                    const isCompleted = habit.lastCompleted === today;
+                    html += `
                         <div class="habit-item">
                             <div>
                                 <div style="font-weight: bold;">${habit.name}</div>
-                                <div class="habit-streak">Серия: ${habit.streak} дней</div>
+                                <div class="habit-streak">Серия: ${habit.streak || 0} дней</div>
                             </div>
                             <div class="habit-actions">
-                                <div class="habit-checkbox ${isToday ? 'checked' : ''}" 
+                                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}" 
                                      onclick="toggleHabit(${habit.id})">
-                                    ${isToday ? '✓' : ''}
+                                    ${isCompleted ? '✓' : ''}
                                 </div>
                                 <div class="delete-habit" onclick="deleteHabit(${habit.id})">🗑️</div>
                             </div>
                         </div>
                     `;
-                }).join('');
+                });
+                habitsList.innerHTML = html;
             }
             
-            const today = new Date().toDateString();
             const completedCount = habits.filter(h => h.lastCompleted === today).length;
             document.getElementById('habits-total').textContent = habits.length;
             document.getElementById('habits-completed').textContent = completedCount;
@@ -1113,11 +1293,13 @@
             
             if (habit) {
                 if (habit.lastCompleted === today) {
+                    // Снимаем отметку
                     habit.lastCompleted = null;
-                    habit.streak = Math.max(0, habit.streak - 1);
+                    habit.streak = Math.max(0, (habit.streak || 0) - 1);
                 } else {
+                    // Отмечаем выполнение
                     habit.lastCompleted = today;
-                    habit.streak += 1;
+                    habit.streak = (habit.streak || 0) + 1;
                     addExperience(10);
                     showNotification(`Привычка выполнена! +10 XP`);
                 }
@@ -1164,7 +1346,32 @@
             showNotification('Привычка добавлена!');
         }
 
-        // ===== GAME 2048 =====
+        // ===== ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЬЯ =====
+        function initUser() {
+            const userData = getUserData();
+            
+            if (!userData.name) {
+                document.getElementById('name-modal').style.display = 'flex';
+            } else {
+                document.getElementById('name-modal').style.display = 'none';
+                updateUserInfo();
+            }
+        }
+
+        function saveUserName() {
+            const name = document.getElementById('user-name-input').value.trim();
+            if (!name) return;
+            
+            const userData = getUserData();
+            userData.name = name;
+            saveUserData(userData);
+            
+            document.getElementById('name-modal').style.display = 'none';
+            updateUserInfo();
+            showNotification(`Добро пожаловать, ${name}!`);
+        }
+
+        // ===== ИГРА 2048 =====
         let gameBoard = [];
         let score = 0;
         let touchStartX = 0;
@@ -1175,75 +1382,6 @@
             showScreen('game-2048-screen');
             resetGame2048();
             gameActive = true;
-            
-            document.addEventListener('keydown', handleKeyPress);
-            
-            const gameScreen = document.getElementById('game-2048-screen');
-            gameScreen.addEventListener('touchstart', handleTouchStart, { passive: false });
-            gameScreen.addEventListener('touchmove', handleTouchMove, { passive: false });
-            gameScreen.addEventListener('touchend', handleTouchEnd, { passive: false });
-        }
-
-        function handleTouchStart(event) {
-            if (!gameActive) return;
-            const touch = event.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            event.preventDefault();
-        }
-
-        function handleTouchMove(event) {
-            if (!gameActive) return;
-            event.preventDefault();
-        }
-
-        function handleTouchEnd(event) {
-            if (!gameActive || !touchStartX || !touchStartY) return;
-            
-            const touch = event.changedTouches[0];
-            const touchEndX = touch.clientX;
-            const touchEndY = touch.clientY;
-            
-            const diffX = touchEndX - touchStartX;
-            const diffY = touchEndY - touchStartY;
-            
-            const minSwipeDistance = 50;
-            
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > minSwipeDistance) {
-                    let moved = false;
-                    if (diffX > 0) {
-                        moved = moveRight();
-                    } else {
-                        moved = moveLeft();
-                    }
-                    
-                    if (moved) {
-                        addRandomTile();
-                        renderGame2048();
-                        checkGameState();
-                    }
-                }
-            } else {
-                if (Math.abs(diffY) > minSwipeDistance) {
-                    let moved = false;
-                    if (diffY > 0) {
-                        moved = moveDown();
-                    } else {
-                        moved = moveUp();
-                    }
-                    
-                    if (moved) {
-                        addRandomTile();
-                        renderGame2048();
-                        checkGameState();
-                    }
-                }
-            }
-            
-            touchStartX = 0;
-            touchStartY = 0;
-            event.preventDefault();
         }
 
         function resetGame2048() {
@@ -1293,70 +1431,82 @@
             }
         }
 
-        function handleKeyPress(event) {
+        // ===== НАПОМИНАНИЯ =====
+        function setupHabitReminders() {
+            showNotification('Функция напоминаний будет реализована в будущем');
+        }
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initUser();
+            
+            // Добавляем обработчики свайпов для игры 2048
+            const gameScreen = document.getElementById('game-2048-screen');
+            if (gameScreen) {
+                gameScreen.addEventListener('touchstart', handleTouchStart, { passive: false });
+                gameScreen.addEventListener('touchmove', handleTouchMove, { passive: false });
+                gameScreen.addEventListener('touchend', handleTouchEnd, { passive: false });
+            }
+        });
+
+        // Обработчики свайпов для 2048
+        function handleTouchStart(event) {
             if (!gameActive) return;
-            
-            if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-                return;
-            }
-            
+            const touch = event.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
             event.preventDefault();
-            let moved = false;
-            
-            switch(event.key) {
-                case 'ArrowLeft': moved = moveLeft(); break;
-                case 'ArrowRight': moved = moveRight(); break;
-                case 'ArrowUp': moved = moveUp(); break;
-                case 'ArrowDown': moved = moveDown(); break;
-            }
-            
-            if (moved) {
-                addRandomTile();
-                renderGame2048();
-                checkGameState();
-            }
         }
 
-        function checkGameState() {
-            if (gameBoard.some(row => row.includes(2048))) {
-                setTimeout(() => {
-                    showNotification('Победа! Вы собрали 2048! +50 XP');
-                    addExperience(50);
-                    gameActive = false;
-                }, 500);
-                return;
-            }
-            
-            if (!canMove()) {
-                setTimeout(() => {
-                    showNotification('Игра окончена! Нет возможных ходов.');
-                    gameActive = false;
-                }, 500);
-            }
+        function handleTouchMove(event) {
+            if (!gameActive) return;
+            event.preventDefault();
         }
 
-        function canMove() {
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    if (gameBoard[i][j] === 0) return true;
+        function handleTouchEnd(event) {
+            if (!gameActive || !touchStartX || !touchStartY) return;
+            
+            const touch = event.changedTouches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            
+            const minSwipeDistance = 50;
+            
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > minSwipeDistance) {
+                    if (diffX > 0) {
+                        moveRight();
+                    } else {
+                        moveLeft();
+                    }
+                    addRandomTile();
+                    renderGame2048();
+                }
+            } else {
+                if (Math.abs(diffY) > minSwipeDistance) {
+                    if (diffY > 0) {
+                        moveDown();
+                    } else {
+                        moveUp();
+                    }
+                    addRandomTile();
+                    renderGame2048();
                 }
             }
             
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    if (j < 3 && gameBoard[i][j] === gameBoard[i][j + 1]) return true;
-                    if (i < 3 && gameBoard[i][j] === gameBoard[i + 1][j]) return true;
-                }
-            }
-            
-            return false;
+            touchStartX = 0;
+            touchStartY = 0;
+            event.preventDefault();
         }
 
+        // Функции движения для 2048
         function moveLeft() {
             let moved = false;
             for (let i = 0; i < 4; i++) {
                 let row = gameBoard[i].filter(cell => cell !== 0);
-                
                 for (let j = 0; j < row.length - 1; j++) {
                     if (row[j] === row[j + 1]) {
                         row[j] *= 2;
@@ -1364,15 +1514,11 @@
                         row.splice(j + 1, 1);
                     }
                 }
-                
-                while (row.length < 4) {
-                    row.push(0);
-                }
-                
-                if (!arraysEqual(gameBoard[i], row)) {
+                while (row.length < 4) row.push(0);
+                if (JSON.stringify(gameBoard[i]) !== JSON.stringify(row)) {
                     moved = true;
+                    gameBoard[i] = row;
                 }
-                gameBoard[i] = row;
             }
             return moved;
         }
@@ -1381,7 +1527,6 @@
             let moved = false;
             for (let i = 0; i < 4; i++) {
                 let row = gameBoard[i].filter(cell => cell !== 0);
-                
                 for (let j = row.length - 1; j > 0; j--) {
                     if (row[j] === row[j - 1]) {
                         row[j] *= 2;
@@ -1389,15 +1534,11 @@
                         row.splice(j - 1, 1);
                     }
                 }
-                
-                while (row.length < 4) {
-                    row.unshift(0);
-                }
-                
-                if (!arraysEqual(gameBoard[i], row)) {
+                while (row.length < 4) row.unshift(0);
+                if (JSON.stringify(gameBoard[i]) !== JSON.stringify(row)) {
                     moved = true;
+                    gameBoard[i] = row;
                 }
-                gameBoard[i] = row;
             }
             return moved;
         }
@@ -1407,11 +1548,8 @@
             for (let j = 0; j < 4; j++) {
                 let column = [];
                 for (let i = 0; i < 4; i++) {
-                    if (gameBoard[i][j] !== 0) {
-                        column.push(gameBoard[i][j]);
-                    }
+                    if (gameBoard[i][j] !== 0) column.push(gameBoard[i][j]);
                 }
-                
                 for (let i = 0; i < column.length - 1; i++) {
                     if (column[i] === column[i + 1]) {
                         column[i] *= 2;
@@ -1419,16 +1557,12 @@
                         column.splice(i + 1, 1);
                     }
                 }
-                
-                while (column.length < 4) {
-                    column.push(0);
-                }
-                
+                while (column.length < 4) column.push(0);
                 for (let i = 0; i < 4; i++) {
                     if (gameBoard[i][j] !== column[i]) {
                         moved = true;
+                        gameBoard[i][j] = column[i];
                     }
-                    gameBoard[i][j] = column[i];
                 }
             }
             return moved;
@@ -1439,11 +1573,8 @@
             for (let j = 0; j < 4; j++) {
                 let column = [];
                 for (let i = 0; i < 4; i++) {
-                    if (gameBoard[i][j] !== 0) {
-                        column.push(gameBoard[i][j]);
-                    }
+                    if (gameBoard[i][j] !== 0) column.push(gameBoard[i][j]);
                 }
-                
                 for (let i = column.length - 1; i > 0; i--) {
                     if (column[i] === column[i - 1]) {
                         column[i] *= 2;
@@ -1451,46 +1582,16 @@
                         column.splice(i - 1, 1);
                     }
                 }
-                
-                while (column.length < 4) {
-                    column.unshift(0);
-                }
-                
+                while (column.length < 4) column.unshift(0);
                 for (let i = 0; i < 4; i++) {
                     if (gameBoard[i][j] !== column[i]) {
                         moved = true;
+                        gameBoard[i][j] = column[i];
                     }
-                    gameBoard[i][j] = column[i];
                 }
             }
             return moved;
         }
-
-        function arraysEqual(arr1, arr2) {
-            if (arr1.length !== arr2.length) return false;
-            for (let i = 0; i < arr1.length; i++) {
-                if (arr1[i] !== arr2[i]) return false;
-            }
-            return true;
-        }
-
-        // ===== INITIALIZATION =====
-        document.addEventListener('DOMContentLoaded', function() {
-            initUser();
-            
-            // WordMaster event listeners
-            document.getElementById('hard-btn').onclick = markWordAsHard;
-            document.getElementById('show-btn').onclick = showTranslation;
-            document.getElementById('know-btn').onclick = markWordAsKnown;
-            document.getElementById('restart-test-btn').onclick = startNewTest;
-            
-            // Tabs
-            document.querySelectorAll('.mode-tab').forEach(tab => {
-                if (tab.dataset.mode) {
-                    tab.onclick = (e) => setWordMode(e.target.dataset.mode);
-                }
-            });
-        });
     </script>
 </body>
 </html>
