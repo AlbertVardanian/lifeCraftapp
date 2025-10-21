@@ -217,11 +217,6 @@
             color: white;
         }
 
-        .btn-warning {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
         .test-options {
             display: grid;
             grid-template-columns: 1fr;
@@ -271,25 +266,6 @@
             font-size: 24px;
             font-weight: bold;
             color: var(--primary-color);
-        }
-
-        .math-problem {
-            font-size: 32px;
-            margin: 20px 0;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .answer-input {
-            width: 100%;
-            padding: 16px;
-            font-size: 18px;
-            border: 2px solid var(--tg-theme-secondary-bg-color);
-            border-radius: 8px;
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            text-align: center;
-            margin-bottom: 16px;
         }
 
         .notification {
@@ -348,236 +324,6 @@
             align-items: center;
         }
 
-        .learned-word-item:last-child {
-            border-bottom: none;
-        }
-
-        .test-results {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .test-score {
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 20px 0;
-        }
-
-        .test-accuracy {
-            font-size: 18px;
-            color: var(--tg-theme-hint-color);
-            margin-bottom: 20px;
-        }
-
-        .math-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .math-tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 8px;
-            background: var(--tg-theme-secondary-bg-color);
-            transition: background-color 0.2s;
-        }
-
-        .math-tab:active {
-            transform: scale(0.95);
-        }
-
-        .math-tab.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .theory-content {
-            line-height: 1.6;
-        }
-
-        .theory-content h3 {
-            margin: 15px 0 10px 0;
-            color: var(--primary-color);
-        }
-
-        .theory-content ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
-        .theory-content li {
-            margin: 5px 0;
-        }
-
-        .example {
-            background: var(--tg-theme-bg-color);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .habit-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
-        }
-
-        .habit-item:last-child {
-            border-bottom: none;
-        }
-
-        .habit-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .habit-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: transform 0.2s;
-        }
-
-        .habit-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Игра 2048 */
-        .game-2048 {
-            text-align: center;
-        }
-
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .score-container {
-            background: var(--primary-color);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-
-        #game-2048-board {
-            width: 300px;
-            height: 300px;
-            margin: 0 auto;
-            background: var(--tg-theme-hint-color);
-            border-radius: 8px;
-            padding: 8px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 8px;
-            touch-action: none;
-        }
-
-        .tile {
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            transition: all 0.15s ease;
-        }
-
-        .tile-2 { background: #eee4da; color: #776e65; }
-        .tile-4 { background: #ede0c8; color: #776e65; }
-        .tile-8 { background: #f2b179; color: white; }
-        .tile-16 { background: #f59563; color: white; }
-        .tile-32 { background: #f67c5f; color: white; }
-        .tile-64 { background: #f65e3b; color: white; }
-        .tile-128 { background: #edcf72; color: white; font-size: 18px; }
-        .tile-256 { background: #edcc61; color: white; font-size: 18px; }
-        .tile-512 { background: #edc850; color: white; font-size: 18px; }
-        .tile-1024 { background: #edc53f; color: white; font-size: 16px; }
-        .tile-2048 { background: #edc22e; color: white; font-size: 16px; }
-
-        .game-over {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            border-radius: 8px;
-        }
-
-        /* Игра Реакция */
-        .reaction-game {
-            text-align: center;
-        }
-
-        .reaction-area {
-            width: 200px;
-            height: 200px;
-            background: var(--tg-theme-secondary-bg-color);
-            border-radius: 100px;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .reaction-target {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-color);
-            border-radius: 30px;
-            display: none;
-        }
-
-        .reaction-message {
-            font-size: 16px;
-            color: var(--tg-theme-hint-color);
-        }
-
-        /* Простая игра - Тапы */
-        .tap-game {
-            text-align: center;
-        }
-
-        .tap-area {
-            width: 200px;
-            height: 200px;
-            background: var(--primary-color);
-            border-radius: 100px;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .tap-area:active {
-            transform: scale(0.95);
-        }
-
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -608,20 +354,10 @@
                     <div class="module-title">WordMaster</div>
                     <div class="module-desc">Изучение английского</div>
                 </div>
-                <div class="module-card" onclick="showScreen('habits-screen'); initHabitTracker();">
-                    <div class="module-icon">📅</div>
-                    <div class="module-title">HabitTracker</div>
-                    <div class="module-desc">Отслеживание привычек</div>
-                </div>
                 <div class="module-card" onclick="showScreen('games-screen');">
                     <div class="module-icon">🎮</div>
                     <div class="module-title">BrainGames</div>
                     <div class="module-desc">Тренировка мозга</div>
-                </div>
-                <div class="module-card" onclick="showScreen('math-screen'); initMathGym();">
-                    <div class="module-icon">🧮</div>
-                    <div class="module-title">MathGym</div>
-                    <div class="module-desc">Математика</div>
                 </div>
             </div>
         </div>
@@ -703,38 +439,6 @@
         </div>
     </div>
 
-    <!-- HabitTracker -->
-    <div id="habits-screen" class="screen">
-        <div class="nav-header">
-            <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
-            <div class="section-title">HabitTracker</div>
-            <div style="width: 40px;"></div>
-        </div>
-        <div class="module-content">
-            <div class="card">
-                <div class="section-title">Мои привычки</div>
-                <div id="habits-list"></div>
-                <button class="btn btn-primary" id="add-habit-btn" style="margin-top: 16px; width: 100%;">
-                    + Добавить привычку
-                </button>
-            </div>
-
-            <div class="card">
-                <div class="section-title">Статистика</div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="total-habits">0</div>
-                        <div class="stat-label">Всего привычек</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="completed-today">0</div>
-                        <div class="stat-label">Выполнено сегодня</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- BrainGames -->
     <div id="games-screen" class="screen">
         <div class="nav-header">
@@ -743,189 +447,11 @@
             <div style="width: 40px;"></div>
         </div>
         <div class="module-content">
-            <div class="card game-card" onclick="startGame2048()">
-                <div style="text-align: center;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🔢</div>
-                    <div style="font-weight: bold;">2048</div>
-                    <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Собирай числа, свайпай плитки</div>
-                </div>
-            </div>
-
-            <div class="card game-card" onclick="startReactionGame()">
-                <div style="text-align: center;">
-                    <div style="font-size: 24px; margin-bottom: 8px;">🎯</div>
-                    <div style="font-weight: bold;">Реакция</div>
-                    <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Проверь скорость реакции</div>
-                </div>
-            </div>
-
             <div class="card game-card" onclick="startTapGame()">
                 <div style="text-align: center;">
                     <div style="font-size: 24px; margin-bottom: 8px;">👆</div>
                     <div style="font-weight: bold;">Тапы</div>
                     <div style="font-size: 12px; color: var(--tg-theme-hint-color);">Простая игра на клики</div>
-                </div>
-            </div>
-
-            <!-- Игра 2048 -->
-            <div id="game-2048" class="game-2048" style="display: none;">
-                <div class="card">
-                    <div class="section-title">2048</div>
-                    <div class="game-info">
-                        <div class="score-container">
-                            Счет: <span id="2048-score">0</span>
-                        </div>
-                        <div class="score-container">
-                            Рекорд: <span id="2048-best">0</span>
-                        </div>
-                    </div>
-                    <div id="game-2048-board"></div>
-                    <div style="margin-top: 16px; font-size: 14px; color: var(--tg-theme-hint-color);">
-                        Используй свайпы или клавиши ←↑→↓
-                    </div>
-                    <button class="btn btn-primary" onclick="showScreen('games-screen')" style="width: 100%; margin-top: 16px;">
-                        Назад к играм
-                    </button>
-                </div>
-            </div>
-
-            <!-- Игра Реакция -->
-            <div id="reaction-game-screen" class="reaction-game" style="display: none;">
-                <div class="card">
-                    <div class="section-title">Тест на реакцию</div>
-                    <div class="reaction-area" id="reaction-area">
-                        <div class="reaction-target" id="reaction-target"></div>
-                        <div class="reaction-message" id="reaction-message">Жди появления цели</div>
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="reaction-time">0</div>
-                            <div class="stat-label">Время (мс)</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="best-time">0</div>
-                            <div class="stat-label">Лучший</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="startReactionGame()" style="width: 100%;">
-                        Начать заново
-                    </button>
-                </div>
-            </div>
-
-            <!-- Простая игра Тапы -->
-            <div id="tap-game-screen" class="tap-game" style="display: none;">
-                <div class="card">
-                    <div class="section-title">Игра в Тапы</div>
-                    <div class="tap-area" id="tap-area">
-                        Нажми!
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="tap-count">0</div>
-                            <div class="stat-label">Кликов</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="tap-time">30</div>
-                            <div class="stat-label">Секунд</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" onclick="startTapGame()" style="width: 100%;">
-                        Начать заново
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MathGym -->
-    <div id="math-screen" class="screen">
-        <div class="nav-header">
-            <button class="back-button" onclick="showScreen('main-screen')">← Назад</button>
-            <div class="section-title">MathGym</div>
-            <div style="width: 40px;"></div>
-        </div>
-        <div class="module-content">
-            <div class="math-tabs">
-                <div class="math-tab active" data-mode="practice">Практика</div>
-                <div class="math-tab" data-mode="test">Тест</div>
-                <div class="math-tab" data-mode="theory">Теория</div>
-            </div>
-
-            <!-- Режим практики -->
-            <div id="math-practice">
-                <div class="card">
-                    <div class="math-problem" id="math-problem">5 + 3 = ?</div>
-                    <input type="number" class="answer-input" id="math-answer" placeholder="Введите ответ">
-                    <button class="btn btn-primary" id="check-math-btn">Проверить</button>
-                </div>
-
-                <div class="card">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="math-correct">0</div>
-                            <div class="stat-label">Правильно</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="math-total">0</div>
-                            <div class="stat-label">Всего решено</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Режим теста -->
-            <div id="math-test" style="display: none;">
-                <div class="card">
-                    <div>Математический тест</div>
-                    <div>Вопрос: <span id="math-test-progress">1/10</span></div>
-                </div>
-
-                <div class="card">
-                    <div class="math-problem" id="math-test-problem">5 + 3 = ?</div>
-                    <input type="number" class="answer-input" id="math-test-answer" placeholder="Введите ответ">
-                    <button class="btn btn-primary" id="check-math-test-btn">Ответить</button>
-                </div>
-
-                <div id="math-test-results" style="display: none;">
-                    <div class="card test-results">
-                        <div class="test-score" id="math-test-score">0%</div>
-                        <div class="test-accuracy" id="math-test-accuracy">Правильно: 0/10</div>
-                        <button class="btn btn-primary" id="restart-math-test-btn">Пройти тест еще раз</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Режим теории -->
-            <div id="math-theory" style="display: none;">
-                <div class="card">
-                    <div class="theory-content">
-                        <h3>🔢 Основы арифметики</h3>
-                        
-                        <div class="example">
-                            <strong>Сложение:</strong> a + b = c<br>
-                            <em>Пример:</em> 5 + 3 = 8<br>
-                            <small>Когда мы складываем, мы объединяем две группы объектов.</small>
-                        </div>
-
-                        <div class="example">
-                            <strong>Вычитание:</strong> a - b = c<br>
-                            <em>Пример:</em> 8 - 3 = 5<br>
-                            <small>Вычитание - это обратная операция к сложению.</small>
-                        </div>
-
-                        <div class="example">
-                            <strong>Умножение:</strong> a × b = c<br>
-                            <em>Пример:</em> 4 × 3 = 12<br>
-                            <small>Умножение - это многократное сложение: 4 + 4 + 4 = 12</small>
-                        </div>
-
-                        <div class="example">
-                            <strong>Деление:</strong> a ÷ b = c<br>
-                            <em>Пример:</em> 12 ÷ 3 = 4<br>
-                            <small>Деление - это обратная операция к умножению.</small>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -938,16 +464,6 @@
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
-            
-            if (screenId !== 'games-screen') {
-                hideAllGames();
-            }
-        }
-
-        function hideAllGames() {
-            document.getElementById('game-2048').style.display = 'none';
-            document.getElementById('reaction-game-screen').style.display = 'none';
-            document.getElementById('tap-game-screen').style.display = 'none';
         }
 
         function showNotification(message) {
@@ -959,6 +475,9 @@
             setTimeout(() => {
                 notification.remove();
             }, 3000);
+            
+            // Отправка уведомления боту
+            sendToBot(message);
         }
 
         function addExperience(amount) {
@@ -977,7 +496,29 @@
             document.getElementById('user-xp').textContent = currentXP + '/100 XP';
         }
 
-        // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ РЕГИСТРАЦИИ =====
+        // ===== TELEGRAM BOT INTEGRATION =====
+        function sendToBot(message) {
+            const tg = window.Telegram?.WebApp;
+            if (tg && tg.sendData) {
+                // Отправляем данные боту
+                const data = {
+                    action: 'notification',
+                    message: message,
+                    user: tg.initDataUnsafe?.user,
+                    timestamp: Date.now()
+                };
+                tg.sendData(JSON.stringify(data));
+            }
+            
+            // Альтернативный способ - через WebApp.showAlert
+            if (tg && tg.showAlert) {
+                tg.showAlert(message);
+            }
+            
+            console.log('Bot notification:', message);
+        }
+
+        // ===== USER REGISTRATION =====
         function initRegistration() {
             const tg = window.Telegram?.WebApp;
             console.log('Telegram WebApp:', tg);
@@ -993,29 +534,52 @@
                     let displayName = 'Пользователь';
                     let avatarText = 'U';
                     
+                    // ПРИОРИТЕТ: username -> first_name -> last_name
                     if (user.username) {
                         displayName = '@' + user.username;
                         avatarText = user.username.charAt(0).toUpperCase();
                     } else if (user.first_name) {
                         displayName = user.first_name;
                         avatarText = user.first_name.charAt(0).toUpperCase();
+                    } else if (user.last_name) {
+                        displayName = user.last_name;
+                        avatarText = user.last_name.charAt(0).toUpperCase();
                     }
                     
                     console.log('Display name:', displayName);
                     
+                    // Обновляем интерфейс
                     document.getElementById('user-name').textContent = displayName;
                     document.getElementById('user-avatar').textContent = avatarText;
                     
+                    // Сохраняем данные
                     const userData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
                     userData.telegramId = user.id;
                     userData.username = user.username;
                     userData.first_name = user.first_name;
+                    userData.last_name = user.last_name;
                     userData.displayName = displayName;
                     localStorage.setItem('lifecraft_user', JSON.stringify(userData));
+                    
+                    // Отправляем приветствие боту
+                    sendToBot(`👋 Пользователь ${displayName} запустил приложение!`);
+                    
+                } else {
+                    loadFromLocalStorage();
                 }
+            } else {
+                loadFromLocalStorage();
             }
             
             updateUserInfo();
+        }
+
+        function loadFromLocalStorage() {
+            const savedUserData = JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
+            if (savedUserData.displayName) {
+                document.getElementById('user-name').textContent = savedUserData.displayName;
+                document.getElementById('user-avatar').textContent = savedUserData.displayName.charAt(0).toUpperCase();
+            }
         }
 
         // ===== WORDMASTER =====
@@ -1031,8 +595,6 @@
             if (!localStorage.getItem('lifecraft_words')) {
                 wordsData = [
                     ["man", "мужчина"], ["woman", "женщина"], ["child", "ребёнок"], 
-                    ["boy", "мальчик"], ["girl", "девочка"], ["person", "человек"],
-                    ["man", "мужчина"], ["woman", "женщина"], ["child", "ребёнок"],
                     ["boy", "мальчик"], ["girl", "девочка"], ["person", "человек"],
                     ["family", "семья"], ["friend", "друг"], ["people", "люди"],
                     ["face", "лицо"], ["eye", "глаз"], ["nose", "нос"],
@@ -1088,8 +650,7 @@
             } else {
                 wordsData = JSON.parse(localStorage.getItem('lifecraft_words'));
             }
-    
-            // Эти строки ДОЛЖНЫ быть в функции:
+            
             setWordMode('cards');
             updateWordStats();
         }
@@ -1138,11 +699,13 @@
             addExperience(5);
             showNextWord();
             updateWordStats();
+            sendToBot('🎉 Выучил новое слово! +5 XP');
         }
 
         function markWordAsHard() {
             addExperience(1);
             showNextWord();
+            sendToBot('💪 Сложное слово! +1 XP');
         }
 
         function startNewTest() {
@@ -1201,9 +764,11 @@
                 element.classList.add('correct');
                 testScore++;
                 showNotification('✅ Правильно!');
+                sendToBot('✅ Правильный ответ в тесте!');
             } else {
                 element.classList.add('incorrect');
                 showNotification('❌ Неправильно!');
+                sendToBot('❌ Ошибка в тесте');
                 
                 document.querySelectorAll('.test-option').forEach(opt => {
                     if (opt.textContent === testWords[currentTestQuestion].translation) {
@@ -1226,10 +791,13 @@
             
             if (testScore >= 8) {
                 addExperience(25);
+                sendToBot(`🏆 Отличный результат в тесте! ${accuracy}% +25 XP`);
             } else if (testScore >= 5) {
                 addExperience(15);
+                sendToBot(`👍 Хороший результат в тесте! ${accuracy}% +15 XP`);
             } else {
                 addExperience(5);
+                sendToBot(`📚 Нужно повторить слова! ${accuracy}% +5 XP`);
             }
         }
 
@@ -1261,398 +829,40 @@
             document.getElementById('words-progress').textContent = progress + '%';
         }
 
-        // ===== HABITTRACKER =====
-        function initHabitTracker() {
-            updateHabitsDisplay();
-        }
-
-        function updateHabitsDisplay() {
-            let habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            const today = new Date().toDateString();
-            
-            const habitsList = document.getElementById('habits-list');
-            habitsList.innerHTML = '';
-
-            if (habits.length === 0) {
-                habitsList.innerHTML = '<div class="empty-state">Добавьте свою первую привычку</div>';
-            } else {
-                habits.forEach(habit => {
-                    const completed = habit.history && habit.history[today];
-                    const habitElement = document.createElement('div');
-                    habitElement.className = 'habit-item';
-                    habitElement.innerHTML = `
-                        <div>
-                            <div style="font-weight: bold;">${habit.name}</div>
-                            <div style="font-size: 12px; color: var(--tg-theme-hint-color);">
-                                Создана: ${new Date(habit.created).toLocaleDateString()}
-                            </div>
-                        </div>
-                        <div class="habit-actions">
-                            <button class="habit-btn ${completed ? 'btn-success' : 'btn-primary'}" 
-                                    onclick="toggleHabit('${habit.id}')">
-                                ${completed ? '✅' : '⏳'}
-                            </button>
-                            <button class="habit-btn btn-danger" onclick="deleteHabit('${habit.id}')">
-                                🗑️
-                            </button>
-                        </div>
-                    `;
-                    habitsList.appendChild(habitElement);
-                });
-            }
-
-            updateHabitStats();
-        }
-
-        function toggleHabit(habitId) {
-            let habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            const habit = habits.find(h => h.id === habitId);
-            const today = new Date().toDateString();
-            
-            if (habit) {
-                if (!habit.history) habit.history = {};
-                
-                if (habit.history[today]) {
-                    delete habit.history[today];
-                    showNotification('Привычка отменена');
-                } else {
-                    habit.history[today] = true;
-                    addExperience(10);
-                    showNotification('Привычка выполнена! +10 XP');
-                }
-                
-                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
-                updateHabitsDisplay();
-            }
-        }
-
-        function addNewHabit() {
-            const habitName = prompt("Введите название привычки:");
-            if (habitName && habitName.trim()) {
-                let habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-                const newHabit = {
-                    id: 'habit_' + Date.now(),
-                    name: habitName.trim(),
-                    created: new Date().toISOString(),
-                    history: {}
-                };
-                habits.push(newHabit);
-                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
-                updateHabitsDisplay();
-                showNotification('Привычка добавлена!');
-            }
-        }
-
-        function deleteHabit(habitId) {
-            if (confirm('Удалить эту привычку?')) {
-                let habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-                habits = habits.filter(habit => habit.id !== habitId);
-                localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
-                updateHabitsDisplay();
-                showNotification('Привычка удалена');
-            }
-        }
-
-        function updateHabitStats() {
-            const habits = JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
-            const today = new Date().toDateString();
-            
-            let completedToday = 0;
-            habits.forEach(habit => {
-                if (habit.history && habit.history[today]) {
-                    completedToday++;
-                }
-            });
-            
-            document.getElementById('total-habits').textContent = habits.length;
-            document.getElementById('completed-today').textContent = completedToday;
-        }
-
-        // ===== BRAINGAMES =====
-        
-        // Игра 2048
-        let game2048 = {
-            board: [],
-            score: 0,
-            bestScore: localStorage.getItem('2048_best_score') || 0,
-            size: 4,
-            gameOver: false
-        };
-
-        function startGame2048() {
-            hideAllGames();
-            document.getElementById('game-2048').style.display = 'block';
-            
-            init2048();
-            render2048();
-            setupSwipeControls();
-        }
-
-        function init2048() {
-            game2048.board = Array(game2048.size).fill().map(() => Array(game2048.size).fill(0));
-            game2048.score = 0;
-            game2048.gameOver = false;
-            
-            document.getElementById('2048-score').textContent = '0';
-            document.getElementById('2048-best').textContent = game2048.bestScore;
-            
-            addRandomTile();
-            addRandomTile();
-        }
-
-        function addRandomTile() {
-            const emptyCells = [];
-            for (let i = 0; i < game2048.size; i++) {
-                for (let j = 0; j < game2048.size; j++) {
-                    if (game2048.board[i][j] === 0) {
-                        emptyCells.push({i, j});
-                    }
-                }
-            }
-            
-            if (emptyCells.length > 0) {
-                const {i, j} = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                game2048.board[i][j] = Math.random() < 0.9 ? 2 : 4;
-            }
-        }
-
-        function render2048() {
-            const boardElement = document.getElementById('game-2048-board');
-            boardElement.innerHTML = '';
-            
-            for (let i = 0; i < game2048.size; i++) {
-                for (let j = 0; j < game2048.size; j++) {
-                    const tile = document.createElement('div');
-                    tile.className = 'tile';
-                    const value = game2048.board[i][j];
-                    
-                    if (value > 0) {
-                        tile.textContent = value;
-                        tile.classList.add(`tile-${value}`);
-                    }
-                    
-                    boardElement.appendChild(tile);
-                }
-            }
-        }
-
-        function move2048(direction) {
-            if (game2048.gameOver) return;
-            
-            let moved = false;
-            const oldBoard = JSON.parse(JSON.stringify(game2048.board));
-            
-            switch(direction) {
-                case 'left': moved = moveLeft(); break;
-                case 'right': moved = moveRight(); break;
-                case 'up': moved = moveUp(); break;
-                case 'down': moved = moveDown(); break;
-            }
-            
-            if (moved) {
-                addRandomTile();
-                render2048();
-                checkGameOver();
-                
-                if (game2048.score > game2048.bestScore) {
-                    game2048.bestScore = game2048.score;
-                    localStorage.setItem('2048_best_score', game2048.bestScore);
-                    document.getElementById('2048-best').textContent = game2048.bestScore;
-                }
-            }
-        }
-
-        function moveLeft() {
-            let moved = false;
-            for (let i = 0; i < game2048.size; i++) {
-                const row = game2048.board[i].filter(cell => cell !== 0);
-                for (let j = 0; j < row.length - 1; j++) {
-                    if (row[j] === row[j + 1]) {
-                        row[j] *= 2;
-                        game2048.score += row[j];
-                        document.getElementById('2048-score').textContent = game2048.score;
-                        row.splice(j + 1, 1);
-                        moved = true;
-                    }
-                }
-                while (row.length < game2048.size) row.push(0);
-                if (JSON.stringify(game2048.board[i]) !== JSON.stringify(row)) moved = true;
-                game2048.board[i] = row;
-            }
-            return moved;
-        }
-
-        function moveRight() {
-            let moved = false;
-            for (let i = 0; i < game2048.size; i++) {
-                const row = game2048.board[i].filter(cell => cell !== 0);
-                for (let j = row.length - 1; j > 0; j--) {
-                    if (row[j] === row[j - 1]) {
-                        row[j] *= 2;
-                        game2048.score += row[j];
-                        document.getElementById('2048-score').textContent = game2048.score;
-                        row.splice(j - 1, 1);
-                        moved = true;
-                    }
-                }
-                while (row.length < game2048.size) row.unshift(0);
-                if (JSON.stringify(game2048.board[i]) !== JSON.stringify(row)) moved = true;
-                game2048.board[i] = row;
-            }
-            return moved;
-        }
-
-        function moveUp() {
-            let moved = false;
-            for (let j = 0; j < game2048.size; j++) {
-                let column = [];
-                for (let i = 0; i < game2048.size; i++) {
-                    if (game2048.board[i][j] !== 0) column.push(game2048.board[i][j]);
-                }
-                for (let i = 0; i < column.length - 1; i++) {
-                    if (column[i] === column[i + 1]) {
-                        column[i] *= 2;
-                        game2048.score += column[i];
-                        document.getElementById('2048-score').textContent = game2048.score;
-                        column.splice(i + 1, 1);
-                        moved = true;
-                    }
-                }
-                while (column.length < game2048.size) column.push(0);
-                for (let i = 0; i < game2048.size; i++) {
-                    if (game2048.board[i][j] !== column[i]) moved = true;
-                    game2048.board[i][j] = column[i];
-                }
-            }
-            return moved;
-        }
-
-        function moveDown() {
-            let moved = false;
-            for (let j = 0; j < game2048.size; j++) {
-                let column = [];
-                for (let i = 0; i < game2048.size; i++) {
-                    if (game2048.board[i][j] !== 0) column.push(game2048.board[i][j]);
-                }
-                for (let i = column.length - 1; i > 0; i--) {
-                    if (column[i] === column[i - 1]) {
-                        column[i] *= 2;
-                        game2048.score += column[i];
-                        document.getElementById('2048-score').textContent = game2048.score;
-                        column.splice(i - 1, 1);
-                        moved = true;
-                    }
-                }
-                while (column.length < game2048.size) column.unshift(0);
-                for (let i = 0; i < game2048.size; i++) {
-                    if (game2048.board[i][j] !== column[i]) moved = true;
-                    game2048.board[i][j] = column[i];
-                }
-            }
-            return moved;
-        }
-
-        function checkGameOver() {
-            for (let i = 0; i < game2048.size; i++) {
-                for (let j = 0; j < game2048.size; j++) {
-                    if (game2048.board[i][j] === 0) return;
-                    if (i < game2048.size - 1 && game2048.board[i][j] === game2048.board[i + 1][j]) return;
-                    if (j < game2048.size - 1 && game2048.board[i][j] === game2048.board[i][j + 1]) return;
-                }
-            }
-            
-            game2048.gameOver = true;
-            showNotification('Игра окончена! Счет: ' + game2048.score);
-            addExperience(Math.floor(game2048.score / 100));
-        }
-
-        function setupSwipeControls() {
-            const board = document.getElementById('game-2048-board');
-            let startX, startY;
-            
-            board.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            });
-            
-            board.addEventListener('touchmove', e => {
-                e.preventDefault();
-            });
-            
-            board.addEventListener('touchend', e => {
-                if (!startX || !startY) return;
-                
-                const endX = e.changedTouches[0].clientX;
-                const endY = e.changedTouches[0].clientY;
-                const diffX = startX - endX;
-                const diffY = startY - endY;
-                
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (diffX > 50) {
-                        move2048('left');
-                    } else if (diffX < -50) {
-                        move2048('right');
-                    }
-                } else {
-                    if (diffY > 50) {
-                        move2048('up');
-                    } else if (diffY < -50) {
-                        move2048('down');
-                    }
-                }
-                
-                startX = null;
-                startY = null;
-            });
-            
-            document.addEventListener('keydown', e => {
-                if (document.getElementById('game-2048').style.display !== 'block') return;
-                
-                switch(e.key) {
-                    case 'ArrowLeft': move2048('left'); break;
-                    case 'ArrowRight': move2048('right'); break;
-                    case 'ArrowUp': move2048('up'); break;
-                    case 'ArrowDown': move2048('down'); break;
-                }
-            });
-        }
-
-        // Игра Реакция
-        let reactionStartTime;
-        let bestReactionTime = localStorage.getItem('best_reaction_time') || 9999;
-
-        function startReactionGame() {
-            hideAllGames();
-            document.getElementById('reaction-game-screen').style.display = 'block';
-            
-            document.getElementById('reaction-time').textContent = '0';
-            document.getElementById('best-time').textContent = bestReactionTime;
-            document.getElementById('reaction-message').textContent = 'Жди появления цели...';
-            document.getElementById('reaction-target').style.display = 'none';
-            
-            setTimeout(() => {
-                reactionStartTime = Date.now();
-                document.getElementById('reaction-target').style.display = 'block';
-                document.getElementById('reaction-message').textContent = 'Нажимай сейчас!';
-            }, Math.random() * 3000 + 1000);
-        }
-
-        // Простая игра Тапы
+        // ===== TAP GAME =====
         let tapCount = 0;
         let tapTimeLeft = 30;
         let tapTimer;
 
         function startTapGame() {
-            hideAllGames();
-            document.getElementById('tap-game-screen').style.display = 'block';
+            showScreen('games-screen');
             
             tapCount = 0;
             tapTimeLeft = 30;
             
-            document.getElementById('tap-count').textContent = '0';
-            document.getElementById('tap-time').textContent = '30';
-            document.getElementById('tap-area').textContent = 'Нажми!';
-            document.getElementById('tap-area').onclick = handleTap;
+            const gameHTML = `
+                <div class="card">
+                    <div class="section-title">Игра в Тапы</div>
+                    <div class="tap-area" id="tap-area" onclick="handleTap()">
+                        Нажми!
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="tap-count">0</div>
+                            <div class="stat-label">Кликов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="tap-time">30</div>
+                            <div class="stat-label">Секунд</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startTapGame()" style="width: 100%;">
+                        Начать заново
+                    </button>
+                </div>
+            `;
+            
+            document.querySelector('#games-screen .module-content').innerHTML = gameHTML;
             
             clearInterval(tapTimer);
             tapTimer = setInterval(() => {
@@ -1667,6 +877,7 @@
                     const xp = Math.floor(tapCount / 2);
                     addExperience(xp);
                     showNotification(`Игра окончена! Тапов: ${tapCount} (+${xp} XP)`);
+                    sendToBot(`🎮 Результат в игре Тапы: ${tapCount} кликов! +${xp} XP`);
                 }
             }, 1000);
         }
@@ -1682,203 +893,23 @@
             }, 100);
         }
 
-        // ===== MATHGYM =====
-        let mathScore = 0;
-        let mathTotal = 0;
-        let mathMode = 'practice';
-        let mathTestScore = 0;
-        let currentMathTestQuestion = 0;
-        let mathTestQuestions = [];
-
-        function initMathGym() {
-            setMathMode('practice');
-        }
-
-        function setMathMode(mode) {
-            mathMode = mode;
-            
-            document.getElementById('math-practice').style.display = 'none';
-            document.getElementById('math-test').style.display = 'none';
-            document.getElementById('math-theory').style.display = 'none';
-            
-            document.getElementById('math-' + mode).style.display = 'block';
-            
-            document.querySelectorAll('.math-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            if (mode === 'practice') {
-                generateMathProblem();
-            } else if (mode === 'test') {
-                startNewMathTest();
-            }
-        }
-
-        function generateMathProblem() {
-            const a = Math.floor(Math.random() * 20) + 1;
-            const b = Math.floor(Math.random() * 20) + 1;
-            const operators = ['+', '-', '×'];
-            const operator = operators[Math.floor(Math.random() * operators.length)];
-            
-            let answer;
-            switch (operator) {
-                case '+': answer = a + b; break;
-                case '-': answer = a - b; break;
-                case '×': answer = a * b; break;
-            }
-            
-            document.getElementById('math-problem').textContent = `${a} ${operator} ${b} = ?`;
-            document.getElementById('math-problem').dataset.answer = answer;
-            document.getElementById('math-answer').value = '';
-        }
-
-        function checkMathAnswer() {
-            const userAnswer = parseInt(document.getElementById('math-answer').value);
-            const correctAnswer = parseInt(document.getElementById('math-problem').dataset.answer);
-            
-            if (userAnswer === correctAnswer) {
-                mathScore++;
-                addExperience(3);
-                showNotification('✅ Правильно! +3 XP');
-            } else {
-                showNotification(`❌ Неправильно! Правильный ответ: ${correctAnswer}`);
-            }
-            
-            mathTotal++;
-            
-            if (mathTotal >= 10) {
-                const accuracy = Math.round((mathScore / 10) * 100);
-                showNotification(`🎯 Результат: ${mathScore}/10 (${accuracy}%)`);
-                if (mathScore >= 8) addExperience(20);
-                mathScore = 0;
-                mathTotal = 0;
-            }
-            
-            updateMathStats();
-            generateMathProblem();
-        }
-
-        function updateMathStats() {
-            document.getElementById('math-correct').textContent = mathScore;
-            document.getElementById('math-total').textContent = mathTotal;
-        }
-
-        function startNewMathTest() {
-            mathTestQuestions = [];
-            for (let i = 0; i < 10; i++) {
-                const a = Math.floor(Math.random() * 20) + 1;
-                const b = Math.floor(Math.random() * 20) + 1;
-                const operators = ['+', '-', '×'];
-                const operator = operators[Math.floor(Math.random() * operators.length)];
-                
-                let answer;
-                switch (operator) {
-                    case '+': answer = a + b; break;
-                    case '-': answer = a - b; break;
-                    case '×': answer = a * b; break;
-                }
-                
-                mathTestQuestions.push({problem: `${a} ${operator} ${b} = ?`, answer: answer});
-            }
-            
-            currentMathTestQuestion = 0;
-            mathTestScore = 0;
-            document.getElementById('math-test-results').style.display = 'none';
-            showMathTestQuestion();
-        }
-
-        function showMathTestQuestion() {
-            if (currentMathTestQuestion >= mathTestQuestions.length) {
-                showMathTestResults();
-                return;
-            }
-            
-            const question = mathTestQuestions[currentMathTestQuestion];
-            document.getElementById('math-test-problem').textContent = question.problem;
-            document.getElementById('math-test-answer').value = '';
-            document.getElementById('math-test-progress').textContent = `${currentMathTestQuestion + 1}/10`;
-        }
-
-        function checkMathTestAnswer() {
-            const userAnswer = parseInt(document.getElementById('math-test-answer').value);
-            const correctAnswer = mathTestQuestions[currentMathTestQuestion].answer;
-            
-            if (userAnswer === correctAnswer) {
-                mathTestScore++;
-                showNotification('✅ Правильно!');
-            } else {
-                showNotification(`❌ Неправильно! Правильный ответ: ${correctAnswer}`);
-            }
-            
-            currentMathTestQuestion++;
-            showMathTestQuestion();
-        }
-
-        function showMathTestResults() {
-            document.getElementById('math-test-results').style.display = 'block';
-            const accuracy = Math.round((mathTestScore / 10) * 100);
-            document.getElementById('math-test-score').textContent = accuracy + '%';
-            document.getElementById('math-test-accuracy').textContent = `Правильно: ${mathTestScore}/10`;
-            
-            if (mathTestScore >= 8) {
-                addExperience(30);
-            } else if (mathTestScore >= 5) {
-                addExperience(20);
-            } else {
-                addExperience(10);
-            }
-        }
-
-        // ОБРАБОТЧИКИ СОБЫТИЙ
+        // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
             initRegistration();
             
-            // WordMaster
+            // WordMaster event listeners
             document.getElementById('hard-btn').onclick = markWordAsHard;
             document.getElementById('show-btn').onclick = showTranslation;
             document.getElementById('know-btn').onclick = markWordAsKnown;
             document.getElementById('restart-test-btn').onclick = startNewTest;
             
-            // Habits
-            document.getElementById('add-habit-btn').onclick = addNewHabit;
-            
-            // Math
-            document.getElementById('check-math-btn').onclick = checkMathAnswer;
-            document.getElementById('check-math-test-btn').onclick = checkMathTestAnswer;
-            document.getElementById('restart-math-test-btn').onclick = startNewMathTest;
-            
             // Tabs
             document.querySelectorAll('.mode-tab').forEach(tab => {
                 tab.onclick = (e) => setWordMode(e.target.dataset.mode);
             });
-            
-            document.querySelectorAll('.math-tab').forEach(tab => {
-                tab.onclick = (e) => setMathMode(e.target.dataset.mode);
-            });
-            
-            // Reaction game
-            document.getElementById('reaction-area').onclick = function() {
-                if (!reactionStartTime) return;
-                
-                const reactionTime = Date.now() - reactionStartTime;
-                document.getElementById('reaction-time').textContent = reactionTime;
-                
-                if (reactionTime < bestReactionTime) {
-                    bestReactionTime = reactionTime;
-                    localStorage.setItem('best_reaction_time', bestReactionTime);
-                    document.getElementById('best-time').textContent = bestReactionTime;
-                    showNotification('🎉 Новый рекорд!');
-                    addExperience(20);
-                }
-                
-                reactionStartTime = null;
-                document.getElementById('reaction-target').style.display = 'none';
-                document.getElementById('reaction-message').textContent = 'Нажми "Начать заново"';
-            };
         });
 
-        // Telegram WebApp для тестирования
+        // Telegram WebApp emulator for testing
         if (!window.Telegram) {
             window.Telegram = {
                 WebApp: {
@@ -1890,14 +921,16 @@
                         }
                     },
                     expand: function() {},
-                    ready: function() {}
+                    ready: function() {},
+                    sendData: function(data) {
+                        console.log('Data sent to bot:', data);
+                    },
+                    showAlert: function(message) {
+                        alert('Bot: ' + message);
+                    }
                 }
             };
         }
     </script>
 </body>
 </html>
-
-
-
-
