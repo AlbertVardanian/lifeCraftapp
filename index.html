@@ -61,6 +61,12 @@
 
         .screen {
             display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
         }
 
         .screen.active {
@@ -562,9 +568,9 @@
         </div>
         <div class="module-content">
             <div class="mode-tabs">
-                <div class="mode-tab active" onclick="setWordMode('cards')">Карточки</div>
-                <div class="mode-tab" onclick="setWordMode('test')">Тест</div>
-                <div class="mode-tab" onclick="setWordMode('learned')">Изученные</div>
+                <div class="mode-tab active" onclick="setWordMode('cards', this)">Карточки</div>
+                <div class="mode-tab" onclick="setWordMode('test', this)">Тест</div>
+                <div class="mode-tab" onclick="setWordMode('learned', this)">Изученные</div>
             </div>
 
             <div id="cards-mode">
@@ -622,7 +628,7 @@
                         <div class="stat-label">Изучено слов</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="words-total">150</div>
+                        <div class="stat-value" id="words-total">152</div>
                         <div class="stat-label">Всего слов</div>
                     </div>
                 </div>
@@ -639,9 +645,9 @@
         </div>
         <div class="module-content">
             <div class="mode-tabs">
-                <div class="mode-tab math-tab active" onclick="setMathMode('practice')">Практика</div>
-                <div class="mode-tab math-tab" onclick="setMathMode('test')">Тест</div>
-                <div class="mode-tab math-tab" onclick="setMathMode('theory')">Теория</div>
+                <div class="mode-tab math-tab active" onclick="setMathMode('practice', this)">Практика</div>
+                <div class="mode-tab math-tab" onclick="setMathMode('test', this)">Тест</div>
+                <div class="mode-tab math-tab" onclick="setMathMode('theory', this)">Теория</div>
             </div>
 
             <div id="math-practice-mode">
@@ -775,7 +781,7 @@
     <!-- Игра 2048 -->
     <div id="game-2048-screen" class="screen">
         <div class="nav-header">
-            <button class="back-button" onclick="showScreen('games-screen')">← Назад</button>
+            <button class="back-button" onclick="exitGame2048()">← Назад</button>
             <div class="section-title">2048</div>
             <div style="width: 40px;"></div>
         </div>
@@ -789,7 +795,7 @@
             </div>
             <div class="game-controls">
                 <button class="btn btn-primary" onclick="resetGame2048()">Новая игра</button>
-                <button class="btn btn-warning" onclick="showScreen('games-screen')">Выйти</button>
+                <button class="btn btn-warning" onclick="exitGame2048()">Выйти</button>
             </div>
         </div>
     </div>
@@ -840,6 +846,13 @@
         let currentMathTestIndex = 0;
         let mathTestScore = 0;
 
+        // 2048 переменные
+        let gameBoard = [];
+        let score = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let gameActive = false;
+
         // ===== ОСНОВНЫЕ ФУНКЦИИ =====
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -882,7 +895,8 @@
 
         // ===== УПРАВЛЕНИЕ ДАННЫМИ =====
         function getUserData() {
-            return JSON.parse(localStorage.getItem('lifecraft_user') || '{}');
+            const data = localStorage.getItem('lifecraft_user');
+            return data ? JSON.parse(data) : {};
         }
 
         function saveUserData(data) {
@@ -890,7 +904,8 @@
         }
 
         function getHabits() {
-            return JSON.parse(localStorage.getItem('lifecraft_habits') || '[]');
+            const data = localStorage.getItem('lifecraft_habits');
+            return data ? JSON.parse(data) : [];
         }
 
         function saveHabits(habits) {
@@ -899,12 +914,52 @@
 
         // ===== WORDMASTER =====
         function initWordMaster() {
-            if (!localStorage.getItem('lifecraft_words')) {
+            // Загружаем слова
+            const savedWords = localStorage.getItem('lifecraft_words');
+            if (!savedWords) {
                 wordsData = [
-                    ["man", "мужчина"], ["woman", "женщина"], ["child", "ребёнок"],
-                    ["house", "дом"], ["car", "машина"], ["book", "книга"],
-                    ["water", "вода"], ["food", "еда"], ["time", "время"],
-                    ["day", "день"], ["night", "ночь"], ["year", "год"]
+                    ["abandon", "покидать"], ["ability", "способность"], ["able", "способный"], 
+                    ["about", "о"], ["above", "над"], ["abroad", "за границей"], ["absence", "отсутствие"], 
+                    ["absolute", "абсолютный"], ["absolutely", "абсолютно"], ["academic", "академический"], 
+                    ["accept", "принимать"], ["access", "доступ"], ["accident", "несчастный случай"], 
+                    ["accompany", "сопровождать"], ["accomplish", "выполнять"], ["according", "согласно"], 
+                    ["account", "счет"], ["accurate", "точный"], ["accuse", "обвинять"], ["achieve", "достигать"], 
+                    ["achievement", "достижение"], ["acid", "кислота"], ["acknowledge", "признавать"], 
+                    ["acquire", "приобретать"], ["across", "через"], ["act", "действовать"], ["action", "действие"], 
+                    ["active", "активный"], ["activity", "деятельность"], ["actor", "актер"], ["actress", "актриса"], 
+                    ["actual", "фактический"], ["actually", "на самом деле"], ["ad", "объявление"], ["adapt", "адаптировать"], 
+                    ["add", "добавлять"], ["addition", "дополнение"], ["additional", "дополнительный"], ["address", "адрес"], 
+                    ["adequate", "адекватный"], ["adjust", "настраивать"], ["adjustment", "регулировка"], ["administration", "администрация"], 
+                    ["admire", "восхищаться"], ["admission", "вход"], ["admit", "признавать"], ["adopt", "принимать"], 
+                    ["adult", "взрослый"], ["advance", "продвижение"], ["advanced", "продвинутый"], ["advantage", "преимущество"], 
+                    ["adventure", "приключение"], ["advertising", "реклама"], ["advice", "совет"], ["advise", "советовать"], 
+                    ["adviser", "советник"], ["affair", "дело"], ["affect", "влиять"], ["afford", "позволять себе"], 
+                    ["afraid", "испуганный"], ["after", "после"], ["afternoon", "после полудня"], ["again", "снова"], 
+                    ["against", "против"], ["age", "возраст"], ["agency", "агентство"], ["agent", "агент"], 
+                    ["aggressive", "агрессивный"], ["ago", "назад"], ["agree", "соглашаться"], ["agreement", "соглашение"], 
+                    ["agricultural", "сельскохозяйственный"], ["ahead", "впереди"], ["aid", "помощь"], ["aim", "цель"], 
+                    ["air", "воздух"], ["aircraft", "самолет"], ["airline", "авиалиния"], ["airport", "аэропорт"], 
+                    ["album", "альбом"], ["alcohol", "алкоголь"], ["alive", "живой"], ["all", "все"], 
+                    ["allow", "позволять"], ["almost", "почти"], ["alone", "один"], ["along", "вдоль"], 
+                    ["already", "уже"], ["also", "также"], ["alter", "изменять"], ["alternative", "альтернатива"], 
+                    ["although", "хотя"], ["always", "всегда"], ["amazing", "удивительный"], ["among", "среди"], 
+                    ["amount", "количество"], ["analysis", "анализ"], ["analyst", "аналитик"], ["analyze", "анализировать"], 
+                    ["ancient", "древний"], ["and", "и"], ["anger", "гнев"], ["angle", "угол"], 
+                    ["angry", "сердитый"], ["animal", "животное"], ["anniversary", "годовщина"], ["announce", "объявлять"], 
+                    ["annual", "ежегодный"], ["another", "другой"], ["answer", "ответ"], ["anticipate", "предвидеть"], 
+                    ["anxiety", "тревога"], ["any", "любой"], ["anybody", "кто-либо"], ["anymore", "больше не"], 
+                    ["anyone", "кто-нибудь"], ["anything", "что-нибудь"], ["anyway", "в любом случае"], ["anywhere", "где-нибудь"], 
+                    ["apart", "отдельно"], ["apartment", "квартира"], ["apparent", "очевидный"], ["apparently", "очевидно"], 
+                    ["appeal", "обращаться"], ["appear", "появляться"], ["appearance", "внешность"], ["apple", "яблоко"], 
+                    ["application", "приложение"], ["apply", "применять"], ["appoint", "назначать"], ["appointment", "назначение"], 
+                    ["appreciate", "ценить"], ["approach", "подход"], ["appropriate", "соответствующий"], ["approval", "одобрение"], 
+                    ["approve", "одобрять"], ["approximately", "приблизительно"], ["architect", "архитектор"], ["area", "область"], 
+                    ["argue", "спорить"], ["argument", "аргумент"], ["arise", "возникать"], ["arm", "рука"], 
+                    ["armed", "вооруженный"], ["army", "армия"], ["around", "вокруг"], ["arrange", "организовывать"], 
+                    ["arrangement", "договоренность"], ["arrest", "арест"], ["arrival", "прибытие"], ["arrive", "прибывать"], 
+                    ["art", "искусство"], ["article", "статья"], ["artist", "художник"], ["artistic", "художественный"], 
+                    ["as", "как"], ["ashamed", "пристыженный"], ["aside", "в сторону"], ["ask", "спрашивать"], 
+                    ["asleep", "спящий"], ["aspect", "аспект"], ["assault", "нападение"], ["assess", "оценивать"]
                 ].map(([en, ru], index) => ({
                     id: index + 1,
                     original: en,
@@ -913,21 +968,21 @@
                 }));
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
             } else {
-                wordsData = JSON.parse(localStorage.getItem('lifecraft_words'));
+                wordsData = JSON.parse(savedWords);
             }
             
-            setWordMode('cards');
+            setWordMode('cards', document.querySelector('#words-screen .mode-tab.active'));
             updateWordStats();
         }
 
-        function setWordMode(mode) {
+        function setWordMode(mode, element) {
             wordMode = mode;
             
             // Обновляем активные вкладки
-            document.querySelectorAll('.mode-tab').forEach(tab => {
+            document.querySelectorAll('#words-screen .mode-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (element) element.classList.add('active');
             
             // Показываем соответствующий режим
             document.getElementById('cards-mode').style.display = mode === 'cards' ? 'block' : 'none';
@@ -968,8 +1023,8 @@
         }
 
         function markWordAsKnown() {
-            const currentWord = document.getElementById('current-word').textContent;
-            const word = wordsData.find(w => w.original === currentWord);
+            const currentWordText = document.getElementById('current-word').textContent;
+            const word = wordsData.find(w => w.original === currentWordText);
             if (word) {
                 word.learned = true;
                 localStorage.setItem('lifecraft_words', JSON.stringify(wordsData));
@@ -994,10 +1049,15 @@
             
             // Выбираем случайные слова для теста
             for (let i = 0; i < Math.min(totalTestQuestions, learnedWords.length); i++) {
-                const randomIndex = Math.floor(Math.random() * learnedWords.length);
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * learnedWords.length);
+                } while (testWords.includes(learnedWords[randomIndex]));
+                
                 testWords.push(learnedWords[randomIndex]);
             }
             
+            document.getElementById('test-results').style.display = 'none';
             showTestQuestion();
         }
 
@@ -1014,7 +1074,7 @@
             // Создаем варианты ответов
             const correctAnswer = word.translation;
             const wrongAnswers = wordsData
-                .filter(w => w.translation !== correctAnswer)
+                .filter(w => w.translation !== correctAnswer && w.learned)
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 3)
                 .map(w => w.translation);
@@ -1023,7 +1083,7 @@
             
             let optionsHtml = '';
             allAnswers.forEach(answer => {
-                optionsHtml += `<button class="btn btn-primary" onclick="checkTestAnswer('${answer}')" style="margin: 5px; width: 100%;">${answer}</button>`;
+                optionsHtml += `<button class="btn btn-primary" onclick="checkTestAnswer('${answer.replace(/'/g, "\\'")}')" style="margin: 5px; width: 100%;">${answer}</button>`;
             });
             
             document.getElementById('test-options').innerHTML = optionsHtml;
@@ -1077,22 +1137,28 @@
             
             document.getElementById('words-learned').textContent = learnedCount;
             document.getElementById('words-progress').textContent = progress + '%';
+            document.getElementById('words-total').textContent = wordsData.length;
         }
 
         // ===== МАТЕМАТИКА =====
         function initMath() {
-            setMathMode('practice');
+            // Загружаем прогресс
+            const mathData = getUserData().math || {};
+            mathCorrectAnswers = mathData.correct || 0;
+            mathTotalAnswers = mathData.total || 0;
+            
+            setMathMode('practice', document.querySelector('#math-screen .mode-tab.active'));
             updateMathStats();
         }
 
-        function setMathMode(mode) {
+        function setMathMode(mode, element) {
             mathMode = mode;
             
             // Обновляем активные вкладки
-            document.querySelectorAll('.mode-tab.math-tab').forEach(tab => {
+            document.querySelectorAll('#math-screen .mode-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (element) element.classList.add('active');
             
             // Показываем соответствующий режим
             document.getElementById('math-practice-mode').style.display = mode === 'practice' ? 'block' : 'none';
@@ -1153,6 +1219,11 @@
                 showNotification(`Неправильно! Правильный ответ: ${currentMathProblem.answer}`);
             }
             
+            // Сохраняем прогресс
+            const userData = getUserData();
+            userData.math = { correct: mathCorrectAnswers, total: mathTotalAnswers };
+            saveUserData(userData);
+            
             updateMathStats();
             generateMathProblem();
         }
@@ -1195,6 +1266,7 @@
                 mathTestProblems.push({ a, b, operation, answer });
             }
             
+            document.getElementById('math-test-results').style.display = 'none';
             showMathTestProblem();
         }
 
@@ -1263,7 +1335,7 @@
                 habits.forEach(habit => {
                     const isCompleted = habit.lastCompleted === today;
                     html += `
-                        <div class="habit-item">
+                        <div class="habit-item" data-habit-id="${habit.id}">
                             <div>
                                 <div style="font-weight: bold;">${habit.name}</div>
                                 <div class="habit-streak">Серия: ${habit.streak || 0} дней</div>
@@ -1346,42 +1418,28 @@
             showNotification('Привычка добавлена!');
         }
 
-        // ===== ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЬЯ =====
-        function initUser() {
-            const userData = getUserData();
-            
-            if (!userData.name) {
-                document.getElementById('name-modal').style.display = 'flex';
-            } else {
-                document.getElementById('name-modal').style.display = 'none';
-                updateUserInfo();
-            }
-        }
-
-        function saveUserName() {
-            const name = document.getElementById('user-name-input').value.trim();
-            if (!name) return;
-            
-            const userData = getUserData();
-            userData.name = name;
-            saveUserData(userData);
-            
-            document.getElementById('name-modal').style.display = 'none';
-            updateUserInfo();
-            showNotification(`Добро пожаловать, ${name}!`);
-        }
-
         // ===== ИГРА 2048 =====
-        let gameBoard = [];
-        let score = 0;
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let gameActive = false;
-
         function startGame2048() {
             showScreen('game-2048-screen');
             resetGame2048();
             gameActive = true;
+            
+            // Добавляем обработчики свайпов
+            const gameScreen = document.getElementById('game-2048-screen');
+            gameScreen.addEventListener('touchstart', handleTouchStart, { passive: false });
+            gameScreen.addEventListener('touchmove', handleTouchMove, { passive: false });
+            gameScreen.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
+
+        function exitGame2048() {
+            gameActive = false;
+            showScreen('games-screen');
+            
+            // Удаляем обработчики свайпов
+            const gameScreen = document.getElementById('game-2048-screen');
+            gameScreen.removeEventListener('touchstart', handleTouchStart);
+            gameScreen.removeEventListener('touchmove', handleTouchMove);
+            gameScreen.removeEventListener('touchend', handleTouchEnd);
         }
 
         function resetGame2048() {
@@ -1431,25 +1489,6 @@
             }
         }
 
-        // ===== НАПОМИНАНИЯ =====
-        function setupHabitReminders() {
-            showNotification('Функция напоминаний будет реализована в будущем');
-        }
-
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        document.addEventListener('DOMContentLoaded', function() {
-            initUser();
-            
-            // Добавляем обработчики свайпов для игры 2048
-            const gameScreen = document.getElementById('game-2048-screen');
-            if (gameScreen) {
-                gameScreen.addEventListener('touchstart', handleTouchStart, { passive: false });
-                gameScreen.addEventListener('touchmove', handleTouchMove, { passive: false });
-                gameScreen.addEventListener('touchend', handleTouchEnd, { passive: false });
-            }
-        });
-
-        // Обработчики свайпов для 2048
         function handleTouchStart(event) {
             if (!gameActive) return;
             const touch = event.touches[0];
@@ -1477,23 +1516,33 @@
             
             if (Math.abs(diffX) > Math.abs(diffY)) {
                 if (Math.abs(diffX) > minSwipeDistance) {
+                    let moved = false;
                     if (diffX > 0) {
-                        moveRight();
+                        moved = moveRight();
                     } else {
-                        moveLeft();
+                        moved = moveLeft();
                     }
-                    addRandomTile();
-                    renderGame2048();
+                    
+                    if (moved) {
+                        addRandomTile();
+                        renderGame2048();
+                        checkGameState();
+                    }
                 }
             } else {
                 if (Math.abs(diffY) > minSwipeDistance) {
+                    let moved = false;
                     if (diffY > 0) {
-                        moveDown();
+                        moved = moveDown();
                     } else {
-                        moveUp();
+                        moved = moveUp();
                     }
-                    addRandomTile();
-                    renderGame2048();
+                    
+                    if (moved) {
+                        addRandomTile();
+                        renderGame2048();
+                        checkGameState();
+                    }
                 }
             }
             
@@ -1502,11 +1551,46 @@
             event.preventDefault();
         }
 
-        // Функции движения для 2048
+        function checkGameState() {
+            if (gameBoard.some(row => row.includes(2048))) {
+                setTimeout(() => {
+                    showNotification('Победа! Вы собрали 2048! +50 XP');
+                    addExperience(50);
+                    gameActive = false;
+                }, 500);
+                return;
+            }
+            
+            if (!canMove()) {
+                setTimeout(() => {
+                    showNotification('Игра окончена! Нет возможных ходов.');
+                    gameActive = false;
+                }, 500);
+            }
+        }
+
+        function canMove() {
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (gameBoard[i][j] === 0) return true;
+                }
+            }
+            
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (j < 3 && gameBoard[i][j] === gameBoard[i][j + 1]) return true;
+                    if (i < 3 && gameBoard[i][j] === gameBoard[i + 1][j]) return true;
+                }
+            }
+            
+            return false;
+        }
+
         function moveLeft() {
             let moved = false;
             for (let i = 0; i < 4; i++) {
                 let row = gameBoard[i].filter(cell => cell !== 0);
+                
                 for (let j = 0; j < row.length - 1; j++) {
                     if (row[j] === row[j + 1]) {
                         row[j] *= 2;
@@ -1514,11 +1598,15 @@
                         row.splice(j + 1, 1);
                     }
                 }
-                while (row.length < 4) row.push(0);
-                if (JSON.stringify(gameBoard[i]) !== JSON.stringify(row)) {
-                    moved = true;
-                    gameBoard[i] = row;
+                
+                while (row.length < 4) {
+                    row.push(0);
                 }
+                
+                if (!arraysEqual(gameBoard[i], row)) {
+                    moved = true;
+                }
+                gameBoard[i] = row;
             }
             return moved;
         }
@@ -1527,6 +1615,7 @@
             let moved = false;
             for (let i = 0; i < 4; i++) {
                 let row = gameBoard[i].filter(cell => cell !== 0);
+                
                 for (let j = row.length - 1; j > 0; j--) {
                     if (row[j] === row[j - 1]) {
                         row[j] *= 2;
@@ -1534,11 +1623,15 @@
                         row.splice(j - 1, 1);
                     }
                 }
-                while (row.length < 4) row.unshift(0);
-                if (JSON.stringify(gameBoard[i]) !== JSON.stringify(row)) {
-                    moved = true;
-                    gameBoard[i] = row;
+                
+                while (row.length < 4) {
+                    row.unshift(0);
                 }
+                
+                if (!arraysEqual(gameBoard[i], row)) {
+                    moved = true;
+                }
+                gameBoard[i] = row;
             }
             return moved;
         }
@@ -1548,8 +1641,11 @@
             for (let j = 0; j < 4; j++) {
                 let column = [];
                 for (let i = 0; i < 4; i++) {
-                    if (gameBoard[i][j] !== 0) column.push(gameBoard[i][j]);
+                    if (gameBoard[i][j] !== 0) {
+                        column.push(gameBoard[i][j]);
+                    }
                 }
+                
                 for (let i = 0; i < column.length - 1; i++) {
                     if (column[i] === column[i + 1]) {
                         column[i] *= 2;
@@ -1557,12 +1653,16 @@
                         column.splice(i + 1, 1);
                     }
                 }
-                while (column.length < 4) column.push(0);
+                
+                while (column.length < 4) {
+                    column.push(0);
+                }
+                
                 for (let i = 0; i < 4; i++) {
                     if (gameBoard[i][j] !== column[i]) {
                         moved = true;
-                        gameBoard[i][j] = column[i];
                     }
+                    gameBoard[i][j] = column[i];
                 }
             }
             return moved;
@@ -1573,8 +1673,11 @@
             for (let j = 0; j < 4; j++) {
                 let column = [];
                 for (let i = 0; i < 4; i++) {
-                    if (gameBoard[i][j] !== 0) column.push(gameBoard[i][j]);
+                    if (gameBoard[i][j] !== 0) {
+                        column.push(gameBoard[i][j]);
+                    }
                 }
+                
                 for (let i = column.length - 1; i > 0; i--) {
                     if (column[i] === column[i - 1]) {
                         column[i] *= 2;
@@ -1582,16 +1685,63 @@
                         column.splice(i - 1, 1);
                     }
                 }
-                while (column.length < 4) column.unshift(0);
+                
+                while (column.length < 4) {
+                    column.unshift(0);
+                }
+                
                 for (let i = 0; i < 4; i++) {
                     if (gameBoard[i][j] !== column[i]) {
                         moved = true;
-                        gameBoard[i][j] = column[i];
                     }
+                    gameBoard[i][j] = column[i];
                 }
             }
             return moved;
         }
+
+        function arraysEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) return false;
+            }
+            return true;
+        }
+
+        // ===== НАПОМИНАНИЯ =====
+        function setupHabitReminders() {
+            showNotification('Функция напоминаний будет реализована в будущем');
+        }
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        function initUser() {
+            const userData = getUserData();
+            
+            if (!userData.name) {
+                document.getElementById('name-modal').style.display = 'flex';
+            } else {
+                document.getElementById('name-modal').style.display = 'none';
+                updateUserInfo();
+            }
+        }
+
+        function saveUserName() {
+            const name = document.getElementById('user-name-input').value.trim();
+            if (!name) return;
+            
+            const userData = getUserData();
+            userData.name = name;
+            saveUserData(userData);
+            
+            document.getElementById('name-modal').style.display = 'none';
+            updateUserInfo();
+            showNotification(`Добро пожаловать, ${name}!`);
+        }
+
+        // Запуск при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            initUser();
+        });
     </script>
 </body>
 </html>
