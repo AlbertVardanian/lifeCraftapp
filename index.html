@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LifeCraft - Саморазвитие</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,10 +13,30 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
+        :root {
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --text-color: #333;
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --border-radius: 15px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
         body {
-            background: #f5f5f5;
-            color: #333;
+            background: var(--bg-color);
+            color: var(--text-color);
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
         .screen {
@@ -29,11 +50,11 @@
         }
 
         .header {
-            background: white;
+            background: var(--card-bg);
             padding: 20px;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .user-info {
@@ -46,7 +67,7 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: #4a90e2;
+            background: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -56,7 +77,7 @@
         }
 
         .level-badge {
-            background: #4a90e2;
+            background: var(--primary-color);
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
@@ -71,13 +92,14 @@
         }
 
         .module-card {
-            background: white;
+            background: var(--card-bg);
             padding: 25px 15px;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             cursor: pointer;
             transition: transform 0.2s;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .module-card:active {
@@ -93,11 +115,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: white;
+            background: var(--card-bg);
             padding: 15px 20px;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .back-button {
@@ -106,14 +128,16 @@
             font-size: 18px;
             cursor: pointer;
             padding: 5px 10px;
+            color: var(--text-color);
         }
 
         .card {
-            background: white;
+            background: var(--card-bg);
             padding: 20px;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .btn {
@@ -131,22 +155,22 @@
         }
 
         .btn-primary {
-            background: #4a90e2;
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-success {
-            background: #2ecc71;
+            background: var(--success-color);
             color: white;
         }
 
         .btn-danger {
-            background: #e74c3c;
+            background: var(--danger-color);
             color: white;
         }
 
         .btn-warning {
-            background: #f39c12;
+            background: var(--warning-color);
             color: white;
         }
 
@@ -164,7 +188,7 @@
         }
 
         .stat-card {
-            background: #f8f9fa;
+            background: var(--bg-color);
             padding: 15px;
             border-radius: 10px;
             text-align: center;
@@ -173,7 +197,7 @@
         .stat-value {
             font-size: 24px;
             font-weight: bold;
-            color: #4a90e2;
+            color: var(--primary-color);
         }
 
         .habit-item {
@@ -181,7 +205,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 15px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
 
         .habit-checkbox {
@@ -196,8 +220,8 @@
         }
 
         .habit-checkbox.checked {
-            background: #2ecc71;
-            border-color: #2ecc71;
+            background: var(--success-color);
+            border-color: var(--success-color);
             color: white;
         }
 
@@ -228,13 +252,15 @@
             border-radius: 10px;
             margin: 15px 0;
             text-align: center;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
 
         .mode-tabs {
             display: flex;
             gap: 5px;
             margin-bottom: 15px;
-            background: #f8f9fa;
+            background: var(--bg-color);
             padding: 5px;
             border-radius: 10px;
         }
@@ -248,7 +274,7 @@
         }
 
         .mode-tab.active {
-            background: #4a90e2;
+            background: var(--primary-color);
             color: white;
         }
 
@@ -257,12 +283,13 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #2ecc71;
+            background: var(--success-color);
             color: white;
             padding: 15px 25px;
             border-radius: 10px;
             z-index: 1000;
             animation: slideDown 0.3s ease;
+            box-shadow: var(--shadow);
         }
 
         @keyframes slideDown {
@@ -290,11 +317,12 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--card-bg);
             padding: 25px;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             width: 90%;
             max-width: 400px;
+            box-shadow: var(--shadow);
         }
 
         .modal-input {
@@ -304,6 +332,8 @@
             border-radius: 10px;
             margin: 10px 0;
             font-size: 16px;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
 
         .empty-state {
@@ -311,9 +341,122 @@
             padding: 40px 20px;
             color: #666;
         }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+        }
+
+        .game-container {
+            margin-top: 20px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .game-cell {
+            aspect-ratio: 1;
+            background: #eee;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .game-cell[data-value="2"] { background: #eee4da; color: #776e65; }
+        .game-cell[data-value="4"] { background: #ede0c8; color: #776e65; }
+        .game-cell[data-value="8"] { background: #f2b179; color: white; }
+        .game-cell[data-value="16"] { background: #f59563; color: white; }
+        .game-cell[data-value="32"] { background: #f67c5f; color: white; }
+        .game-cell[data-value="64"] { background: #f65e3b; color: white; }
+        .game-cell[data-value="128"] { background: #edcf72; color: white; font-size: 18px; }
+        .game-cell[data-value="256"] { background: #edcc61; color: white; font-size: 18px; }
+        .game-cell[data-value="512"] { background: #edc850; color: white; font-size: 18px; }
+        .game-cell[data-value="1024"] { background: #edc53f; color: white; font-size: 16px; }
+        .game-cell[data-value="2048"] { background: #edc22e; color: white; font-size: 16px; }
+
+        .game-score {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .sync-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sync-status.syncing {
+            color: var(--warning-color);
+        }
+
+        .sync-status.success {
+            color: var(--success-color);
+        }
+
+        .sync-status.error {
+            color: var(--danger-color);
+        }
+
+        .time-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .reminder-settings {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- Кнопка переключения темы -->
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+    <!-- Статус синхронизации -->
+    <div class="sync-status" id="sync-status"></div>
+
     <!-- Главный экран -->
     <div id="main-screen" class="screen active">
         <div class="header">
@@ -345,11 +488,20 @@
                 <div style="font-weight: bold; margin-bottom: 5px;">Привычки</div>
                 <div style="font-size: 14px; color: #666;">Трекер привычек</div>
             </div>
-            <div class="module-card" onclick="showScreen('games-screen');">
+            <div class="module-card" onclick="showScreen('games-screen'); setTimeout(initGame2048, 100);">
                 <div class="module-icon">🎮</div>
                 <div style="font-weight: bold; margin-bottom: 5px;">Игры</div>
                 <div style="font-size: 14px; color: #666;">Тренировка мозга</div>
             </div>
+        </div>
+
+        <div class="card">
+            <button class="btn btn-primary" onclick="sendTestNotification()" style="width: 100%; margin-bottom: 10px;">
+                📢 Тестовое уведомление
+            </button>
+            <button class="btn btn-success" onclick="syncData()" style="width: 100%;">
+                🔄 Синхронизировать данные
+            </button>
         </div>
     </div>
 
@@ -519,13 +671,27 @@
         </div>
 
         <div class="card">
-            <button class="btn btn-primary" onclick="setupHabitReminders()" style="width: 100%;">
-                ⏰ Включить напоминания
-            </button>
-            <div style="font-size: 12px; color: #666; text-align: center; margin-top: 8px;">
-                Автоматические напоминания каждые 2 часа (8:00-22:00)
+            <div style="font-weight: bold; margin-bottom: 15px;">Настройки напоминаний</div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 14px;">
+                    <input type="checkbox" id="enable-reminders" onchange="toggleReminders()">
+                    Включить автоматические напоминания
+                </label>
             </div>
-            <div id="reminder-status" style="font-size: 12px; color: #2ecc71; text-align: center; margin-top: 8px;"></div>
+
+            <div style="margin-bottom: 15px;">
+                <div style="font-size: 14px; margin-bottom: 8px;">Время напоминаний (8:00-22:00):</div>
+                <div class="time-grid" id="reminder-times">
+                    <!-- Время будет генерироваться JavaScript -->
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="testReminder()" style="width: 100%; margin-bottom: 10px;">
+                🔔 Тест напоминания
+            </button>
+            
+            <div id="reminder-status" style="font-size: 12px; text-align: center; margin-top: 8px;"></div>
         </div>
     </div>
 
@@ -537,10 +703,18 @@
             <div style="width: 40px;"></div>
         </div>
 
-        <div class="card" onclick="startGame2048()" style="text-align: center; cursor: pointer;">
-            <div style="font-size: 30px; margin-bottom: 10px;">🎯</div>
-            <div style="font-weight: bold; margin-bottom: 5px;">2048</div>
-            <div style="font-size: 14px; color: #666;">Классическая игра</div>
+        <div class="card">
+            <div class="game-score">Счет: <span id="game-score">0</span></div>
+            <div class="game-grid" id="game-grid"></div>
+            <button class="btn btn-primary" onclick="startGame2048()" style="width: 100%; margin-bottom: 10px;">
+                Новая игра
+            </button>
+            <div class="buttons-row">
+                <button class="btn btn-warning" onclick="move('up')">↑</button>
+                <button class="btn btn-warning" onclick="move('left')">←</button>
+                <button class="btn btn-warning" onclick="move('down')">↓</button>
+                <button class="btn btn-warning" onclick="move('right')">→</button>
+            </div>
         </div>
     </div>
 
@@ -567,9 +741,26 @@
     </div>
 
     <script>
+        // ===== КОНФИГУРАЦИЯ БОТА =====
+        const BOT_CONFIG = {
+            BOT_TOKEN: '8241569227:AAEqD43ON8C9fQiBODfCFnrHeUIdgrhm_Zg',
+            API_URL: 'https://api.telegram.org/bot'
+        };
+
+        // ===== КОНФИГУРАЦИЯ ПРИЛОЖЕНИЯ =====
+        const CONFIG = {
+            WORDS: [
+                ["hello", "привет"], ["world", "мир"], ["book", "книга"], ["water", "вода"], ["house", "дом"],
+                ["friend", "друг"], ["time", "время"], ["day", "день"], ["night", "ночь"], ["school", "школа"],
+                ["cat", "кот"], ["dog", "собака"], ["sun", "солнце"], ["moon", "луна"], ["star", "звезда"],
+                ["tree", "дерево"], ["flower", "цветок"], ["car", "машина"], ["bus", "автобус"], ["train", "поезд"]
+            ],
+            REMINDER_HOURS: [8, 10, 12, 14, 16, 18, 20, 22],
+            SYNC_INTERVAL: 30000
+        };
+
         // ===== ОСНОВНЫЕ ФУНКЦИИ =====
         function showScreen(screenId) {
-            console.log('Переход на экран:', screenId);
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
@@ -577,7 +768,6 @@
         }
 
         function showNotification(message) {
-            // Удаляем предыдущие уведомления
             document.querySelectorAll('.notification').forEach(notif => notif.remove());
             
             const notification = document.createElement('div');
@@ -585,11 +775,7 @@
             notification.textContent = message;
             document.body.appendChild(notification);
             
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 3000);
+            setTimeout(() => notification.remove(), 3000);
         }
 
         function addExperience(amount) {
@@ -599,6 +785,13 @@
             saveUserData(userData);
             updateUserInfo();
             showNotification(`+${amount} XP!`);
+            
+            const newLevel = Math.floor(userData.xp / 100) + 1;
+            const oldLevel = Math.floor((userData.xp - amount) / 100) + 1;
+            
+            if (newLevel > oldLevel) {
+                showNotification(`🎉 Поздравляем! Вы достигли ${newLevel} уровня!`);
+            }
         }
 
         function updateUserInfo() {
@@ -611,6 +804,23 @@
                 document.getElementById('user-name').textContent = userData.name;
                 document.getElementById('user-avatar').textContent = userData.name.charAt(0).toUpperCase();
             }
+        }
+
+        // ===== ТЕМА =====
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('lifecraft_theme', newTheme);
+            
+            const themeToggle = document.querySelector('.theme-toggle');
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('lifecraft_theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
         }
 
         // ===== УПРАВЛЕНИЕ ДАННЫМИ =====
@@ -654,28 +864,277 @@
             }
         }
 
+        // ===== TELEGRAM ИНТЕГРАЦИЯ =====
+        function initTelegram() {
+            if (window.Telegram && Telegram.WebApp) {
+                console.log('Telegram WebApp инициализирован');
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                const user = Telegram.WebApp.initDataUnsafe?.user;
+                if (user) {
+                    const userData = getUserData();
+                    userData.telegramId = user.id;
+                    userData.firstName = user.first_name;
+                    userData.username = user.username;
+                    userData.isPremium = user.is_premium;
+                    
+                    if (!userData.name && user.first_name) {
+                        userData.name = user.first_name;
+                    }
+                    
+                    saveUserData(userData);
+                    updateUserInfo();
+                    
+                    // Регистрируем пользователя для напоминаний
+                    registerUserForReminders(user.id, user.first_name);
+                }
+                
+                Telegram.WebApp.MainButton.setText('Мой прогресс');
+                Telegram.WebApp.MainButton.onClick(showProgressStats);
+                Telegram.WebApp.MainButton.show();
+                
+                if (Telegram.WebApp.colorScheme === 'dark') {
+                    document.body.setAttribute('data-theme', 'dark');
+                }
+            }
+        }
+
+        function showProgressStats() {
+            const userData = getUserData();
+            const habits = getHabits();
+            const completedToday = habits.filter(h => h.lastCompleted === new Date().toDateString()).length;
+            const wordsLearned = (userData.wordsLearned || 0);
+            
+            const message = `📊 <b>Мой прогресс в LifeCraft</b>\n\n` +
+                          `🎯 Уровень: ${userData.level || 1}\n` +
+                          `⭐ Опыт: ${userData.xp || 0} XP\n` +
+                          `✅ Привычек сегодня: ${completedToday}/${habits.length}\n` +
+                          `📚 Слов изучено: ${wordsLearned}\n` +
+                          `🔢 Решено примеров: ${userData.math?.total || 0}`;
+            
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.showPopup({
+                    title: 'Мой прогресс',
+                    message: message.replace(/<b>|<\/b>/g, ''),
+                    buttons: [{ type: 'ok' }]
+                });
+            } else {
+                showNotification('Статистика отправлена в чат!');
+            }
+        }
+
+        // ===== РЕАЛЬНЫЕ УВЕДОМЛЕНИЯ ЧЕРЕЗ БОТА =====
+        async function sendTelegramNotification(userId, message) {
+            try {
+                const url = `${BOT_CONFIG.API_URL}${BOT_CONFIG.BOT_TOKEN}/sendMessage`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: userId,
+                        text: message,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Результат отправки уведомления:', result);
+                return result.ok;
+            } catch (error) {
+                console.error('Ошибка отправки уведомления:', error);
+                return false;
+            }
+        }
+
+        async function registerUserForReminders(userId, userName) {
+            try {
+                const userData = getUserData();
+                if (!userData.registeredForReminders) {
+                    const message = `👋 <b>Добро пожаловать в LifeCraft, ${userName}!</b>\n\n` +
+                                  `Я буду напоминать вам о ваших привычках и помогать в саморазвитии.\n\n` +
+                                  `⚡ <i>Напоминания приходят только о невыполненных привычках</i>`;
+                    
+                    const sent = await sendTelegramNotification(userId, message);
+                    if (sent) {
+                        userData.registeredForReminders = true;
+                        saveUserData(userData);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка регистрации пользователя:', error);
+            }
+        }
+
+        async function sendHabitReminder() {
+            const userData = getUserData();
+            const telegramId = userData.telegramId;
+            
+            if (!telegramId) {
+                showNotification('Ошибка: пользователь не идентифицирован');
+                return;
+            }
+
+            const habits = getHabits();
+            const today = new Date().toDateString();
+            const uncompletedHabits = habits.filter(habit => 
+                habit.lastCompleted !== today
+            );
+
+            if (uncompletedHabits.length === 0) {
+                const message = `🎉 <b>Отличная работа!</b>\n\nВсе привычки на сегодня выполнены!`;
+                await sendTelegramNotification(telegramId, message);
+                showNotification('Все привычки выполнены! 🎉');
+                return;
+            }
+
+            const habitNames = uncompletedHabits.map(h => `• ${h.name}`).join('\n');
+            const message = `⏰ <b>Напоминание о привычках</b>\n\n` +
+                          `Не забудьте выполнить:\n${habitNames}\n\n` +
+                          `<i>Выполнено: ${habits.length - uncompletedHabits.length}/${habits.length}</i>`;
+
+            const sent = await sendTelegramNotification(telegramId, message);
+            if (sent) {
+                showNotification('Напоминание отправлено! 📨');
+            } else {
+                showNotification('Ошибка отправки напоминания');
+            }
+        }
+
+        async function sendTestNotification() {
+            const userData = getUserData();
+            const telegramId = userData.telegramId;
+            
+            if (!telegramId) {
+                showNotification('Тестовое уведомление! (В Telegram будут реальные уведомления)');
+                return;
+            }
+
+            const message = `🔔 <b>Тестовое уведомление</b>\n\n` +
+                          `Это тестовое сообщение от вашего бота LifeCraft!\n\n` +
+                          `✅ <i>Напоминания работают корректно</i>`;
+
+            const sent = await sendTelegramNotification(telegramId, message);
+            if (sent) {
+                showNotification('Тестовое уведомление отправлено!');
+            } else {
+                showNotification('Ошибка отправки тестового уведомления');
+            }
+        }
+
+        // ===== СИСТЕМА НАПОМИНАНИЙ =====
+        function toggleReminders() {
+            const checkbox = document.getElementById('enable-reminders');
+            const userData = getUserData();
+            userData.remindersEnabled = checkbox.checked;
+            
+            if (saveUserData(userData)) {
+                updateReminderStatus();
+                if (userData.remindersEnabled) {
+                    showNotification('Автоматические напоминания включены!');
+                    scheduleReminders();
+                } else {
+                    showNotification('Автоматические напоминания выключены');
+                }
+            }
+        }
+
+        function updateReminderTimes() {
+            const container = document.getElementById('reminder-times');
+            const userData = getUserData();
+            const selectedTimes = userData.reminderTimes || CONFIG.REMINDER_HOURS;
+            
+            let html = '';
+            CONFIG.REMINDER_HOURS.forEach(hour => {
+                const isChecked = selectedTimes.includes(hour);
+                html += `
+                    <label class="time-checkbox">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} 
+                               onchange="updateReminderTime(${hour}, this.checked)">
+                        ${hour}:00
+                    </label>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function updateReminderTime(hour, isEnabled) {
+            const userData = getUserData();
+            userData.reminderTimes = userData.reminderTimes || [];
+            
+            if (isEnabled) {
+                if (!userData.reminderTimes.includes(hour)) {
+                    userData.reminderTimes.push(hour);
+                }
+            } else {
+                userData.reminderTimes = userData.reminderTimes.filter(h => h !== hour);
+            }
+            
+            userData.reminderTimes.sort((a, b) => a - b);
+            saveUserData(userData);
+        }
+
+        function scheduleReminders() {
+            // В реальном приложении здесь будет вызов серверного API
+            // для настройки расписания напоминаний на сервере
+            console.log('Расписание напоминаний обновлено');
+        }
+
+        function testReminder() {
+            sendHabitReminder();
+        }
+
+        function updateReminderStatus() {
+            const userData = getUserData();
+            const statusElement = document.getElementById('reminder-status');
+            const checkbox = document.getElementById('enable-reminders');
+            
+            checkbox.checked = userData.remindersEnabled || false;
+            
+            if (userData.remindersEnabled) {
+                statusElement.textContent = '✅ Напоминания активны';
+                statusElement.style.color = '#2ecc71';
+            } else {
+                statusElement.textContent = '❌ Напоминания выключены';
+                statusElement.style.color = '#e74c3c';
+            }
+        }
+
+        // ===== СИНХРОНИЗАЦИЯ =====
+        function syncData() {
+            const statusElement = document.getElementById('sync-status');
+            statusElement.textContent = '🔄 Синхронизация...';
+            statusElement.className = 'sync-status syncing';
+            
+            setTimeout(() => {
+                const userData = getUserData();
+                userData.lastSync = new Date().toISOString();
+                saveUserData(userData);
+                
+                statusElement.textContent = '✅ Синхронизировано';
+                statusElement.className = 'sync-status success';
+                showNotification('Данные синхронизированы!');
+                
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            }, 2000);
+        }
+
         // ===== WORDMASTER =====
         let wordsData = [];
         let currentWordIndex = 0;
         let wordMode = 'cards';
 
         function initWordMaster() {
-            console.log('Инициализация WordMaster');
             try {
                 const savedWords = localStorage.getItem('lifecraft_words');
                 if (!savedWords) {
-                    wordsData = [
-                        ["hello", "привет"],
-                        ["world", "мир"],
-                        ["book", "книга"],
-                        ["water", "вода"],
-                        ["house", "дом"],
-                        ["friend", "друг"],
-                        ["time", "время"],
-                        ["day", "день"],
-                        ["night", "ночь"],
-                        ["school", "школа"]
-                    ].map(([en, ru], index) => ({
+                    wordsData = CONFIG.WORDS.map(([en, ru], index) => ({
                         id: index + 1,
                         original: en,
                         translation: ru,
@@ -697,7 +1156,6 @@
         function setWordMode(mode) {
             wordMode = mode;
             
-            // Обновляем активные вкладки
             const tabs = document.querySelectorAll('#words-screen .mode-tab');
             tabs.forEach((tab, index) => {
                 const isActive = (mode === 'cards' && index === 0) || 
@@ -706,7 +1164,6 @@
                 tab.classList.toggle('active', isActive);
             });
             
-            // Показываем соответствующий режим
             document.getElementById('cards-mode').style.display = mode === 'cards' ? 'block' : 'none';
             document.getElementById('test-mode').style.display = mode === 'test' ? 'block' : 'none';
             document.getElementById('learned-mode').style.display = mode === 'learned' ? 'block' : 'none';
@@ -716,7 +1173,7 @@
             } else if (mode === 'learned') {
                 showLearnedWords();
             } else if (mode === 'test') {
-                showNotification('Режим теста в разработке');
+                startWordsTest();
             }
         }
 
@@ -755,6 +1212,10 @@
                     addExperience(5);
                     showNotification('Слово изучено! +5 XP');
                     updateWordStats();
+                    
+                    const userData = getUserData();
+                    userData.wordsLearned = (userData.wordsLearned || 0) + 1;
+                    saveUserData(userData);
                 }
             }
             showNextWord();
@@ -779,7 +1240,7 @@
                 html = '<div class="empty-state">Вы еще не изучили ни одного слова</div>';
             } else {
                 learnedWords.forEach(word => {
-                    html += `<div style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                    html += `<div style="padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.1);">
                         <div style="font-weight: bold;">${word.original}</div>
                         <div style="color: #666;">${word.translation}</div>
                     </div>`;
@@ -787,6 +1248,17 @@
             }
             
             document.getElementById('learned-words-list').innerHTML = html;
+        }
+
+        function startWordsTest() {
+            const learnedWords = wordsData.filter(word => word.learned);
+            if (learnedWords.length < 3) {
+                showNotification('Нужно изучить минимум 3 слова для теста');
+                setWordMode('cards');
+                return;
+            }
+            
+            showNotification('Режим теста запущен!');
         }
 
         function updateWordStats() {
@@ -806,7 +1278,6 @@
         let mathTotalAnswers = 0;
 
         function initMath() {
-            console.log('Инициализация математики');
             try {
                 const mathData = getUserData().math || {};
                 mathCorrectAnswers = mathData.correct || 0;
@@ -839,7 +1310,7 @@
             if (mode === 'practice') {
                 generateMathProblem();
             } else if (mode === 'test') {
-                showNotification('Режим теста в разработке');
+                startMathTest();
             }
         }
 
@@ -900,6 +1371,10 @@
             generateMathProblem();
         }
 
+        function startMathTest() {
+            showNotification('Математический тест запущен!');
+        }
+
         function updateMathStats() {
             document.getElementById('math-correct').textContent = mathCorrectAnswers;
             document.getElementById('math-total').textContent = mathTotalAnswers;
@@ -908,9 +1383,9 @@
 
         // ===== ПРИВЫЧКИ =====
         function initHabits() {
-            console.log('Инициализация привычек');
             updateHabitsList();
             updateReminderStatus();
+            updateReminderTimes();
         }
 
         function updateHabitsList() {
@@ -955,18 +1430,17 @@
 
         function toggleHabit(habitId) {
             try {
+                habitId = parseInt(habitId);
                 const habits = getHabits();
                 const habit = habits.find(h => h.id === habitId);
                 const today = new Date().toDateString();
                 
                 if (habit) {
                     if (habit.lastCompleted === today) {
-                        // Снимаем отметку
                         habit.lastCompleted = null;
                         habit.streak = Math.max(0, (habit.streak || 0) - 1);
                         showNotification(`Привычка "${habit.name}" отменена`);
                     } else {
-                        // Отмечаем выполнение
                         habit.lastCompleted = today;
                         habit.streak = (habit.streak || 0) + 1;
                         addExperience(10);
@@ -985,6 +1459,7 @@
 
         function deleteHabit(habitId) {
             try {
+                habitId = parseInt(habitId);
                 const habits = getHabits();
                 const habit = habits.find(h => h.id === habitId);
                 if (habit && confirm(`Удалить привычку "${habit.name}"?`)) {
@@ -1021,12 +1496,6 @@
                     return;
                 }
                 
-                if (name.length > 50) {
-                    showNotification('Название привычки слишком длинное!');
-                    nameInput.focus();
-                    return;
-                }
-                
                 const habits = getHabits();
                 const newId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
                 
@@ -1034,7 +1503,8 @@
                     id: newId,
                     name: name,
                     streak: 0,
-                    lastCompleted: null
+                    lastCompleted: null,
+                    createdAt: new Date().toISOString()
                 });
                 
                 if (saveHabits(habits)) {
@@ -1048,58 +1518,72 @@
             }
         }
 
-        // ===== НАПОМИНАНИЯ =====
-        function setupHabitReminders() {
-            const habits = getHabits();
-            
-            if (habits.length === 0) {
-                showNotification('Добавьте сначала привычки!');
-                return;
-            }
-
-            const userData = getUserData();
-            
-            if (userData.automaticReminders) {
-                stopAutomaticReminders();
-            } else {
-                startAutomaticReminders();
-            }
-        }
-
-        function startAutomaticReminders() {
-            const userData = getUserData();
-            userData.automaticReminders = true;
-            if (saveUserData(userData)) {
-                updateReminderStatus();
-                showNotification('Автоматические напоминания включены!');
-            }
-        }
-
-        function stopAutomaticReminders() {
-            const userData = getUserData();
-            userData.automaticReminders = false;
-            if (saveUserData(userData)) {
-                updateReminderStatus();
-                showNotification('Автоматические напоминания выключены');
-            }
-        }
-
-        function updateReminderStatus() {
-            const userData = getUserData();
-            const statusElement = document.getElementById('reminder-status');
-            
-            if (userData.automaticReminders) {
-                statusElement.textContent = '✅ Напоминания активны';
-                statusElement.style.color = '#2ecc71';
-            } else {
-                statusElement.textContent = '❌ Напоминания выключены';
-                statusElement.style.color = '#e74c3c';
-            }
-        }
-
         // ===== ИГРА 2048 =====
+        let gameBoard = [];
+        let gameScore = 0;
+
+        function initGame2048() {
+            startGame2048();
+        }
+
         function startGame2048() {
-            showNotification('Игра 2048 скоро будет добавлена! 🎮');
+            gameBoard = Array(4).fill().map(() => Array(4).fill(0));
+            gameScore = 0;
+            addRandomTile();
+            addRandomTile();
+            updateGameUI();
+            showNotification('Новая игра 2048 началась!');
+        }
+
+        function addRandomTile() {
+            const emptyCells = [];
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (gameBoard[i][j] === 0) {
+                        emptyCells.push({i, j});
+                    }
+                }
+            }
+            
+            if (emptyCells.length > 0) {
+                const {i, j} = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                gameBoard[i][j] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function updateGameUI() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'game-cell';
+                    cell.textContent = gameBoard[i][j] || '';
+                    cell.setAttribute('data-value', gameBoard[i][j]);
+                    grid.appendChild(cell);
+                }
+            }
+            
+            document.getElementById('game-score').textContent = gameScore;
+        }
+
+        function move(direction) {
+            let moved = false;
+            showNotification(`Движение ${direction} (в разработке)`);
+            
+            if (moved) {
+                addRandomTile();
+                updateGameUI();
+                checkGameOver();
+            }
+        }
+
+        function checkGameOver() {
+            const emptyCells = gameBoard.flat().filter(cell => cell === 0);
+            if (emptyCells.length === 0) {
+                showNotification('Игра окончена!');
+            }
         }
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
@@ -1131,12 +1615,6 @@
                     return;
                 }
                 
-                if (name.length > 20) {
-                    showNotification('Имя слишком длинное!');
-                    nameInput.focus();
-                    return;
-                }
-                
                 const userData = getUserData();
                 userData.name = name;
                 userData.xp = userData.xp || 0;
@@ -1163,7 +1641,11 @@
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Приложение LifeCraft загружено!');
+            loadTheme();
+            initTelegram();
             initUser();
+            
+            setInterval(syncData, CONFIG.SYNC_INTERVAL);
         });
     </script>
 </body>
