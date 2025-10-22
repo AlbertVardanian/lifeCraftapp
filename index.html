@@ -37,13 +37,14 @@
             color: var(--text-color);
             min-height: 100vh;
             transition: all 0.3s ease;
-            touch-action: pan-y;
+            overflow-x: hidden;
         }
 
         .screen {
             display: none;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
         .screen.active {
@@ -364,6 +365,7 @@
             margin-top: 20px;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: pan-y;
         }
 
         .game-grid {
@@ -525,6 +527,14 @@
         .swipe-area {
             position: relative;
             overflow: hidden;
+        }
+
+        /* Предотвращение скролла для игры */
+        .no-scroll {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -768,7 +778,7 @@
             <div style="width: 40px;"></div>
         </div>
 
-        <div class="card swipe-area">
+        <div class="card swipe-area" id="game-container">
             <div class="game-score">Счет: <span id="game-score">0</span></div>
             <div class="game-grid" id="game-grid"></div>
             <button class="btn btn-primary" onclick="startGame2048()" style="width: 100%; margin-top: 10px;">
@@ -825,6 +835,11 @@
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
+            
+            // Восстанавливаем обработчики для привычек при переключении экранов
+            if (screenId === 'habits-screen') {
+                setTimeout(updateHabitsList, 100);
+            }
         }
 
         function showNotification(message) {
@@ -907,7 +922,12 @@
         function getHabits() {
             try {
                 const data = localStorage.getItem('lifecraft_habits');
-                return data ? JSON.parse(data) : [];
+                const habits = data ? JSON.parse(data) : [];
+                // ВАЖНО: Преобразуем ID в числа при загрузке
+                return habits.map(habit => ({
+                    ...habit,
+                    id: Number(habit.id)
+                }));
             } catch (e) {
                 console.error('Ошибка загрузки привычек:', e);
                 return [];
@@ -1175,6 +1195,7 @@
         let gameBoard = [];
         let gameScore = 0;
         let touchStartX, touchStartY, touchEndX, touchEndY;
+        let isSwiping = false;
 
         function initGame2048() {
             startGame2048();
@@ -1246,28 +1267,40 @@
         }
 
         function setupSwipeListeners() {
-            const gameArea = document.querySelector('.swipe-area');
+            const gameArea = document.getElementById('game-container');
             
             gameArea.addEventListener('touchstart', e => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            }, { passive: true });
+                if (e.target.closest('.game-grid')) {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    isSwiping = true;
+                    e.preventDefault(); // Предотвращаем скролл страницы
+                }
+            }, { passive: false });
+
+            gameArea.addEventListener('touchmove', e => {
+                if (isSwiping) {
+                    e.preventDefault(); // Предотвращаем скролл страницы во время свайпа
+                }
+            }, { passive: false });
 
             gameArea.addEventListener('touchend', e => {
-                if (!touchStartX || !touchStartY) return;
+                if (!isSwiping || !touchStartX || !touchStartY) return;
                 
                 touchEndX = e.changedTouches[0].clientX;
                 touchEndY = e.changedTouches[0].clientY;
                 
                 handleSwipe();
+                isSwiping = false;
             }, { passive: true });
         }
 
         function handleSwipe() {
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
-            const minSwipeDistance = 50;
+            const minSwipeDistance = 30; // Уменьшил минимальное расстояние для более чувствительных свайпов
 
+            // Определяем направление свайпа
             if (Math.abs(diffX) > Math.abs(diffY)) {
                 // Горизонтальный свайп
                 if (Math.abs(diffX) > minSwipeDistance) {
@@ -1704,12 +1737,16 @@
                 const habitsList = document.getElementById('habits-list');
                 const today = new Date().toDateString();
                 
+                console.log('Загруженные привычки:', habits); // Отладочная информация
+                
                 if (habits.length === 0) {
                     habitsList.innerHTML = '<div class="empty-state">У вас пока нет привычек</div>';
                 } else {
                     let html = '';
                     habits.forEach(habit => {
                         const isCompleted = habit.lastCompleted === today;
+                        console.log(`Привычка ${habit.id}: ${habit.name}, completed: ${isCompleted}`); // Отладочная информация
+                        
                         html += `
                             <div class="habit-item">
                                 <div>
@@ -1740,8 +1777,10 @@
 
         function toggleHabit(habitId) {
             try {
-                habitId = parseInt(habitId);
+                habitId = Number(habitId); // Убеждаемся, что ID число
                 const habits = getHabits();
+                console.log('Попытка переключения привычки ID:', habitId, 'Все привычки:', habits); // Отладочная информация
+                
                 const habit = habits.find(h => h.id === habitId);
                 const today = new Date().toDateString();
                 
@@ -1760,6 +1799,9 @@
                     if (saveHabits(habits)) {
                         updateHabitsList();
                     }
+                } else {
+                    console.error('Привычка не найдена! ID:', habitId);
+                    showNotification('Ошибка: привычка не найдена');
                 }
             } catch (e) {
                 console.error('Ошибка переключения привычки:', e);
@@ -1769,7 +1811,7 @@
 
         function deleteHabit(habitId) {
             try {
-                habitId = parseInt(habitId);
+                habitId = Number(habitId); // Убеждаемся, что ID число
                 const habits = getHabits();
                 const habit = habits.find(h => h.id === habitId);
                 if (habit && confirm(`Удалить привычку "${habit.name}"?`)) {
