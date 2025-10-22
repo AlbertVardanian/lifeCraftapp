@@ -37,6 +37,7 @@
             color: var(--text-color);
             min-height: 100vh;
             transition: all 0.3s ease;
+            touch-action: pan-y;
         }
 
         .screen {
@@ -361,6 +362,8 @@
 
         .game-container {
             margin-top: 20px;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .game-grid {
@@ -368,36 +371,100 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 20px;
+            background: #bbada0;
+            padding: 10px;
+            border-radius: 6px;
+            touch-action: none;
         }
 
         .game-cell {
             aspect-ratio: 1;
-            background: #eee;
-            border-radius: 5px;
+            background: rgba(238, 228, 218, 0.35);
+            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 35px;
+            color: #776e65;
+            transition: all 0.1s ease;
         }
 
-        .game-cell[data-value="2"] { background: #eee4da; color: #776e65; }
-        .game-cell[data-value="4"] { background: #ede0c8; color: #776e65; }
-        .game-cell[data-value="8"] { background: #f2b179; color: white; }
-        .game-cell[data-value="16"] { background: #f59563; color: white; }
-        .game-cell[data-value="32"] { background: #f67c5f; color: white; }
-        .game-cell[data-value="64"] { background: #f65e3b; color: white; }
-        .game-cell[data-value="128"] { background: #edcf72; color: white; font-size: 18px; }
-        .game-cell[data-value="256"] { background: #edcc61; color: white; font-size: 18px; }
-        .game-cell[data-value="512"] { background: #edc850; color: white; font-size: 18px; }
-        .game-cell[data-value="1024"] { background: #edc53f; color: white; font-size: 16px; }
-        .game-cell[data-value="2048"] { background: #edc22e; color: white; font-size: 16px; }
+        .game-cell[data-value="2"] { 
+            background: #eee4da; 
+            color: #776e65; 
+            font-size: 35px;
+        }
+        .game-cell[data-value="4"] { 
+            background: #ede0c8; 
+            color: #776e65; 
+            font-size: 35px;
+        }
+        .game-cell[data-value="8"] { 
+            background: #f2b179; 
+            color: white; 
+            font-size: 35px;
+        }
+        .game-cell[data-value="16"] { 
+            background: #f59563; 
+            color: white; 
+            font-size: 30px;
+        }
+        .game-cell[data-value="32"] { 
+            background: #f67c5f; 
+            color: white; 
+            font-size: 30px;
+        }
+        .game-cell[data-value="64"] { 
+            background: #f65e3b; 
+            color: white; 
+            font-size: 30px;
+        }
+        .game-cell[data-value="128"] { 
+            background: #edcf72; 
+            color: white; 
+            font-size: 25px;
+        }
+        .game-cell[data-value="256"] { 
+            background: #edcc61; 
+            color: white; 
+            font-size: 25px;
+        }
+        .game-cell[data-value="512"] { 
+            background: #edc850; 
+            color: white; 
+            font-size: 25px;
+        }
+        .game-cell[data-value="1024"] { 
+            background: #edc53f; 
+            color: white; 
+            font-size: 20px;
+        }
+        .game-cell[data-value="2048"] { 
+            background: #edc22e; 
+            color: white; 
+            font-size: 20px;
+        }
 
         .game-score {
             text-align: center;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(238, 228, 218, 0.73);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
         }
 
         .sync-status {
@@ -412,6 +479,12 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sync-status.visible {
+            opacity: 1;
         }
 
         .sync-status.syncing {
@@ -447,6 +520,11 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 10px;
+        }
+
+        .swipe-area {
+            position: relative;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -493,15 +571,6 @@
                 <div style="font-weight: bold; margin-bottom: 5px;">Игры</div>
                 <div style="font-size: 14px; color: #666;">Тренировка мозга</div>
             </div>
-        </div>
-
-        <div class="card">
-            <button class="btn btn-primary" onclick="sendTestNotification()" style="width: 100%; margin-bottom: 10px;">
-                📢 Тестовое уведомление
-            </button>
-            <button class="btn btn-success" onclick="syncData()" style="width: 100%;">
-                🔄 Синхронизировать данные
-            </button>
         </div>
     </div>
 
@@ -686,10 +755,6 @@
                     <!-- Время будет генерироваться JavaScript -->
                 </div>
             </div>
-
-            <button class="btn btn-primary" onclick="testReminder()" style="width: 100%; margin-bottom: 10px;">
-                🔔 Тест напоминания
-            </button>
             
             <div id="reminder-status" style="font-size: 12px; text-align: center; margin-top: 8px;"></div>
         </div>
@@ -703,18 +768,12 @@
             <div style="width: 40px;"></div>
         </div>
 
-        <div class="card">
+        <div class="card swipe-area">
             <div class="game-score">Счет: <span id="game-score">0</span></div>
             <div class="game-grid" id="game-grid"></div>
-            <button class="btn btn-primary" onclick="startGame2048()" style="width: 100%; margin-bottom: 10px;">
+            <button class="btn btn-primary" onclick="startGame2048()" style="width: 100%; margin-top: 10px;">
                 Новая игра
             </button>
-            <div class="buttons-row">
-                <button class="btn btn-warning" onclick="move('up')">↑</button>
-                <button class="btn btn-warning" onclick="move('left')">←</button>
-                <button class="btn btn-warning" onclick="move('down')">↓</button>
-                <button class="btn btn-warning" onclick="move('right')">→</button>
-            </div>
         </div>
     </div>
 
@@ -756,7 +815,8 @@
                 ["tree", "дерево"], ["flower", "цветок"], ["car", "машина"], ["bus", "автобус"], ["train", "поезд"]
             ],
             REMINDER_HOURS: [8, 10, 12, 14, 16, 18, 20, 22],
-            SYNC_INTERVAL: 30000
+            SYNC_INTERVAL: 30000, // 30 секунд
+            AUTO_SYNC_INTERVAL: 60000 // 1 минута
         };
 
         // ===== ОСНОВНЫЕ ФУНКЦИИ =====
@@ -969,12 +1029,12 @@
             }
         }
 
-        async function sendHabitReminder() {
+        async function sendPersonalizedReminder() {
             const userData = getUserData();
             const telegramId = userData.telegramId;
             
             if (!telegramId) {
-                showNotification('Ошибка: пользователь не идентифицирован');
+                console.log('Пользователь не идентифицирован для отправки напоминания');
                 return;
             }
 
@@ -985,44 +1045,19 @@
             );
 
             if (uncompletedHabits.length === 0) {
-                const message = `🎉 <b>Отличная работа!</b>\n\nВсе привычки на сегодня выполнены!`;
+                const message = `🎉 <b>Отличная работа, ${userData.firstName || userData.name}!</b>\n\n` +
+                              `Все привычки на сегодня выполнены! Так держать! 💪`;
                 await sendTelegramNotification(telegramId, message);
-                showNotification('Все привычки выполнены! 🎉');
                 return;
             }
 
             const habitNames = uncompletedHabits.map(h => `• ${h.name}`).join('\n');
             const message = `⏰ <b>Напоминание о привычках</b>\n\n` +
-                          `Не забудьте выполнить:\n${habitNames}\n\n` +
-                          `<i>Выполнено: ${habits.length - uncompletedHabits.length}/${habits.length}</i>`;
+                          `Привет, ${userData.firstName || userData.name}! Не забудьте выполнить:\n${habitNames}\n\n` +
+                          `<i>Выполнено: ${habits.length - uncompletedHabits.length}/${habits.length}</i>\n` +
+                          `<i>Ваш уровень: ${userData.level || 1}</i>`;
 
-            const sent = await sendTelegramNotification(telegramId, message);
-            if (sent) {
-                showNotification('Напоминание отправлено! 📨');
-            } else {
-                showNotification('Ошибка отправки напоминания');
-            }
-        }
-
-        async function sendTestNotification() {
-            const userData = getUserData();
-            const telegramId = userData.telegramId;
-            
-            if (!telegramId) {
-                showNotification('Тестовое уведомление! (В Telegram будут реальные уведомления)');
-                return;
-            }
-
-            const message = `🔔 <b>Тестовое уведомление</b>\n\n` +
-                          `Это тестовое сообщение от вашего бота LifeCraft!\n\n` +
-                          `✅ <i>Напоминания работают корректно</i>`;
-
-            const sent = await sendTelegramNotification(telegramId, message);
-            if (sent) {
-                showNotification('Тестовое уведомление отправлено!');
-            } else {
-                showNotification('Ошибка отправки тестового уведомления');
-            }
+            await sendTelegramNotification(telegramId, message);
         }
 
         // ===== СИСТЕМА НАПОМИНАНИЙ =====
@@ -1082,10 +1117,14 @@
             // В реальном приложении здесь будет вызов серверного API
             // для настройки расписания напоминаний на сервере
             console.log('Расписание напоминаний обновлено');
-        }
-
-        function testReminder() {
-            sendHabitReminder();
+            
+            // Тестовое напоминание каждые 2 минуты для демонстрации
+            setInterval(() => {
+                const userData = getUserData();
+                if (userData.remindersEnabled && userData.telegramId) {
+                    sendPersonalizedReminder();
+                }
+            }, 120000); // 2 минуты для теста
         }
 
         function updateReminderStatus() {
@@ -1096,7 +1135,7 @@
             checkbox.checked = userData.remindersEnabled || false;
             
             if (userData.remindersEnabled) {
-                statusElement.textContent = '✅ Напоминания активны';
+                statusElement.textContent = '✅ Напоминания активны (только ваши привычки)';
                 statusElement.style.color = '#2ecc71';
             } else {
                 statusElement.textContent = '❌ Напоминания выключены';
@@ -1104,11 +1143,11 @@
             }
         }
 
-        // ===== СИНХРОНИЗАЦИЯ =====
+        // ===== АВТОМАТИЧЕСКАЯ СИНХРОНИЗАЦИЯ =====
         function syncData() {
             const statusElement = document.getElementById('sync-status');
             statusElement.textContent = '🔄 Синхронизация...';
-            statusElement.className = 'sync-status syncing';
+            statusElement.className = 'sync-status syncing visible';
             
             setTimeout(() => {
                 const userData = getUserData();
@@ -1116,13 +1155,284 @@
                 saveUserData(userData);
                 
                 statusElement.textContent = '✅ Синхронизировано';
-                statusElement.className = 'sync-status success';
-                showNotification('Данные синхронизированы!');
+                statusElement.className = 'sync-status success visible';
                 
                 setTimeout(() => {
-                    statusElement.textContent = '';
+                    statusElement.className = 'sync-status';
                 }, 3000);
-            }, 2000);
+            }, 1000);
+        }
+
+        function startAutoSync() {
+            // Авто-синхронизация каждую минуту
+            setInterval(syncData, CONFIG.AUTO_SYNC_INTERVAL);
+            
+            // Синхронизация при загрузке
+            setTimeout(syncData, 2000);
+        }
+
+        // ===== ИГРА 2048 С СВАЙПАМИ =====
+        let gameBoard = [];
+        let gameScore = 0;
+        let touchStartX, touchStartY, touchEndX, touchEndY;
+
+        function initGame2048() {
+            startGame2048();
+            setupSwipeListeners();
+        }
+
+        function startGame2048() {
+            gameBoard = [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ];
+            gameScore = 0;
+            addRandomTile();
+            addRandomTile();
+            updateGameUI();
+        }
+
+        function addRandomTile() {
+            const emptyCells = [];
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (gameBoard[i][j] === 0) {
+                        emptyCells.push({i, j});
+                    }
+                }
+            }
+            
+            if (emptyCells.length > 0) {
+                const {i, j} = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                gameBoard[i][j] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function updateGameUI() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'game-cell';
+                    const value = gameBoard[i][j];
+                    cell.textContent = value || '';
+                    cell.setAttribute('data-value', value);
+                    grid.appendChild(cell);
+                }
+            }
+            
+            document.getElementById('game-score').textContent = gameScore;
+            
+            // Проверка окончания игры
+            if (isGameOver()) {
+                const gameOver = document.createElement('div');
+                gameOver.className = 'game-over';
+                gameOver.innerHTML = `
+                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Игра окончена!</div>
+                    <div style="margin-bottom: 15px;">Финальный счет: ${gameScore}</div>
+                    <button class="btn btn-primary" onclick="startGame2048()">Новая игра</button>
+                `;
+                grid.appendChild(gameOver);
+                
+                if (gameScore >= 2048) {
+                    addExperience(50);
+                    showNotification('Поздравляем! Вы выиграли 2048! +50 XP');
+                }
+            }
+        }
+
+        function setupSwipeListeners() {
+            const gameArea = document.querySelector('.swipe-area');
+            
+            gameArea.addEventListener('touchstart', e => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            gameArea.addEventListener('touchend', e => {
+                if (!touchStartX || !touchStartY) return;
+                
+                touchEndX = e.changedTouches[0].clientX;
+                touchEndY = e.changedTouches[0].clientY;
+                
+                handleSwipe();
+            }, { passive: true });
+        }
+
+        function handleSwipe() {
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            const minSwipeDistance = 50;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                // Горизонтальный свайп
+                if (Math.abs(diffX) > minSwipeDistance) {
+                    if (diffX > 0) {
+                        move('right');
+                    } else {
+                        move('left');
+                    }
+                }
+            } else {
+                // Вертикальный свайп
+                if (Math.abs(diffY) > minSwipeDistance) {
+                    if (diffY > 0) {
+                        move('down');
+                    } else {
+                        move('up');
+                    }
+                }
+            }
+
+            // Сброс значений
+            touchStartX = touchStartY = touchEndX = touchEndY = null;
+        }
+
+        function move(direction) {
+            let moved = false;
+            const oldBoard = JSON.parse(JSON.stringify(gameBoard));
+            
+            switch(direction) {
+                case 'up':
+                    moved = moveUp();
+                    break;
+                case 'down':
+                    moved = moveDown();
+                    break;
+                case 'left':
+                    moved = moveLeft();
+                    break;
+                case 'right':
+                    moved = moveRight();
+                    break;
+            }
+            
+            if (moved) {
+                addRandomTile();
+                updateGameUI();
+            }
+        }
+
+        function moveUp() {
+            let moved = false;
+            for (let j = 0; j < 4; j++) {
+                for (let i = 1; i < 4; i++) {
+                    if (gameBoard[i][j] !== 0) {
+                        let row = i;
+                        while (row > 0 && gameBoard[row-1][j] === 0) {
+                            gameBoard[row-1][j] = gameBoard[row][j];
+                            gameBoard[row][j] = 0;
+                            row--;
+                            moved = true;
+                        }
+                        if (row > 0 && gameBoard[row-1][j] === gameBoard[row][j]) {
+                            gameBoard[row-1][j] *= 2;
+                            gameScore += gameBoard[row-1][j];
+                            gameBoard[row][j] = 0;
+                            moved = true;
+                        }
+                    }
+                }
+            }
+            return moved;
+        }
+
+        function moveDown() {
+            let moved = false;
+            for (let j = 0; j < 4; j++) {
+                for (let i = 2; i >= 0; i--) {
+                    if (gameBoard[i][j] !== 0) {
+                        let row = i;
+                        while (row < 3 && gameBoard[row+1][j] === 0) {
+                            gameBoard[row+1][j] = gameBoard[row][j];
+                            gameBoard[row][j] = 0;
+                            row++;
+                            moved = true;
+                        }
+                        if (row < 3 && gameBoard[row+1][j] === gameBoard[row][j]) {
+                            gameBoard[row+1][j] *= 2;
+                            gameScore += gameBoard[row+1][j];
+                            gameBoard[row][j] = 0;
+                            moved = true;
+                        }
+                    }
+                }
+            }
+            return moved;
+        }
+
+        function moveLeft() {
+            let moved = false;
+            for (let i = 0; i < 4; i++) {
+                for (let j = 1; j < 4; j++) {
+                    if (gameBoard[i][j] !== 0) {
+                        let col = j;
+                        while (col > 0 && gameBoard[i][col-1] === 0) {
+                            gameBoard[i][col-1] = gameBoard[i][col];
+                            gameBoard[i][col] = 0;
+                            col--;
+                            moved = true;
+                        }
+                        if (col > 0 && gameBoard[i][col-1] === gameBoard[i][col]) {
+                            gameBoard[i][col-1] *= 2;
+                            gameScore += gameBoard[i][col-1];
+                            gameBoard[i][col] = 0;
+                            moved = true;
+                        }
+                    }
+                }
+            }
+            return moved;
+        }
+
+        function moveRight() {
+            let moved = false;
+            for (let i = 0; i < 4; i++) {
+                for (let j = 2; j >= 0; j--) {
+                    if (gameBoard[i][j] !== 0) {
+                        let col = j;
+                        while (col < 3 && gameBoard[i][col+1] === 0) {
+                            gameBoard[i][col+1] = gameBoard[i][col];
+                            gameBoard[i][col] = 0;
+                            col++;
+                            moved = true;
+                        }
+                        if (col < 3 && gameBoard[i][col+1] === gameBoard[i][col]) {
+                            gameBoard[i][col+1] *= 2;
+                            gameScore += gameBoard[i][col+1];
+                            gameBoard[i][col] = 0;
+                            moved = true;
+                        }
+                    }
+                }
+            }
+            return moved;
+        }
+
+        function isGameOver() {
+            // Проверка наличия пустых клеток
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (gameBoard[i][j] === 0) return false;
+                }
+            }
+            
+            // Проверка возможных слияний
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const current = gameBoard[i][j];
+                    if ((i < 3 && gameBoard[i+1][j] === current) ||
+                        (j < 3 && gameBoard[i][j+1] === current)) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
         }
 
         // ===== WORDMASTER =====
@@ -1518,74 +1828,6 @@
             }
         }
 
-        // ===== ИГРА 2048 =====
-        let gameBoard = [];
-        let gameScore = 0;
-
-        function initGame2048() {
-            startGame2048();
-        }
-
-        function startGame2048() {
-            gameBoard = Array(4).fill().map(() => Array(4).fill(0));
-            gameScore = 0;
-            addRandomTile();
-            addRandomTile();
-            updateGameUI();
-            showNotification('Новая игра 2048 началась!');
-        }
-
-        function addRandomTile() {
-            const emptyCells = [];
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    if (gameBoard[i][j] === 0) {
-                        emptyCells.push({i, j});
-                    }
-                }
-            }
-            
-            if (emptyCells.length > 0) {
-                const {i, j} = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                gameBoard[i][j] = Math.random() < 0.9 ? 2 : 4;
-            }
-        }
-
-        function updateGameUI() {
-            const grid = document.getElementById('game-grid');
-            grid.innerHTML = '';
-            
-            for (let i = 0; i < 4; i++) {
-                for (let j = 0; j < 4; j++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'game-cell';
-                    cell.textContent = gameBoard[i][j] || '';
-                    cell.setAttribute('data-value', gameBoard[i][j]);
-                    grid.appendChild(cell);
-                }
-            }
-            
-            document.getElementById('game-score').textContent = gameScore;
-        }
-
-        function move(direction) {
-            let moved = false;
-            showNotification(`Движение ${direction} (в разработке)`);
-            
-            if (moved) {
-                addRandomTile();
-                updateGameUI();
-                checkGameOver();
-            }
-        }
-
-        function checkGameOver() {
-            const emptyCells = gameBoard.flat().filter(cell => cell === 0);
-            if (emptyCells.length === 0) {
-                showNotification('Игра окончена!');
-            }
-        }
-
         // ===== ИНИЦИАЛИЗАЦИЯ =====
         function initUser() {
             try {
@@ -1644,8 +1886,7 @@
             loadTheme();
             initTelegram();
             initUser();
-            
-            setInterval(syncData, CONFIG.SYNC_INTERVAL);
+            startAutoSync();
         });
     </script>
 </body>
