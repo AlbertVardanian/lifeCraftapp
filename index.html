@@ -533,6 +533,12 @@
             width: 100%;
             margin-top: 10px;
         }
+
+        .test-option {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px;
+        }
     </style>
 </head>
 <body>
@@ -609,7 +615,7 @@
 
             <div class="buttons-row">
                 <button class="btn btn-danger" onclick="markWordAsHard()">Сложно</button>
-                <button class="btn btn-warning" onclick="showTranslation()">Показать</button>
+                <button class="btn btn-warning" onclick="showTranslation()">Перевод</button>
                 <button class="btn btn-success" onclick="markWordAsKnown()">Знаю</button>
             </div>
         </div>
@@ -812,6 +818,7 @@
 
     <script>
         // ===== КОНФИГУРАЦИЯ БОТА =====
+        // ВАЖНО: Замените 'YOUR_BOT_TOKEN_HERE' на реальный токен вашего бота
         const BOT_CONFIG = {
             BOT_TOKEN: '8241569227:AAEqD43ON8C9fQiBODfCFnrHeUIdgrhm_Zg',
             API_URL: 'https://api.telegram.org/bot'
@@ -1074,6 +1081,13 @@
         // ===== РЕАЛЬНЫЕ УВЕДОМЛЕНИЯ ЧЕРЕЗ БОТА =====
         async function sendTelegramNotification(userId, message) {
             try {
+                // Проверяем, установлен ли токен бота
+                if (BOT_CONFIG.BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || !BOT_CONFIG.BOT_TOKEN) {
+                    console.warn('Токен бота не настроен. Уведомления не будут отправляться.');
+                    showNotification('⚠️ Настройте токен бота для уведомлений');
+                    return false;
+                }
+                
                 const url = `${BOT_CONFIG.API_URL}${BOT_CONFIG.BOT_TOKEN}/sendMessage`;
                 
                 console.log('Отправка уведомления пользователю:', userId);
@@ -1594,6 +1608,9 @@
         let wordsData = [];
         let currentWordIndex = 0;
         let wordMode = 'cards';
+        let testWords = [];
+        let currentTestIndex = 0;
+        let testScore = 0;
 
         function initWordMaster() {
             try {
@@ -1717,13 +1734,103 @@
 
         function startWordsTest() {
             const learnedWords = wordsData.filter(word => word.learned);
+            
             if (learnedWords.length < 3) {
                 showNotification('Нужно изучить минимум 3 слова для теста');
                 setWordMode('cards');
                 return;
             }
             
-            showNotification('Режим теста запущен!');
+            // Выбираем 10 случайных изученных слов для теста
+            testWords = [];
+            const tempLearnedWords = [...learnedWords]; // копируем массив
+            
+            for (let i = 0; i < Math.min(10, tempLearnedWords.length); i++) {
+                const randomIndex = Math.floor(Math.random() * tempLearnedWords.length);
+                testWords.push(tempLearnedWords[randomIndex]);
+                tempLearnedWords.splice(randomIndex, 1);
+            }
+            
+            currentTestIndex = 0;
+            testScore = 0;
+            
+            showTestQuestion();
+            showNotification('Тест начался! ' + testWords.length + ' вопросов.');
+        }
+
+        function showTestQuestion() {
+            if (currentTestIndex >= testWords.length) {
+                finishTest();
+                return;
+            }
+            
+            const currentWord = testWords[currentTestIndex];
+            document.getElementById('test-word').textContent = currentWord.original;
+            document.getElementById('test-progress').textContent = `${currentTestIndex + 1}/${testWords.length}`;
+            
+            // Создаем варианты ответов
+            const optionsContainer = document.getElementById('test-options');
+            optionsContainer.innerHTML = '';
+            
+            // Собираем все возможные переводы (правильный + 3 случайных неправильных)
+            const wrongTranslations = wordsData
+                .filter(word => word.translation !== currentWord.translation && !word.learned)
+                .map(word => word.translation)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            // Добавляем правильный ответ
+            const allOptions = [...wrongTranslations, currentWord.translation];
+            
+            // Перемешиваем варианты
+            const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
+            
+            // Создаем кнопки с вариантами
+            shuffledOptions.forEach((translation) => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-primary test-option';
+                button.textContent = translation;
+                button.onclick = () => checkTestAnswer(translation === currentWord.translation);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkTestAnswer(isCorrect) {
+            if (isCorrect) {
+                testScore++;
+                showNotification('Правильно! ✅');
+            } else {
+                const correctAnswer = testWords[currentTestIndex].translation;
+                showNotification(`Неправильно! Правильный ответ: ${correctAnswer}`);
+            }
+            
+            currentTestIndex++;
+            
+            if (currentTestIndex < testWords.length) {
+                setTimeout(showTestQuestion, 1000);
+            } else {
+                setTimeout(finishTest, 1000);
+            }
+        }
+
+        function finishTest() {
+            const xpEarned = Math.floor(testScore * 5);
+            addExperience(xpEarned);
+            
+            const message = `Тест завершен!\nРезультат: ${testScore}/${testWords.length}\nПолучено опыта: +${xpEarned} XP`;
+            
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.showPopup({
+                    title: 'Результат теста',
+                    message: message,
+                    buttons: [{ type: 'ok' }]
+                });
+            } else {
+                showNotification(message);
+            }
+            
+            // Возвращаемся к карточкам
+            setWordMode('cards');
         }
 
         function updateWordStats() {
