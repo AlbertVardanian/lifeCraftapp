@@ -529,12 +529,9 @@
             overflow: hidden;
         }
 
-        /* Предотвращение скролла для игры */
-        .no-scroll {
-            overflow: hidden;
-            position: fixed;
+        .reminder-test-btn {
             width: 100%;
-            height: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -765,6 +762,10 @@
                     <!-- Время будет генерироваться JavaScript -->
                 </div>
             </div>
+
+            <button class="btn btn-primary reminder-test-btn" onclick="sendTestReminder()">
+                🔔 Тест напоминания
+            </button>
             
             <div id="reminder-status" style="font-size: 12px; text-align: center; margin-top: 8px;"></div>
         </div>
@@ -819,14 +820,75 @@
         // ===== КОНФИГУРАЦИЯ ПРИЛОЖЕНИЯ =====
         const CONFIG = {
             WORDS: [
+                // Базовые слова (50 слов)
                 ["hello", "привет"], ["world", "мир"], ["book", "книга"], ["water", "вода"], ["house", "дом"],
                 ["friend", "друг"], ["time", "время"], ["day", "день"], ["night", "ночь"], ["school", "школа"],
                 ["cat", "кот"], ["dog", "собака"], ["sun", "солнце"], ["moon", "луна"], ["star", "звезда"],
-                ["tree", "дерево"], ["flower", "цветок"], ["car", "машина"], ["bus", "автобус"], ["train", "поезд"]
+                ["tree", "дерево"], ["flower", "цветок"], ["car", "машина"], ["bus", "автобус"], ["train", "поезд"],
+                ["apple", "яблоко"], ["banana", "банан"], ["orange", "апельсин"], ["milk", "молоко"], ["bread", "хлеб"],
+                ["computer", "компьютер"], ["phone", "телефон"], ["table", "стол"], ["chair", "стул"], ["bed", "кровать"],
+                ["window", "окно"], ["door", "дверь"], ["wall", "стена"], ["floor", "пол"], ["ceiling", "потолок"],
+                ["city", "город"], ["village", "деревня"], ["street", "улица"], ["park", "парк"], ["river", "река"],
+                ["mountain", "гора"], ["sea", "море"], ["lake", "озеро"], ["forest", "лес"], ["field", "поле"],
+                ["sky", "небо"], ["cloud", "облако"], ["rain", "дождь"], ["snow", "снег"], ["wind", "ветер"],
+                
+                // Еда и напитки (30 слов)
+                ["food", "еда"], ["drink", "напиток"], ["tea", "чай"], ["coffee", "кофе"], ["juice", "сок"],
+                ["water", "вода"], ["meat", "мясо"], ["fish", "рыба"], ["chicken", "курица"], ["beef", "говядина"],
+                ["pork", "свинина"], ["rice", "рис"], ["pasta", "паста"], ["potato", "картофель"], ["tomato", "помидор"],
+                ["cucumber", "огурец"], ["onion", "лук"], ["garlic", "чеснок"], ["carrot", "морковь"], ["cabbage", "капуста"],
+                ["cheese", "сыр"], ["butter", "масло"], ["egg", "яйцо"], ["salt", "соль"], ["sugar", "сахар"],
+                ["honey", "мед"], ["chocolate", "шоколад"], ["cake", "торт"], ["ice cream", "мороженое"], ["fruit", "фрукт"],
+                
+                // Семья и люди (25 слов)
+                ["family", "семья"], ["mother", "мать"], ["father", "отец"], ["son", "сын"], ["daughter", "дочь"],
+                ["brother", "брат"], ["sister", "сестра"], ["grandmother", "бабушка"], ["grandfather", "дедушка"],
+                ["uncle", "дядя"], ["aunt", "тетя"], ["cousin", "двоюродный брат/сестра"], ["husband", "муж"],
+                ["wife", "жена"], ["child", "ребенок"], ["children", "дети"], ["man", "мужчина"], ["woman", "женщина"],
+                ["boy", "мальчик"], ["girl", "девочка"], ["people", "люди"], ["person", "человек"], ["friend", "друг"],
+                ["teacher", "учитель"], ["student", "студент"],
+                
+                // Профессии (20 слов)
+                ["doctor", "врач"], ["engineer", "инженер"], ["programmer", "программист"], ["driver", "водитель"],
+                ["cook", "повар"], ["waiter", "официант"], ["manager", "менеджер"], ["director", "директор"],
+                ["accountant", "бухгалтер"], ["lawyer", "юрист"], ["policeman", "полицейский"], ["fireman", "пожарный"],
+                ["soldier", "солдат"], ["artist", "художник"], ["musician", "музыкант"], ["writer", "писатель"],
+                ["journalist", "журналист"], ["scientist", "ученый"], ["farmer", "фермер"], ["builder", "строитель"],
+                
+                // Одежда (20 слов)
+                ["clothes", "одежда"], ["shirt", "рубашка"], ["t-shirt", "футболка"], ["jacket", "куртка"],
+                ["coat", "пальто"], ["dress", "платье"], ["skirt", "юбка"], ["trousers", "брюки"], ["jeans", "джинсы"],
+                ["shorts", "шорты"], ["shoes", "туфли"], ["boots", "ботинки"], ["sneakers", "кроссовки"],
+                ["hat", "шляпа"], ["cap", "кепка"], ["scarf", "шарф"], ["gloves", "перчатки"], ["socks", "носки"],
+                ["underwear", "нижнее белье"], ["uniform", "форма"],
+                
+                // Цвета (15 слов)
+                ["color", "цвет"], ["red", "красный"], ["blue", "синий"], ["green", "зеленый"], ["yellow", "желтый"],
+                ["white", "белый"], ["black", "черный"], ["gray", "серый"], ["brown", "коричневый"], ["orange", "оранжевый"],
+                ["pink", "розовый"], ["purple", "фиолетовый"], ["gold", "золотой"], ["silver", "серебряный"], ["light", "светлый"],
+                
+                // Числа (20 слов)
+                ["number", "число"], ["one", "один"], ["two", "два"], ["three", "три"], ["four", "четыре"],
+                ["five", "пять"], ["six", "шесть"], ["seven", "семь"], ["eight", "восемь"], ["nine", "девять"],
+                ["ten", "десять"], ["hundred", "сто"], ["thousand", "тысяча"], ["million", "миллион"],
+                ["first", "первый"], ["second", "второй"], ["third", "третий"], ["fourth", "четвертый"],
+                ["fifth", "пятый"], ["last", "последний"],
+                
+                // Время и дата (15 слов)
+                ["time", "время"], ["hour", "час"], ["minute", "минута"], ["second", "секунда"], ["day", "день"],
+                ["week", "неделя"], ["month", "месяц"], ["year", "год"], ["today", "сегодня"], ["yesterday", "вчера"],
+                ["tomorrow", "завтра"], ["morning", "утро"], ["afternoon", "день"], ["evening", "вечер"], ["night", "ночь"],
+                
+                // Природа и животные (25 слов)
+                ["nature", "природа"], ["animal", "животное"], ["bird", "птица"], ["fish", "рыба"], ["insect", "насекомое"],
+                ["lion", "лев"], ["tiger", "тигр"], ["elephant", "слон"], ["giraffe", "жираф"], ["zebra", "зебра"],
+                ["monkey", "обезьяна"], ["bear", "медведь"], ["wolf", "волк"], ["fox", "лиса"], ["rabbit", "кролик"],
+                ["deer", "олень"], ["horse", "лошадь"], ["cow", "корова"], ["pig", "свинья"], ["sheep", "овца"],
+                ["butterfly", "бабочка"], ["bee", "пчела"], ["ant", "муравей"], ["spider", "паук"], ["snake", "змея"]
             ],
             REMINDER_HOURS: [8, 10, 12, 14, 16, 18, 20, 22],
-            SYNC_INTERVAL: 30000, // 30 секунд
-            AUTO_SYNC_INTERVAL: 60000 // 1 минута
+            SYNC_INTERVAL: 30000,
+            AUTO_SYNC_INTERVAL: 60000
         };
 
         // ===== ОСНОВНЫЕ ФУНКЦИИ =====
@@ -836,7 +898,6 @@
             });
             document.getElementById(screenId).classList.add('active');
             
-            // Восстанавливаем обработчики для привычек при переключении экранов
             if (screenId === 'habits-screen') {
                 setTimeout(updateHabitsList, 100);
             }
@@ -927,7 +988,6 @@
                 const habits = JSON.parse(data);
                 console.log('Загружены привычки из localStorage:', habits);
                 
-                // ВАЖНО: Преобразуем ID в числа и убеждаемся в корректности данных
                 return habits.map(habit => ({
                     id: Number(habit.id),
                     name: String(habit.name || ''),
@@ -974,7 +1034,6 @@
                     saveUserData(userData);
                     updateUserInfo();
                     
-                    // Регистрируем пользователя для напоминаний
                     registerUserForReminders(user.id, user.first_name);
                 }
                 
@@ -1017,6 +1076,9 @@
             try {
                 const url = `${BOT_CONFIG.API_URL}${BOT_CONFIG.BOT_TOKEN}/sendMessage`;
                 
+                console.log('Отправка уведомления пользователю:', userId);
+                console.log('Сообщение:', message);
+                
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -1031,9 +1093,16 @@
 
                 const result = await response.json();
                 console.log('Результат отправки уведомления:', result);
-                return result.ok;
+                
+                if (result.ok) {
+                    console.log('✅ Уведомление успешно отправлено');
+                    return true;
+                } else {
+                    console.error('❌ Ошибка отправки уведомления:', result);
+                    return false;
+                }
             } catch (error) {
-                console.error('Ошибка отправки уведомления:', error);
+                console.error('❌ Ошибка сети при отправке уведомления:', error);
                 return false;
             }
         }
@@ -1044,12 +1113,14 @@
                 if (!userData.registeredForReminders) {
                     const message = `👋 <b>Добро пожаловать в LifeCraft, ${userName}!</b>\n\n` +
                                   `Я буду напоминать вам о ваших привычках и помогать в саморазвитии.\n\n` +
-                                  `⚡ <i>Напоминания приходят только о невыполненных привычках</i>`;
+                                  `⚡ <i>Напоминания приходят только о невыполненных привычках</i>\n` +
+                                  `⏰ <i>Время напоминаний: 8:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00</i>`;
                     
                     const sent = await sendTelegramNotification(userId, message);
                     if (sent) {
                         userData.registeredForReminders = true;
                         saveUserData(userData);
+                        console.log('✅ Пользователь зарегистрирован для напоминаний');
                     }
                 }
             } catch (error) {
@@ -1062,8 +1133,8 @@
             const telegramId = userData.telegramId;
             
             if (!telegramId) {
-                console.log('Пользователь не идентифицирован для отправки напоминания');
-                return;
+                console.log('❌ Пользователь не идентифицирован для отправки напоминания');
+                return false;
             }
 
             const habits = getHabits();
@@ -1072,20 +1143,49 @@
                 habit.lastCompleted !== today
             );
 
+            console.log('📊 Статистика для напоминания:');
+            console.log('- Всего привычек:', habits.length);
+            console.log('- Невыполненных сегодня:', uncompletedHabits.length);
+            console.log('- Выполненных сегодня:', habits.length - uncompletedHabits.length);
+
             if (uncompletedHabits.length === 0) {
                 const message = `🎉 <b>Отличная работа, ${userData.firstName || userData.name}!</b>\n\n` +
-                              `Все привычки на сегодня выполнены! Так держать! 💪`;
-                await sendTelegramNotification(telegramId, message);
-                return;
+                              `Все привычки на сегодня выполнены! Так держать! 💪\n\n` +
+                              `<i>Ваш уровень: ${userData.level || 1}</i>`;
+                return await sendTelegramNotification(telegramId, message);
             }
 
             const habitNames = uncompletedHabits.map(h => `• ${h.name}`).join('\n');
+            const completedCount = habits.length - uncompletedHabits.length;
+            const totalCount = habits.length;
+            
             const message = `⏰ <b>Напоминание о привычках</b>\n\n` +
                           `Привет, ${userData.firstName || userData.name}! Не забудьте выполнить:\n${habitNames}\n\n` +
-                          `<i>Выполнено: ${habits.length - uncompletedHabits.length}/${habits.length}</i>\n` +
-                          `<i>Ваш уровень: ${userData.level || 1}</i>`;
+                          `<i>Выполнено: ${completedCount}/${totalCount}</i>\n` +
+                          `<i>Ваш уровень: ${userData.level || 1}</i>\n\n` +
+                          `💪 <i>Продолжайте в том же духе!</i>`;
 
-            await sendTelegramNotification(telegramId, message);
+            return await sendTelegramNotification(telegramId, message);
+        }
+
+        async function sendTestReminder() {
+            console.log('=== ТЕСТОВОЕ НАПОМИНАНИЕ ===');
+            const userData = getUserData();
+            
+            if (!userData.telegramId) {
+                showNotification('❌ Ошибка: пользователь не идентифицирован');
+                return;
+            }
+
+            showNotification('📨 Отправка тестового напоминания...');
+            
+            const success = await sendPersonalizedReminder();
+            
+            if (success) {
+                showNotification('✅ Тестовое напоминание отправлено!');
+            } else {
+                showNotification('❌ Ошибка отправки напоминания');
+            }
         }
 
         // ===== СИСТЕМА НАПОМИНАНИЙ =====
@@ -1097,10 +1197,11 @@
             if (saveUserData(userData)) {
                 updateReminderStatus();
                 if (userData.remindersEnabled) {
-                    showNotification('Автоматические напоминания включены!');
-                    scheduleReminders();
+                    showNotification('✅ Автоматические напоминания включены!');
+                    startReminderScheduler();
                 } else {
-                    showNotification('Автоматические напоминания выключены');
+                    showNotification('❌ Автоматические напоминания выключены');
+                    stopReminderScheduler();
                 }
             }
         }
@@ -1141,18 +1242,41 @@
             saveUserData(userData);
         }
 
-        function scheduleReminders() {
-            // В реальном приложении здесь будет вызов серверного API
-            // для настройки расписания напоминаний на сервере
-            console.log('Расписание напоминаний обновлено');
-            
-            // Тестовое напоминание каждые 2 минуты для демонстрации
-            setInterval(() => {
+        let reminderInterval = null;
+
+        function startReminderScheduler() {
+            // Останавливаем предыдущий интервал если был
+            if (reminderInterval) {
+                clearInterval(reminderInterval);
+            }
+
+            // Запускаем проверку каждую минуту
+            reminderInterval = setInterval(() => {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                
                 const userData = getUserData();
-                if (userData.remindersEnabled && userData.telegramId) {
-                    sendPersonalizedReminder();
+                
+                // Проверяем, включены ли напоминания и есть ли telegramId
+                if (userData.remindersEnabled && userData.telegramId && userData.reminderTimes) {
+                    // Проверяем, совпадает ли текущее время с одним из выбранных часов
+                    if (userData.reminderTimes.includes(currentHour) && currentMinute === 0) {
+                        console.log(`⏰ Время напоминания! ${currentHour}:00`);
+                        sendPersonalizedReminder();
+                    }
                 }
-            }, 120000); // 2 минуты для теста
+            }, 60000); // Проверяем каждую минуту
+
+            console.log('✅ Планировщик напоминаний запущен');
+        }
+
+        function stopReminderScheduler() {
+            if (reminderInterval) {
+                clearInterval(reminderInterval);
+                reminderInterval = null;
+                console.log('❌ Планировщик напоминаний остановлен');
+            }
         }
 
         function updateReminderStatus() {
@@ -1192,10 +1316,7 @@
         }
 
         function startAutoSync() {
-            // Авто-синхронизация каждую минуту
             setInterval(syncData, CONFIG.AUTO_SYNC_INTERVAL);
-            
-            // Синхронизация при загрузке
             setTimeout(syncData, 2000);
         }
 
@@ -1256,7 +1377,6 @@
             
             document.getElementById('game-score').textContent = gameScore;
             
-            // Проверка окончания игры
             if (isGameOver()) {
                 const gameOver = document.createElement('div');
                 gameOver.className = 'game-over';
@@ -1282,13 +1402,13 @@
                     touchStartX = e.touches[0].clientX;
                     touchStartY = e.touches[0].clientY;
                     isSwiping = true;
-                    e.preventDefault(); // Предотвращаем скролл страницы
+                    e.preventDefault();
                 }
             }, { passive: false });
 
             gameArea.addEventListener('touchmove', e => {
                 if (isSwiping) {
-                    e.preventDefault(); // Предотвращаем скролл страницы во время свайпа
+                    e.preventDefault();
                 }
             }, { passive: false });
 
@@ -1306,11 +1426,9 @@
         function handleSwipe() {
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
-            const minSwipeDistance = 30; // Уменьшил минимальное расстояние для более чувствительных свайпов
+            const minSwipeDistance = 30;
 
-            // Определяем направление свайпа
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                // Горизонтальный свайп
                 if (Math.abs(diffX) > minSwipeDistance) {
                     if (diffX > 0) {
                         move('right');
@@ -1319,7 +1437,6 @@
                     }
                 }
             } else {
-                // Вертикальный свайп
                 if (Math.abs(diffY) > minSwipeDistance) {
                     if (diffY > 0) {
                         move('down');
@@ -1329,7 +1446,6 @@
                 }
             }
 
-            // Сброс значений
             touchStartX = touchStartY = touchEndX = touchEndY = null;
         }
 
@@ -1455,14 +1571,12 @@
         }
 
         function isGameOver() {
-            // Проверка наличия пустых клеток
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
                     if (gameBoard[i][j] === 0) return false;
                 }
             }
             
-            // Проверка возможных слияний
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
                     const current = gameBoard[i][j];
@@ -1732,11 +1846,12 @@
             document.getElementById('math-progress').textContent = mathTotalAnswers;
         }
 
-        // ===== ПРИВЫЧКИ - ПОЛНОСТЬЮ ПЕРЕРАБОТАННЫЕ ФУНКЦИИ =====
+        // ===== ПРИВЫЧКИ =====
         function initHabits() {
             updateHabitsList();
             updateReminderStatus();
             updateReminderTimes();
+            startReminderScheduler(); // Запускаем планировщик при инициализации
         }
 
         function updateHabitsList() {
@@ -1745,15 +1860,12 @@
                 const habitsList = document.getElementById('habits-list');
                 const today = new Date().toDateString();
                 
-                console.log('Загруженные привычки для отображения:', habits);
-                
                 if (habits.length === 0) {
                     habitsList.innerHTML = '<div class="empty-state">У вас пока нет привычек</div>';
                 } else {
                     let html = '';
                     habits.forEach(habit => {
                         const isCompleted = habit.lastCompleted === today;
-                        console.log(`Отображение привычки: ID=${habit.id}, name=${habit.name}, completed=${isCompleted}`);
                         
                         html += `
                             <div class="habit-item" data-habit-id="${habit.id}">
@@ -1785,17 +1897,9 @@
 
         function toggleHabit(habitId) {
             try {
-                console.log('=== TOGGLE HABIT START ===');
-                console.log('Полученный ID:', habitId, 'Тип:', typeof habitId);
-                
                 habitId = Number(habitId);
-                console.log('Преобразованный ID:', habitId, 'Тип:', typeof habitId);
-                
                 const habits = getHabits();
-                console.log('Все привычки:', habits);
-                
                 const habitIndex = habits.findIndex(h => h.id === habitId);
-                console.log('Найденный индекс:', habitIndex);
                 
                 if (habitIndex === -1) {
                     console.error('Привычка не найдена! ID:', habitId);
@@ -1805,62 +1909,41 @@
                 
                 const habit = habits[habitIndex];
                 const today = new Date().toDateString();
-                console.log('Текущая привычка:', habit);
-                console.log('Сегодняшняя дата:', today);
                 
                 if (habit.lastCompleted === today) {
-                    // Снимаем отметку
                     habit.lastCompleted = null;
                     habit.streak = Math.max(0, (habit.streak || 0) - 1);
-                    console.log('Снята отметка, новый streak:', habit.streak);
                     showNotification(`Привычка "${habit.name}" отменена`);
                 } else {
-                    // Отмечаем выполнение
                     habit.lastCompleted = today;
                     habit.streak = (habit.streak || 0) + 1;
-                    console.log('Отмечена выполненной, новый streak:', habit.streak);
                     addExperience(10);
                     showNotification(`Привычка "${habit.name}" выполнена! +10 XP`);
                 }
                 
-                // Обновляем массив привычек
                 habits[habitIndex] = habit;
-                console.log('Обновленные привычки перед сохранением:', habits);
                 
                 if (saveHabits(habits)) {
-                    console.log('Привычки успешно сохранены');
                     updateHabitsList();
-                } else {
-                    console.error('Ошибка сохранения привычек');
-                    showNotification('Ошибка сохранения');
                 }
-                
-                console.log('=== TOGGLE HABIT END ===');
             } catch (e) {
-                console.error('Критическая ошибка в toggleHabit:', e);
-                showNotification('Критическая ошибка при обновлении привычки');
+                console.error('Ошибка переключения привычки:', e);
+                showNotification('Ошибка обновления привычки');
             }
         }
 
         function deleteHabit(habitId) {
             try {
-                console.log('=== DELETE HABIT START ===');
                 habitId = Number(habitId);
                 const habits = getHabits();
                 const habit = habits.find(h => h.id === habitId);
-                
                 if (habit && confirm(`Удалить привычку "${habit.name}"?`)) {
                     const updatedHabits = habits.filter(h => h.id !== habitId);
-                    console.log('Привычки после удаления:', updatedHabits);
-                    
                     if (saveHabits(updatedHabits)) {
                         updateHabitsList();
                         showNotification('Привычка удалена');
-                    } else {
-                        showNotification('Ошибка удаления привычки');
                     }
                 }
-                console.log('=== DELETE HABIT END ===');
             } catch (e) {
                 console.error('Ошибка удаления привычки:', e);
                 showNotification('Ошибка удаления привычки');
@@ -1889,13 +1972,8 @@
                 }
                 
                 const habits = getHabits();
-                console.log('Текущие привычки перед добавлением:', habits);
-                
-                // Находим максимальный ID
                 const maxId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) : 0;
                 const newId = maxId + 1;
-                
-                console.log('Новый ID привычки:', newId);
                 
                 const newHabit = {
                     id: newId,
@@ -1906,14 +1984,11 @@
                 };
                 
                 habits.push(newHabit);
-                console.log('Привычки после добавления:', habits);
                 
                 if (saveHabits(habits)) {
                     updateHabitsList();
                     hideAddHabitModal();
                     showNotification('Привычка добавлена!');
-                } else {
-                    showNotification('Ошибка добавления привычки');
                 }
             } catch (e) {
                 console.error('Ошибка добавления привычки:', e);
@@ -1966,7 +2041,6 @@
             }
         }
 
-        // Авто-фокус на поле ввода при открытии модального окна имени
         document.getElementById('name-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 document.getElementById('user-name-input').focus();
