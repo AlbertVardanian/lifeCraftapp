@@ -922,11 +922,18 @@
         function getHabits() {
             try {
                 const data = localStorage.getItem('lifecraft_habits');
-                const habits = data ? JSON.parse(data) : [];
-                // ВАЖНО: Преобразуем ID в числа при загрузке
+                if (!data) return [];
+                
+                const habits = JSON.parse(data);
+                console.log('Загружены привычки из localStorage:', habits);
+                
+                // ВАЖНО: Преобразуем ID в числа и убеждаемся в корректности данных
                 return habits.map(habit => ({
-                    ...habit,
-                    id: Number(habit.id)
+                    id: Number(habit.id),
+                    name: String(habit.name || ''),
+                    streak: Number(habit.streak || 0),
+                    lastCompleted: habit.lastCompleted || null,
+                    createdAt: habit.createdAt || new Date().toISOString()
                 }));
             } catch (e) {
                 console.error('Ошибка загрузки привычек:', e);
@@ -936,6 +943,7 @@
 
         function saveHabits(habits) {
             try {
+                console.log('Сохранение привычек:', habits);
                 localStorage.setItem('lifecraft_habits', JSON.stringify(habits));
                 return true;
             } catch (e) {
@@ -1724,7 +1732,7 @@
             document.getElementById('math-progress').textContent = mathTotalAnswers;
         }
 
-        // ===== ПРИВЫЧКИ =====
+        // ===== ПРИВЫЧКИ - ПОЛНОСТЬЮ ПЕРЕРАБОТАННЫЕ ФУНКЦИИ =====
         function initHabits() {
             updateHabitsList();
             updateReminderStatus();
@@ -1737,7 +1745,7 @@
                 const habitsList = document.getElementById('habits-list');
                 const today = new Date().toDateString();
                 
-                console.log('Загруженные привычки:', habits); // Отладочная информация
+                console.log('Загруженные привычки для отображения:', habits);
                 
                 if (habits.length === 0) {
                     habitsList.innerHTML = '<div class="empty-state">У вас пока нет привычек</div>';
@@ -1745,10 +1753,10 @@
                     let html = '';
                     habits.forEach(habit => {
                         const isCompleted = habit.lastCompleted === today;
-                        console.log(`Привычка ${habit.id}: ${habit.name}, completed: ${isCompleted}`); // Отладочная информация
+                        console.log(`Отображение привычки: ID=${habit.id}, name=${habit.name}, completed=${isCompleted}`);
                         
                         html += `
-                            <div class="habit-item">
+                            <div class="habit-item" data-habit-id="${habit.id}">
                                 <div>
                                     <div style="font-weight: bold;">${habit.name}</div>
                                     <div style="font-size: 14px; color: #666;">Серия: ${habit.streak || 0} дней</div>
@@ -1777,50 +1785,82 @@
 
         function toggleHabit(habitId) {
             try {
-                habitId = Number(habitId); // Убеждаемся, что ID число
+                console.log('=== TOGGLE HABIT START ===');
+                console.log('Полученный ID:', habitId, 'Тип:', typeof habitId);
+                
+                habitId = Number(habitId);
+                console.log('Преобразованный ID:', habitId, 'Тип:', typeof habitId);
+                
                 const habits = getHabits();
-                console.log('Попытка переключения привычки ID:', habitId, 'Все привычки:', habits); // Отладочная информация
+                console.log('Все привычки:', habits);
                 
-                const habit = habits.find(h => h.id === habitId);
-                const today = new Date().toDateString();
+                const habitIndex = habits.findIndex(h => h.id === habitId);
+                console.log('Найденный индекс:', habitIndex);
                 
-                if (habit) {
-                    if (habit.lastCompleted === today) {
-                        habit.lastCompleted = null;
-                        habit.streak = Math.max(0, (habit.streak || 0) - 1);
-                        showNotification(`Привычка "${habit.name}" отменена`);
-                    } else {
-                        habit.lastCompleted = today;
-                        habit.streak = (habit.streak || 0) + 1;
-                        addExperience(10);
-                        showNotification(`Привычка "${habit.name}" выполнена! +10 XP`);
-                    }
-                    
-                    if (saveHabits(habits)) {
-                        updateHabitsList();
-                    }
-                } else {
+                if (habitIndex === -1) {
                     console.error('Привычка не найдена! ID:', habitId);
                     showNotification('Ошибка: привычка не найдена');
+                    return;
                 }
+                
+                const habit = habits[habitIndex];
+                const today = new Date().toDateString();
+                console.log('Текущая привычка:', habit);
+                console.log('Сегодняшняя дата:', today);
+                
+                if (habit.lastCompleted === today) {
+                    // Снимаем отметку
+                    habit.lastCompleted = null;
+                    habit.streak = Math.max(0, (habit.streak || 0) - 1);
+                    console.log('Снята отметка, новый streak:', habit.streak);
+                    showNotification(`Привычка "${habit.name}" отменена`);
+                } else {
+                    // Отмечаем выполнение
+                    habit.lastCompleted = today;
+                    habit.streak = (habit.streak || 0) + 1;
+                    console.log('Отмечена выполненной, новый streak:', habit.streak);
+                    addExperience(10);
+                    showNotification(`Привычка "${habit.name}" выполнена! +10 XP`);
+                }
+                
+                // Обновляем массив привычек
+                habits[habitIndex] = habit;
+                console.log('Обновленные привычки перед сохранением:', habits);
+                
+                if (saveHabits(habits)) {
+                    console.log('Привычки успешно сохранены');
+                    updateHabitsList();
+                } else {
+                    console.error('Ошибка сохранения привычек');
+                    showNotification('Ошибка сохранения');
+                }
+                
+                console.log('=== TOGGLE HABIT END ===');
             } catch (e) {
-                console.error('Ошибка переключения привычки:', e);
-                showNotification('Ошибка обновления привычки');
+                console.error('Критическая ошибка в toggleHabit:', e);
+                showNotification('Критическая ошибка при обновлении привычки');
             }
         }
 
         function deleteHabit(habitId) {
             try {
-                habitId = Number(habitId); // Убеждаемся, что ID число
+                console.log('=== DELETE HABIT START ===');
+                habitId = Number(habitId);
                 const habits = getHabits();
                 const habit = habits.find(h => h.id === habitId);
+                
                 if (habit && confirm(`Удалить привычку "${habit.name}"?`)) {
                     const updatedHabits = habits.filter(h => h.id !== habitId);
+                    console.log('Привычки после удаления:', updatedHabits);
+                    
                     if (saveHabits(updatedHabits)) {
                         updateHabitsList();
                         showNotification('Привычка удалена');
+                    } else {
+                        showNotification('Ошибка удаления привычки');
                     }
                 }
+                console.log('=== DELETE HABIT END ===');
             } catch (e) {
                 console.error('Ошибка удаления привычки:', e);
                 showNotification('Ошибка удаления привычки');
@@ -1849,20 +1889,31 @@
                 }
                 
                 const habits = getHabits();
-                const newId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) + 1 : 1;
+                console.log('Текущие привычки перед добавлением:', habits);
                 
-                habits.push({
+                // Находим максимальный ID
+                const maxId = habits.length > 0 ? Math.max(...habits.map(h => h.id)) : 0;
+                const newId = maxId + 1;
+                
+                console.log('Новый ID привычки:', newId);
+                
+                const newHabit = {
                     id: newId,
                     name: name,
                     streak: 0,
                     lastCompleted: null,
                     createdAt: new Date().toISOString()
-                });
+                };
+                
+                habits.push(newHabit);
+                console.log('Привычки после добавления:', habits);
                 
                 if (saveHabits(habits)) {
                     updateHabitsList();
                     hideAddHabitModal();
                     showNotification('Привычка добавлена!');
+                } else {
+                    showNotification('Ошибка добавления привычки');
                 }
             } catch (e) {
                 console.error('Ошибка добавления привычки:', e);
