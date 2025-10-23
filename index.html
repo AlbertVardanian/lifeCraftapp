@@ -839,10 +839,15 @@
 
     <script>
         // ===== КОНФИГУРАЦИЯ БОТА =====
-        // ВАЖНО: Замените 'YOUR_BOT_TOKEN_HERE' на реальный токен вашего бота
+        // ЗАМЕНИТЕ НА ВАШ РЕАЛЬНЫЙ URL REPLIT
         const BOT_CONFIG = {
-            BOT_TOKEN: '8241569227:AAEqD43ON8C9fQiBODfCFnrHeUIdgrhm_Zg',
-            API_URL: 'https://api.telegram.org/bot'
+            REPLIT_URL: 'https://your-bot-project.your-username.repl.co', 
+            API_ENDPOINTS: {
+                UPDATE_USER: '/update-user',
+                SEND_REMINDER: '/send-reminder',
+                TEST_REMINDER: '/test-reminder',
+                DISABLE_REMINDERS: '/disable-reminders'
+            }
         };
 
         // ===== КОНФИГУРАЦИЯ ПРИЛОЖЕНИЯ =====
@@ -914,7 +919,7 @@
                 ["deer", "олень"], ["horse", "лошадь"], ["cow", "корова"], ["pig", "свинья"], ["sheep", "овца"],
                 ["butterfly", "бабочка"], ["bee", "пчела"], ["ant", "муравей"], ["spider", "паук"], ["snake", "змея"]
             ],
-            REMINDER_HOURS: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22], // Каждый час
+            REMINDER_HOURS: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
             SYNC_INTERVAL: 30000,
             AUTO_SYNC_INTERVAL: 60000
         };
@@ -1040,6 +1045,106 @@
             }
         }
 
+        // ===== ИНТЕГРАЦИЯ С БОТОМ НА REPLIT =====
+        async function updateUserInBot() {
+            try {
+                const userData = getUserData();
+                const habits = getHabits();
+                
+                if (!userData.telegramId) {
+                    console.log('❌ Пользователь не идентифицирован для обновления в боте');
+                    return false;
+                }
+
+                const payload = {
+                    userId: userData.telegramId,
+                    habits: habits,
+                    reminderTimes: userData.reminderTimes || [8, 10, 12, 14, 16, 18, 20, 22],
+                    userName: userData.firstName || userData.name || 'Пользователь',
+                    interval: userData.reminderInterval || 2,
+                    enabled: userData.remindersEnabled || false
+                };
+
+                console.log('📤 Отправка данных в бота:', payload);
+
+                const response = await fetch(BOT_CONFIG.REPLIT_URL + BOT_CONFIG.API_ENDPOINTS.UPDATE_USER, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    console.log('✅ Данные пользователя обновлены в боте');
+                    return true;
+                } else {
+                    console.error('❌ Ошибка обновления данных в боте:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Ошибка сети при обновлении данных в боте:', error);
+                return false;
+            }
+        }
+
+        async function sendTestReminder() {
+            try {
+                const userData = getUserData();
+                
+                if (!userData.telegramId) {
+                    showNotification('❌ Ошибка: пользователь не идентифицирован');
+                    return;
+                }
+
+                showNotification('📨 Отправка тестового напоминания через бота...');
+
+                const response = await fetch(BOT_CONFIG.REPLIT_URL + BOT_CONFIG.API_ENDPOINTS.TEST_REMINDER, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userData.telegramId
+                    })
+                });
+
+                if (response.ok) {
+                    showNotification('✅ Тестовое напоминание отправлено! Проверьте Telegram');
+                } else {
+                    showNotification('❌ Ошибка отправки напоминания');
+                }
+            } catch (error) {
+                console.error('❌ Ошибка сети:', error);
+                showNotification('❌ Ошибка подключения к боту');
+            }
+        }
+
+        async function disableBotReminders() {
+            try {
+                const userData = getUserData();
+                
+                if (!userData.telegramId) {
+                    return false;
+                }
+
+                const response = await fetch(BOT_CONFIG.REPLIT_URL + BOT_CONFIG.API_ENDPOINTS.DISABLE_REMINDERS, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userData.telegramId
+                    })
+                });
+
+                return response.ok;
+            } catch (error) {
+                console.error('❌ Ошибка отключения напоминаний в боте:', error);
+                return false;
+            }
+        }
+
         // ===== TELEGRAM ИНТЕГРАЦИЯ =====
         function initTelegram() {
             if (window.Telegram && Telegram.WebApp) {
@@ -1062,7 +1167,8 @@
                     saveUserData(userData);
                     updateUserInfo();
                     
-                    registerUserForReminders(user.id, user.first_name);
+                    // Регистрируем пользователя в боте
+                    setTimeout(() => updateUserInBot(), 1000);
                 }
                 
                 Telegram.WebApp.MainButton.setText('Мой прогресс');
@@ -1099,149 +1205,35 @@
             }
         }
 
-        // ===== РЕАЛЬНЫЕ УВЕДОМЛЕНИЯ ЧЕРЕЗ БОТА =====
-        async function sendTelegramNotification(userId, message) {
-            try {
-                // Проверяем, установлен ли токен бота
-                if (BOT_CONFIG.BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || !BOT_CONFIG.BOT_TOKEN) {
-                    console.warn('Токен бота не настроен. Уведомления не будут отправляться.');
-                    showNotification('⚠️ Настройте токен бота для уведомлений');
-                    return false;
-                }
-                
-                const url = `${BOT_CONFIG.API_URL}${BOT_CONFIG.BOT_TOKEN}/sendMessage`;
-                
-                console.log('Отправка уведомления пользователю:', userId);
-                console.log('Сообщение:', message);
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: userId,
-                        text: message,
-                        parse_mode: 'HTML'
-                    })
-                });
-
-                const result = await response.json();
-                console.log('Результат отправки уведомления:', result);
-                
-                if (result.ok) {
-                    console.log('✅ Уведомление успешно отправлено');
-                    return true;
-                } else {
-                    console.error('❌ Ошибка отправки уведомления:', result);
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Ошибка сети при отправке уведомления:', error);
-                return false;
-            }
-        }
-
-        async function registerUserForReminders(userId, userName) {
-            try {
-                const userData = getUserData();
-                if (!userData.registeredForReminders) {
-                    const message = `👋 <b>Добро пожаловать в LifeCraft, ${userName}!</b>\n\n` +
-                                  `Я буду напоминать вам о ваших привычках и помогать в саморазвитии.\n\n` +
-                                  `⚡ <i>Напоминания приходят только о невыполненных привычках</i>\n` +
-                                  `⏰ <i>Вы можете настроить интервал напоминаний в приложении</i>`;
-                    
-                    const sent = await sendTelegramNotification(userId, message);
-                    if (sent) {
-                        userData.registeredForReminders = true;
-                        saveUserData(userData);
-                        console.log('✅ Пользователь зарегистрирован для напоминаний');
-                    }
-                }
-            } catch (error) {
-                console.error('Ошибка регистрации пользователя:', error);
-            }
-        }
-
-        async function sendPersonalizedReminder() {
-            const userData = getUserData();
-            const telegramId = userData.telegramId;
-            
-            if (!telegramId) {
-                console.log('❌ Пользователь не идентифицирован для отправки напоминания');
-                return false;
-            }
-
-            const habits = getHabits();
-            const today = new Date().toDateString();
-            const uncompletedHabits = habits.filter(habit => 
-                habit.lastCompleted !== today
-            );
-
-            console.log('📊 Статистика для напоминания:');
-            console.log('- Всего привычек:', habits.length);
-            console.log('- Невыполненных сегодня:', uncompletedHabits.length);
-            console.log('- Выполненных сегодня:', habits.length - uncompletedHabits.length);
-
-            if (uncompletedHabits.length === 0) {
-                const message = `🎉 <b>Отличная работа, ${userData.firstName || userData.name}!</b>\n\n` +
-                              `Все привычки на сегодня выполнены! Так держать! 💪\n\n` +
-                              `<i>Ваш уровень: ${userData.level || 1}</i>`;
-                return await sendTelegramNotification(telegramId, message);
-            }
-
-            const habitNames = uncompletedHabits.map(h => `• ${h.name}`).join('\n');
-            const completedCount = habits.length - uncompletedHabits.length;
-            const totalCount = habits.length;
-            
-            const message = `⏰ <b>Напоминание о привычках</b>\n\n` +
-                          `Привет, ${userData.firstName || userData.name}! Не забудьте выполнить:\n${habitNames}\n\n` +
-                          `<i>Выполнено: ${completedCount}/${totalCount}</i>\n` +
-                          `<i>Ваш уровень: ${userData.level || 1}</i>\n\n` +
-                          `💪 <i>Продолжайте в том же духе!</i>`;
-
-            return await sendTelegramNotification(telegramId, message);
-        }
-
-        async function sendTestReminder() {
-            console.log('=== ТЕСТОВОЕ НАПОМИНАНИЕ ===');
-            const userData = getUserData();
-            
-            if (!userData.telegramId) {
-                showNotification('❌ Ошибка: пользователь не идентифицирован');
-                return;
-            }
-
-            showNotification('📨 Отправка тестового напоминания...');
-            
-            const success = await sendPersonalizedReminder();
-            
-            if (success) {
-                showNotification('✅ Тестовое напоминание отправлено!');
-            } else {
-                showNotification('❌ Ошибка отправки напоминания');
-            }
-        }
-
         // ===== СИСТЕМА НАПОМИНАНИЙ =====
-        function toggleReminders() {
+        async function toggleReminders() {
             const checkbox = document.getElementById('enable-reminders');
             const userData = getUserData();
             userData.remindersEnabled = checkbox.checked;
             
             if (saveUserData(userData)) {
                 updateReminderStatus();
+                
+                // Синхронизируем с ботом
+                const success = await updateUserInBot();
+                
                 if (userData.remindersEnabled) {
-                    showNotification('✅ Автоматические напоминания включены!');
-                    startReminderScheduler();
+                    if (success) {
+                        showNotification('✅ Автоматические напоминания включены!');
+                    } else {
+                        showNotification('⚠️ Напоминания включены, но ошибка синхронизации с ботом');
+                    }
                 } else {
-                    showNotification('❌ Автоматические напоминания выключены');
-                    stopReminderScheduler();
+                    if (await disableBotReminders()) {
+                        showNotification('❌ Автоматические напоминания выключены');
+                    } else {
+                        showNotification('❌ Напоминания выключены, но ошибка синхронизации с ботом');
+                    }
                 }
             }
         }
 
-        function updateReminderInterval() {
+        async function updateReminderInterval() {
             const select = document.getElementById('reminder-interval');
             const interval = parseInt(select.value);
             const userData = getUserData();
@@ -1257,10 +1249,49 @@
             if (saveUserData(userData)) {
                 updateReminderTimes();
                 showNotification(`✅ Интервал напоминаний: каждые ${interval} часа`);
-                if (userData.remindersEnabled) {
-                    startReminderScheduler();
-                }
+                
+                // Синхронизируем с ботом
+                await updateUserInBot();
             }
+        }
+
+        async function updateReminderTime(hour, isEnabled) {
+            const userData = getUserData();
+            userData.reminderTimes = userData.reminderTimes || [];
+            
+            if (isEnabled) {
+                if (!userData.reminderTimes.includes(hour)) {
+                    userData.reminderTimes.push(hour);
+                }
+            } else {
+                userData.reminderTimes = userData.reminderTimes.filter(h => h !== hour);
+            }
+            
+            userData.reminderTimes.sort((a, b) => a - b);
+            
+            if (saveUserData(userData)) {
+                // Синхронизируем с ботом
+                await updateUserInBot();
+            }
+        }
+
+        function updateReminderStatus() {
+            const userData = getUserData();
+            const statusElement = document.getElementById('reminder-status');
+            const checkbox = document.getElementById('enable-reminders');
+            
+            checkbox.checked = userData.remindersEnabled || false;
+            
+            if (userData.remindersEnabled) {
+                const interval = userData.reminderInterval || 1;
+                statusElement.textContent = `✅ Напоминания активны (каждые ${interval} часа)`;
+                statusElement.style.color = '#2ecc71';
+            } else {
+                statusElement.textContent = '❌ Напоминания выключены';
+                statusElement.style.color = '#e74c3c';
+            }
+            
+            updateReminderTimes();
         }
 
         function updateReminderTimes() {
@@ -1297,78 +1328,6 @@
             }
         }
 
-        function updateReminderTime(hour, isEnabled) {
-            const userData = getUserData();
-            userData.reminderTimes = userData.reminderTimes || [];
-            
-            if (isEnabled) {
-                if (!userData.reminderTimes.includes(hour)) {
-                    userData.reminderTimes.push(hour);
-                }
-            } else {
-                userData.reminderTimes = userData.reminderTimes.filter(h => h !== hour);
-            }
-            
-            userData.reminderTimes.sort((a, b) => a - b);
-            saveUserData(userData);
-        }
-
-        let reminderInterval = null;
-
-        function startReminderScheduler() {
-            // Останавливаем предыдущий интервал если был
-            if (reminderInterval) {
-                clearInterval(reminderInterval);
-            }
-
-            // Запускаем проверку каждую минуту
-            reminderInterval = setInterval(() => {
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentMinute = now.getMinutes();
-                
-                const userData = getUserData();
-                
-                // Проверяем, включены ли напоминания и есть ли telegramId
-                if (userData.remindersEnabled && userData.telegramId && userData.reminderTimes) {
-                    // Проверяем, совпадает ли текущее время с одним из выбранных часов
-                    if (userData.reminderTimes.includes(currentHour) && currentMinute === 0) {
-                        console.log(`⏰ Время напоминания! ${currentHour}:00`);
-                        sendPersonalizedReminder();
-                    }
-                }
-            }, 60000); // Проверяем каждую минуту
-
-            console.log('✅ Планировщик напоминаний запущен');
-        }
-
-        function stopReminderScheduler() {
-            if (reminderInterval) {
-                clearInterval(reminderInterval);
-                reminderInterval = null;
-                console.log('❌ Планировщик напоминаний остановлен');
-            }
-        }
-
-        function updateReminderStatus() {
-            const userData = getUserData();
-            const statusElement = document.getElementById('reminder-status');
-            const checkbox = document.getElementById('enable-reminders');
-            
-            checkbox.checked = userData.remindersEnabled || false;
-            
-            if (userData.remindersEnabled) {
-                const interval = userData.reminderInterval || 1;
-                statusElement.textContent = `✅ Напоминания активны (каждые ${interval} часа)`;
-                statusElement.style.color = '#2ecc71';
-            } else {
-                statusElement.textContent = '❌ Напоминания выключены';
-                statusElement.style.color = '#e74c3c';
-            }
-            
-            updateReminderTimes();
-        }
-
         // ===== АВТОМАТИЧЕСКАЯ СИНХРОНИЗАЦИЯ =====
         function syncData() {
             const statusElement = document.getElementById('sync-status');
@@ -1394,7 +1353,7 @@
             setTimeout(syncData, 2000);
         }
 
-        // ===== ИГРА 2048 С СВАЙПАМИ =====
+        // ===== ИГРА 2048 =====
         let gameBoard = [];
         let gameScore = 0;
         let touchStartX, touchStartY, touchEndX, touchEndY;
@@ -2123,10 +2082,9 @@
             updateHabitsList();
             updateReminderStatus();
             updateReminderTimes();
-            startReminderScheduler();
         }
 
-        function updateHabitsList() {
+        async function updateHabitsList() {
             try {
                 const habits = getHabits();
                 const habitsList = document.getElementById('habits-list');
@@ -2161,13 +2119,16 @@
                 const completedCount = habits.filter(h => h.lastCompleted === today).length;
                 document.getElementById('habits-total').textContent = habits.length;
                 document.getElementById('habits-completed').textContent = completedCount;
+                
+                // Синхронизируем с ботом
+                await updateUserInBot();
             } catch (e) {
                 console.error('Ошибка обновления списка привычек:', e);
                 showNotification('Ошибка загрузки привычек');
             }
         }
 
-        function toggleHabit(habitId) {
+        async function toggleHabit(habitId) {
             try {
                 habitId = Number(habitId);
                 const habits = getHabits();
@@ -2204,7 +2165,7 @@
             }
         }
 
-        function deleteHabit(habitId) {
+        async function deleteHabit(habitId) {
             try {
                 habitId = Number(habitId);
                 const habits = getHabits();
@@ -2232,7 +2193,7 @@
             document.getElementById('new-habit-name').value = '';
         }
 
-        function addNewHabit() {
+        async function addNewHabit() {
             try {
                 const nameInput = document.getElementById('new-habit-name');
                 const name = nameInput.value.trim();
